@@ -1,5 +1,7 @@
-package it.unical.mat.lifetune
+package it.unical.mat.lifetune.activity
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.design.widget.NavigationView
@@ -8,6 +10,8 @@ import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
+import com.firebase.ui.auth.IdpResponse
+import it.unical.mat.lifetune.R
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 
@@ -80,5 +84,21 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         drawer_layout.closeDrawer(GravityCompat.START)
         return true
+    }
+
+    companion object {
+
+        private val EXTRA_IDP_RESPONSE = "extra_idp_response"
+
+        fun createIntent(context: Context, idpResponse: IdpResponse?): Intent {
+
+            val startIntent = Intent()
+
+            if (idpResponse != null) {
+                startIntent.putExtra(EXTRA_IDP_RESPONSE, idpResponse)
+            }
+
+            return startIntent.setClass(context, MainActivity::class.java)
+        }
     }
 }

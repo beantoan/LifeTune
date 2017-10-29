@@ -19,3 +19,26 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+####################################################################################################
+# Firebase Authentication 11.4.2
+# https://firebase.google.com/docs/auth/android/start/
+####################################################################################################
+-keepattributes Signature
+-keepattributes *Annotation*
+-keepattributes EnclosingMethod
+-keepattributes InnerClasses
+
+####################################################################################################
+# Firebase Authentication Facebook 11.4.2
+# https://firebase.google.com/docs/auth/android/facebook-login?utm_source=studio
+####################################################################################################
+-dontwarn com.facebook.**
+
+####################################################################################################
+# OkHttp 3.9.0
+# https://github.com/square/okhttp
+####################################################################################################
+-dontwarn okhttp3.**
+-dontwarn okio.**
+-dontwarn javax.annotation.**

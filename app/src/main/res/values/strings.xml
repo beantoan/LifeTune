@@ -5,4 +5,15 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
+
+    <!-- Auth UI -->
+    <string name="launch_title">FirebaseUI Auth Demo</string>
+    <string name="sign_in">Sign In</string>
+
+    <string name="unknown_response">Unexpected onActivityResult response code</string>
+    <string name="unknown_sign_in_response">Unknown response from AuthUI sign-in</string>
+    <string name="sign_in_cancelled">Sign in cancelled</string>
+    <string name="no_internet_connection">No internet connection</string>
+    <string name="unknown_error">An unknown error occurred</string>
+
 </resources>
