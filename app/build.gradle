@@ -8,7 +8,7 @@ android {
     compileSdkVersion 26
     defaultConfig {
         applicationId "it.unical.mat.lifetune"
-        minSdkVersion 14
+        minSdkVersion 16
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
@@ -24,11 +24,36 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation"org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
-    implementation 'com.android.support:appcompat-v7:26.1.0'
-    implementation 'com.android.support:design:26.1.0'
-    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    implementation "com.android.support:appcompat-v7:$android_support_version"
+    implementation "com.android.support:design:$android_support_version"
+    implementation "com.android.support.constraint:constraint-layout:1.0.2"
+    implementation "com.android.support:support-vector-drawable:$android_support_version"
+
+    implementation "com.google.firebase:firebase-config:$firebase_version"
+    implementation "com.google.firebase:firebase-invites:$firebase_version"
+    implementation "com.google.firebase:firebase-firestore:$firebase_version"
+
+    implementation "com.google.firebase:firebase-auth:$firebase_version"
+    implementation "com.google.android.gms:play-services-auth:11.4.2"
+    implementation 'com.facebook.android:facebook-login:4.27.0'
+    implementation "com.android.support:customtabs:$android_support_version"
+    implementation "com.android.support:cardview-v7:$android_support_version"
+    implementation "com.firebaseui:firebase-ui-auth:3.1.0"
+
+    implementation 'com.android.support:support-v4:26.1.0'
+    implementation 'com.android.support:recyclerview-v7:26.1.0'
+    compile "pub.devrel:easypermissions:1.0.1"
+
+    compile 'com.squareup.okhttp3:okhttp:3.9.0'
+
+    compile 'com.jakewharton:butterknife:8.8.1'
+    kapt 'com.jakewharton:butterknife-compiler:8.8.1'
+
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 }
+
+
+apply plugin: 'com.google.gms.google-services'
