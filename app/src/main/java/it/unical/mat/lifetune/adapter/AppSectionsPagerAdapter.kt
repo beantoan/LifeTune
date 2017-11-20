@@ -1,13 +1,11 @@
 package it.unical.mat.lifetune.adapter
 
-import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
-import android.util.Log
 import it.unical.mat.lifetune.fragment.ActivitiesSectionFragment
-import it.unical.mat.lifetune.fragment.SchedulesSectionFragment
 import it.unical.mat.lifetune.fragment.MusicSectionFragment
+import it.unical.mat.lifetune.fragment.SchedulesSectionFragment
 
 /**
  * Created by beantoan on 11/17/17.

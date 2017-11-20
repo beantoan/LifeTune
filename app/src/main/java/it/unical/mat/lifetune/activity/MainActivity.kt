@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.support.v4.app.FragmentTransaction
 import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import com.firebase.ui.auth.IdpResponse
 import it.unical.mat.lifetune.R
 import it.unical.mat.lifetune.adapter.AppSectionsPagerAdapter
@@ -19,24 +18,23 @@ class MainActivity : AppCompatActivity(), android.support.v7.app.ActionBar.TabLi
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        // TODO: need to check again
-//        setSupportActionBar(toolbar)
 
-        boot()
+        onCreateTasks()
     }
 
-    private fun boot() {
+    private fun onCreateTasks() {
+        setContentView(R.layout.activity_main)
+
         // Create the adapter that will return a fragment for each of the three primary sections
         // of the app.
         mAppSectionsPagerAdapter = AppSectionsPagerAdapter(supportFragmentManager)
 
         // Set up the action bar.
-        val actionBar = supportActionBar
+        val actionBar = supportActionBar!!
 
         // Specify that the Home/Up button should not be enabled, since there is no hierarchical
         // parent.
-        actionBar!!.setHomeButtonEnabled(false)
+        actionBar.setHomeButtonEnabled(false)
 
         // Specify that we will be displaying tabs in the action bar.
         actionBar.navigationMode = ActionBar.NAVIGATION_MODE_TABS
@@ -74,8 +72,8 @@ class MainActivity : AppCompatActivity(), android.support.v7.app.ActionBar.TabLi
     }
 
     override fun onTabSelected(tab: android.support.v7.app.ActionBar.Tab?, ft: FragmentTransaction?) {
-        Log.d(TAG, tab!!.position.toString())
         mViewPager.currentItem = tab!!.position
+
     }
 
     companion object {
