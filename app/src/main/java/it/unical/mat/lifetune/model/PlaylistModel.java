@@ -7,19 +7,19 @@ import com.airbnb.epoxy.EpoxyAttribute;
 import com.airbnb.epoxy.EpoxyModelClass;
 
 import it.unical.mat.lifetune.R;
-import it.unical.mat.lifetune.entity.Song;
+import it.unical.mat.lifetune.entity.Playlist;
 
 import static com.airbnb.epoxy.EpoxyAttribute.Option.DoNotHash;
 
-@EpoxyModelClass(layout = R.layout.model_song)
-public abstract class SongModel extends DataBindingEpoxyModel {
+@EpoxyModelClass(layout = R.layout.model_playlist)
+public abstract class PlaylistModel extends DataBindingEpoxyModel {
     @EpoxyAttribute(DoNotHash)
     View.OnClickListener clickListener;
 
     @EpoxyAttribute(DoNotHash)
-    Song song;
+    Playlist playlist;
 
-    public SongModel(Song _song) {
-        song = _song;
+    public PlaylistModel(Playlist _playlist) {
+        playlist = _playlist;
     }
 }

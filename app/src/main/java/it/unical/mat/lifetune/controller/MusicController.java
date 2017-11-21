@@ -1,16 +1,20 @@
 package it.unical.mat.lifetune.controller;
 
+import com.airbnb.epoxy.AutoModel;
 import com.airbnb.epoxy.TypedEpoxyController;
 
 import java.util.List;
 
-import it.unical.mat.lifetune.entity.Playlist;
-import it.unical.mat.lifetune.model.PlaylistModelGroup;
+import it.unical.mat.lifetune.entity.Category;
+import it.unical.mat.lifetune.model.CategoryModelGroup;
+import it.unical.mat.lifetune.view.CategoryCarouselHeaderViewModel_;
 
-public class MusicController extends TypedEpoxyController<List<Playlist>> {
+public class MusicController extends TypedEpoxyController<List<Category>> {
+    @AutoModel
+    CategoryCarouselHeaderViewModel_ categoryCarouselHeaderViewModel;
 
     public interface AdapterCallbacks {
-        void onPlaylistClicked(Playlist playlist, int position);
+        void onPlaylistClicked(Category category, int position);
     }
 
     private final AdapterCallbacks callbacks;
@@ -21,10 +25,11 @@ public class MusicController extends TypedEpoxyController<List<Playlist>> {
     }
 
     @Override
-    protected void buildModels(List<Playlist> playlists) {
-        for (int i = 0; i < playlists.size(); i++) {
-            Playlist playlist = playlists.get(i);
-            add(new PlaylistModelGroup(playlist, callbacks));
+    protected void buildModels(List<Category> categories) {
+        categoryCarouselHeaderViewModel.addTo(this);
+
+        for (Category category : categories) {
+            add(new CategoryModelGroup(category, callbacks));
         }
     }
 

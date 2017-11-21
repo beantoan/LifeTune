@@ -9,39 +9,36 @@ import android.databinding.Bindable
 class Playlist(
         var id: Int,
         private var _title: String?,
-        private var _description: String?,
-        private var _songs: List<Song>) : BaseObservable() {
+        private var _url: String?,
+        private var _thumbUrl: String?) : BaseObservable() {
 
     var title: String?
         @Bindable get() = _title
         set(value) {
             if (!_title.equals(value)) {
                 _title = value
-
-                notifyPropertyChanged(it.unical.mat.lifetune.BR.title)
             }
         }
 
-    var description: String?
-        @Bindable get() = _description
+    var url: String?
+        @Bindable get() = _url
         set(value) {
-            if (!_description.equals(value)) {
-                _description = value
-
-                notifyPropertyChanged(it.unical.mat.lifetune.BR.description)
+            if (!_url.equals(value)) {
+                _url = value
             }
         }
 
-    // TODO need to add notifyPropertyChanged later
-    var songs: List<Song>
-        @Bindable get() = _songs
+    var thumbUrl: String?
+        @Bindable get() = _thumbUrl
         set(value) {
-            _songs = value
+            if (!_thumbUrl.equals(value)) {
+                _thumbUrl = value
+            }
         }
 
     init {
         title = _title
-        description = _description
-        songs = _songs
+        url = _url
+        thumbUrl = _thumbUrl
     }
 }
