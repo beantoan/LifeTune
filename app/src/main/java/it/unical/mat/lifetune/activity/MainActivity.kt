@@ -1,15 +1,19 @@
 package it.unical.mat.lifetune.activity
 
 import android.app.ActionBar
+import android.app.SearchManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.FragmentTransaction
 import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.SearchView
+import android.view.Menu
 import com.firebase.ui.auth.IdpResponse
 import it.unical.mat.lifetune.R
 import it.unical.mat.lifetune.adapter.AppSectionsPagerAdapter
+
 
 class MainActivity : AppCompatActivity(), android.support.v7.app.ActionBar.TabListener {
     lateinit var mAppSectionsPagerAdapter: AppSectionsPagerAdapter
@@ -20,6 +24,16 @@ class MainActivity : AppCompatActivity(), android.support.v7.app.ActionBar.TabLi
         super.onCreate(savedInstanceState)
 
         onCreateTasks()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.options_menu, menu)
+
+        val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
+        val searchView = menu!!.findItem(R.id.action_search).actionView as SearchView
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName))
+
+        return super.onCreateOptionsMenu(menu)
     }
 
     private fun onCreateTasks() {

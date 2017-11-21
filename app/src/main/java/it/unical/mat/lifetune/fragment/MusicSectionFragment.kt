@@ -5,9 +5,8 @@ import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.GridLayoutManager
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.util.Log
+import android.view.*
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.airbnb.epoxy.EpoxyRecyclerView
@@ -23,13 +22,14 @@ import it.unical.mat.lifetune.entity.Playlist
  * Created by beantoan on 11/17/17.
  */
 class MusicSectionFragment : Fragment(), MusicController.AdapterCallbacks {
-
     @BindView(R.id.categories)
     lateinit var mRecyclerViewPlaylists: EpoxyRecyclerView
 
     private val musicController: MusicController = MusicController(this)
 
     private var categories: MutableList<Category> = ArrayList()
+
+    private var actionBarMenu: Menu? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -41,11 +41,26 @@ class MusicSectionFragment : Fragment(), MusicController.AdapterCallbacks {
         return rootView
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+        super.onCreateOptionsMenu(menu, inflater)
+
+        actionBarMenu = menu
+    }
+
     override fun onPlaylistClicked(category: Category, position: Int) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
+    override fun onSearchMusicClicked() {
+        Log.d(TAG, "onSearchMusicClicked")
+
+        val menuItemSearch = actionBarMenu!!.findItem(R.id.action_search)
+        menuItemSearch.expandActionView()
+    }
+
     private fun onCreateViewTasks(rootView: View) {
+        setHasOptionsMenu(true)
+
         ButterKnife.bind(this, rootView)
 
         setupRecyclerViewPlaylists()
@@ -55,7 +70,7 @@ class MusicSectionFragment : Fragment(), MusicController.AdapterCallbacks {
         updateMusicController()
     }
 
-    fun setupRecyclerViewPlaylists() {
+    private fun setupRecyclerViewPlaylists() {
         val dividerItemDecoration = CategoryDividerItemDecoration(activity!!, DividerItemDecoration.VERTICAL)
         val dividerDrawable = ContextCompat.getDrawable(context!!, R.drawable.category_divider)
         dividerItemDecoration.setDrawable(dividerDrawable!!)

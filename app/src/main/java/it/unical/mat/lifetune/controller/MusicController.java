@@ -10,23 +10,25 @@ import it.unical.mat.lifetune.model.CategoryModelGroup;
 import it.unical.mat.lifetune.view.CategoryCarouselHeaderViewModel_;
 
 public class MusicController extends TypedEpoxyController<List<Category>> {
-    @AutoModel
-    CategoryCarouselHeaderViewModel_ categoryCarouselHeaderViewModel;
-
     public interface AdapterCallbacks {
+        void onSearchMusicClicked();
         void onPlaylistClicked(Category category, int position);
     }
 
+    @AutoModel
+    CategoryCarouselHeaderViewModel_ categoryCarouselHeaderViewModel;
+
     private final AdapterCallbacks callbacks;
 
-    public MusicController(AdapterCallbacks callbacks) {
-        this.callbacks = callbacks;
+    public MusicController(AdapterCallbacks _callbacks) {
+        this.callbacks = _callbacks;
         setDebugLoggingEnabled(true);
     }
 
     @Override
     protected void buildModels(List<Category> categories) {
-        categoryCarouselHeaderViewModel.addTo(this);
+//        categoryCarouselHeaderViewModel.addTo(this);
+        categoryCarouselHeaderViewModel.searchMusicClickListener(callbacks);
 
         for (Category category : categories) {
             add(new CategoryModelGroup(category, callbacks));
