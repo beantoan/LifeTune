@@ -36,8 +36,8 @@ class MusicSectionFragment : Fragment(), MusicController.AdapterCallbacks {
         return rootView
     }
 
-    override fun onPlaylistClicked(playlist: Playlist?, position: Int) {
-
+    override fun onPlaylistClicked(playlist: Playlist, position: Int) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     private fun onCreateViewTasks(rootView: View) {
@@ -59,13 +59,9 @@ class MusicSectionFragment : Fragment(), MusicController.AdapterCallbacks {
     private fun dummyPlaylistData() {
         val songs: MutableList<Song> = ArrayList()
 
-        for (i in 0..100) {
-            songs.add(Song(i, "Song $i", "xxxurl", "yyyurl"))
-        }
+        (0..100).mapTo(songs) { Song(it, "Song $it", "xxxurl", "yyyurl") }
 
-        for (i in 0..1000) {
-            playlists.add(Playlist(i, "Playlist $i", "test 1", songs));
-        }
+        (0..1000).forEach { i -> playlists.add(Playlist(i, "Playlist $i", "test 1", songs)); }
     }
 
     companion object {
