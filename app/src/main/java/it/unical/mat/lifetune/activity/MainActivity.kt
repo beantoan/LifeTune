@@ -53,7 +53,7 @@ class MainActivity : AppCompatActivity(), android.support.v7.app.ActionBar.TabLi
         })
 
         // For each of the sections in the app, add a tab to the action bar.
-        for (i in 0 until mAppSectionsPagerAdapter.count) {
+        (0 until mAppSectionsPagerAdapter.count).forEach { i ->
             // Create a tab with text corresponding to the page title defined by the adapter.
             // Also specify this Activity object, which implements the TabListener interface, as the
             // listener for when this tab is selected.
