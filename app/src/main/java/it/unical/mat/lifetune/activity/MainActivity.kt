@@ -1,92 +1,84 @@
 package it.unical.mat.lifetune.activity
 
+import android.app.ActionBar
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.support.design.widget.Snackbar
-import android.support.design.widget.NavigationView
-import android.support.v4.view.GravityCompat
-import android.support.v7.app.ActionBarDrawerToggle
+import android.support.v4.app.FragmentTransaction
+import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
-import android.view.Menu
-import android.view.MenuItem
 import com.firebase.ui.auth.IdpResponse
 import it.unical.mat.lifetune.R
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.app_bar_main.*
+import it.unical.mat.lifetune.adapter.AppSectionsPagerAdapter
 
-class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+class MainActivity : AppCompatActivity(), android.support.v7.app.ActionBar.TabListener {
+    lateinit var mAppSectionsPagerAdapter: AppSectionsPagerAdapter
+
+    lateinit var mViewPager: ViewPager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        onCreateTasks()
+    }
+
+    private fun onCreateTasks() {
         setContentView(R.layout.activity_main)
-        setSupportActionBar(toolbar)
 
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
+        // Create the adapter that will return a fragment for each of the three primary sections
+        // of the app.
+        mAppSectionsPagerAdapter = AppSectionsPagerAdapter(supportFragmentManager)
+
+        // Set up the action bar.
+        val actionBar = supportActionBar!!
+
+        // Specify that the Home/Up button should not be enabled, since there is no hierarchical
+        // parent.
+        actionBar.setHomeButtonEnabled(false)
+
+        // Specify that we will be displaying tabs in the action bar.
+        actionBar.navigationMode = ActionBar.NAVIGATION_MODE_TABS
+
+        // Set up the ViewPager, attaching the adapter and setting up a listener for when the
+        // user swipes between sections.
+        mViewPager = findViewById(R.id.pager)
+        mViewPager.adapter = mAppSectionsPagerAdapter
+        mViewPager.addOnPageChangeListener(object : ViewPager.SimpleOnPageChangeListener() {
+            override fun onPageSelected(position: Int) {
+                // When swiping between different app sections, select the corresponding tab.
+                // We can also use ActionBar.Tab#select() to do this if we have a reference to the
+                // Tab.
+                actionBar.setSelectedNavigationItem(position)
+            }
+        })
+
+        // For each of the sections in the app, add a tab to the action bar.
+        for (i in 0 until mAppSectionsPagerAdapter.count) {
+            // Create a tab with text corresponding to the page title defined by the adapter.
+            // Also specify this Activity object, which implements the TabListener interface, as the
+            // listener for when this tab is selected.
+            actionBar.addTab(
+                    actionBar.newTab()
+                            .setText(mAppSectionsPagerAdapter.getPageTitle(i))
+                            .setTabListener(this))
         }
-
-        val toggle = ActionBarDrawerToggle(
-                this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
-        drawer_layout.addDrawerListener(toggle)
-        toggle.syncState()
-
-        nav_view.setNavigationItemSelectedListener(this)
     }
 
-    override fun onBackPressed() {
-        if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
-            drawer_layout.closeDrawer(GravityCompat.START)
-        } else {
-            super.onBackPressed()
-        }
+    override fun onTabReselected(tab: android.support.v7.app.ActionBar.Tab?, ft: FragmentTransaction?) {
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.main, menu)
-        return true
+    override fun onTabUnselected(tab: android.support.v7.app.ActionBar.Tab?, ft: FragmentTransaction?) {
+
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        when (item.itemId) {
-            R.id.action_settings -> return true
-            else -> return super.onOptionsItemSelected(item)
-        }
-    }
+    override fun onTabSelected(tab: android.support.v7.app.ActionBar.Tab?, ft: FragmentTransaction?) {
+        mViewPager.currentItem = tab!!.position
 
-    override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        // Handle navigation view item clicks here.
-        when (item.itemId) {
-            R.id.nav_camera -> {
-                // Handle the camera action
-            }
-            R.id.nav_gallery -> {
-
-            }
-            R.id.nav_slideshow -> {
-
-            }
-            R.id.nav_manage -> {
-
-            }
-            R.id.nav_share -> {
-
-            }
-            R.id.nav_send -> {
-
-            }
-        }
-
-        drawer_layout.closeDrawer(GravityCompat.START)
-        return true
     }
 
     companion object {
+
+        private val TAG = MainActivity::class.java.canonicalName
 
         private val EXTRA_IDP_RESPONSE = "extra_idp_response"
 
