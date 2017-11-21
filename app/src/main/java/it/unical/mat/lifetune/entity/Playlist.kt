@@ -1,4 +1,4 @@
-package it.unical.mat.lifetune.model
+package it.unical.mat.lifetune.entity
 
 import android.databinding.BaseObservable
 import android.databinding.Bindable
@@ -7,6 +7,7 @@ import android.databinding.Bindable
  * Created by beantoan on 11/20/17.
  */
 class Playlist(
+        var id: Int,
         private var _title: String?,
         private var _description: String?,
         private var _songs: List<Song>) : BaseObservable() {
