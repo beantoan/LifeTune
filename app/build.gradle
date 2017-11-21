@@ -85,6 +85,8 @@ dependencies {
     implementation 'com.airbnb.android:epoxy:2.7.2'
     implementation 'com.airbnb.android:epoxy-databinding:2.7.2'
     kapt 'com.airbnb.android:epoxy-processor:2.7.2'
+
+    implementation 'com.thedeanda:lorem:2.1'
 }
 
 

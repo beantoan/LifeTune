@@ -3,8 +3,8 @@
 
     <data>
         <variable
-            name="playlist"
-            type="it.unical.mat.lifetune.entity.Playlist" />
+            name="category"
+            type="it.unical.mat.lifetune.entity.Category" />
     </data>
 
     <LinearLayout
@@ -13,23 +13,24 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:layout_marginStart="16dp"
-            android:paddingTop="8dp"
-            android:text='@{playlist.title}'
+            android:layout_marginEnd="16sp"
+            android:layout_marginStart="16sp"
+            android:layout_marginRight="16sp"
+            android:layout_marginLeft="16sp"
+            android:text='@{category.title}'
             android:textAppearance="@style/TextAppearance.AppCompat.Headline"/>
 
         <TextView
-            android:id="@+id/description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:layout_marginStart="16dp"
-            android:text='@{playlist.description}'
-            android:textAppearance="@style/TextAppearance.AppCompat.Title" />
+            android:layout_marginEnd="16sp"
+            android:layout_marginStart="18sp"
+            android:text='@{category.description}'
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            android:layout_marginRight="16sp"
+            android:layout_marginLeft="18sp" />
     </LinearLayout>
 
 </layout>
