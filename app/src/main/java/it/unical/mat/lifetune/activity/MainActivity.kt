@@ -1,14 +1,12 @@
 package it.unical.mat.lifetune.activity
 
 import android.app.ActionBar
-import android.app.SearchManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.FragmentTransaction
 import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.SearchView
 import android.view.Menu
 import com.firebase.ui.auth.IdpResponse
 import it.unical.mat.lifetune.R
@@ -27,13 +25,34 @@ class MainActivity : AppCompatActivity(), android.support.v7.app.ActionBar.TabLi
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+//        super.onCreateOptionsMenu(menu)
+
         menuInflater.inflate(R.menu.options_menu, menu)
+//
+//        val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
+//        val searchView = menu!!.findItem(R.id.action_search).actionView as SearchView
+//
+//        val cn = ComponentName(this, SearchMusicResultsActivity::class.java)
+//        searchView.setSearchableInfo(searchManager.getSearchableInfo(cn))
+//
+//        searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName))
+//
+//        searchView.setIconifiedByDefault(false)
+//
+//        searchView.setOnQueryTextListener(object : OnQueryTextListener {
+//            override fun onQueryTextSubmit(query: String?): Boolean {
+//                Log.d(TAG, "onQueryTextSubmit: $query")
+//                return true
+//            }
+//
+//            override fun onQueryTextChange(newText: String?): Boolean {
+//                Log.d(TAG, "onQueryTextSubmit: $newText")
+//                return true
+//            }
+//
+//        })
 
-        val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
-        val searchView = menu!!.findItem(R.id.action_search).actionView as SearchView
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName))
-
-        return super.onCreateOptionsMenu(menu)
+        return true
     }
 
     private fun onCreateTasks() {

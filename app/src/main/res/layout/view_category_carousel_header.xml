@@ -2,26 +2,18 @@
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <EditText
-        android:id="@+id/search_music"
+    <com.arlib.floatingsearchview.FloatingSearchView
+        android:id="@+id/floating_search_view_search_music"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginEnd="8sp"
-        android:layout_marginStart="8sp"
-        app:layout_goneMarginStart="8sp"
-        app:layout_goneMarginEnd="8sp"
-        android:layout_marginTop="8dp"
-        android:drawableRight="@android:drawable/ic_menu_search"
-        android:drawableEnd="@android:drawable/ic_menu_search"
-        android:text="Search music"
-        android:ems="10"
-        android:focusable="false"
-        android:inputType="text" />
-
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:minHeight="8sp" />
-
+        app:floatingSearch_close_search_on_keyboard_dismiss="false"
+        app:floatingSearch_dimBackground="false"
+        app:floatingSearch_dismissOnOutsideTouch="true"
+        app:floatingSearch_leftActionMode="showSearch"
+        app:floatingSearch_searchBarMarginLeft="16sp"
+        app:floatingSearch_searchBarMarginTop="8sp"
+        app:floatingSearch_searchBarMarginRight="16sp"
+        app:floatingSearch_searchHint="@string/search_music_title"
+        app:floatingSearch_showSearchKey="true"
+        app:floatingSearch_suggestionsListAnimDuration="250" />
 </merge>

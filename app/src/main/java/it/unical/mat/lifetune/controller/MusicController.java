@@ -11,7 +11,7 @@ import it.unical.mat.lifetune.view.CategoryCarouselHeaderViewModel_;
 
 public class MusicController extends TypedEpoxyController<List<Category>> {
     public interface AdapterCallbacks {
-        void onSearchMusicClicked();
+        void onSearchMusicFocused();
         void onPlaylistClicked(Category category, int position);
     }
 
