@@ -7,9 +7,11 @@ import android.os.Bundle
 import android.support.v4.app.FragmentTransaction
 import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
+import android.view.Menu
 import com.firebase.ui.auth.IdpResponse
 import it.unical.mat.lifetune.R
 import it.unical.mat.lifetune.adapter.AppSectionsPagerAdapter
+
 
 class MainActivity : AppCompatActivity(), android.support.v7.app.ActionBar.TabListener {
     lateinit var mAppSectionsPagerAdapter: AppSectionsPagerAdapter
@@ -20,6 +22,37 @@ class MainActivity : AppCompatActivity(), android.support.v7.app.ActionBar.TabLi
         super.onCreate(savedInstanceState)
 
         onCreateTasks()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+//        super.onCreateOptionsMenu(menu)
+
+        menuInflater.inflate(R.menu.options_menu, menu)
+//
+//        val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
+//        val searchView = menu!!.findItem(R.id.action_search).actionView as SearchView
+//
+//        val cn = ComponentName(this, SearchMusicResultsActivity::class.java)
+//        searchView.setSearchableInfo(searchManager.getSearchableInfo(cn))
+//
+//        searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName))
+//
+//        searchView.setIconifiedByDefault(false)
+//
+//        searchView.setOnQueryTextListener(object : OnQueryTextListener {
+//            override fun onQueryTextSubmit(query: String?): Boolean {
+//                Log.d(TAG, "onQueryTextSubmit: $query")
+//                return true
+//            }
+//
+//            override fun onQueryTextChange(newText: String?): Boolean {
+//                Log.d(TAG, "onQueryTextSubmit: $newText")
+//                return true
+//            }
+//
+//        })
+
+        return true
     }
 
     private fun onCreateTasks() {

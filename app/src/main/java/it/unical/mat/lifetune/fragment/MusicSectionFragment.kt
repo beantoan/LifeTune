@@ -5,9 +5,9 @@ import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.GridLayoutManager
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.support.v7.widget.SearchView
+import android.util.Log
+import android.view.*
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.airbnb.epoxy.EpoxyRecyclerView
@@ -17,6 +17,7 @@ import it.unical.mat.lifetune.controller.MusicController
 import it.unical.mat.lifetune.decoration.CategoryDividerItemDecoration
 import it.unical.mat.lifetune.entity.Category
 import it.unical.mat.lifetune.entity.Playlist
+import java.util.*
 
 
 /**
@@ -25,44 +26,64 @@ import it.unical.mat.lifetune.entity.Playlist
 class MusicSectionFragment : Fragment(), MusicController.AdapterCallbacks {
 
     @BindView(R.id.categories)
-    lateinit var mRecyclerViewPlaylists: EpoxyRecyclerView
+    lateinit var mRecyclerViewCategories: EpoxyRecyclerView
 
     private val musicController: MusicController = MusicController(this)
 
     private var categories: MutableList<Category> = ArrayList()
 
+    private var actionBarMenu: Menu? = null
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        super.onCreateView(inflater, container, savedInstanceState)
+        return inflater.inflate(R.layout.fragment_music_section, container, false)
+    }
 
-        val rootView = inflater.inflate(R.layout.fragment_music_section, container, false)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        onCreateViewTasks(rootView)
+        onCreateViewTasks(view)
+    }
 
-        return rootView
+    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+        super.onCreateOptionsMenu(menu, inflater)
+
+        actionBarMenu = menu
     }
 
     override fun onPlaylistClicked(category: Category, position: Int) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    private fun onCreateViewTasks(rootView: View) {
-        ButterKnife.bind(this, rootView)
+    override fun onSearchMusicFocused() {
+        Log.d(TAG, "onSearchMusicFocused")
 
-        setupRecyclerViewPlaylists()
+        val menuItemSearch = actionBarMenu!!.findItem(R.id.action_search)
+        menuItemSearch.expandActionView()
+        val searchView = menuItemSearch.actionView as SearchView
+        searchView.requestFocus()
+        searchView.requestFocusFromTouch()
+    }
+
+    private fun onCreateViewTasks(view: View) {
+        setHasOptionsMenu(true)
+
+        ButterKnife.bind(this, view)
+
+        setupRecyclerViewCategories()
 
         dummyPlaylistData()
 
         updateMusicController()
     }
 
-    fun setupRecyclerViewPlaylists() {
+    private fun setupRecyclerViewCategories() {
         val dividerItemDecoration = CategoryDividerItemDecoration(activity!!, DividerItemDecoration.VERTICAL)
         val dividerDrawable = ContextCompat.getDrawable(context!!, R.drawable.category_divider)
         dividerItemDecoration.setDrawable(dividerDrawable!!)
 
-        mRecyclerViewPlaylists.layoutManager = GridLayoutManager(context, 1)
-        mRecyclerViewPlaylists.addItemDecoration(dividerItemDecoration)
-        mRecyclerViewPlaylists.setController(musicController)
+        mRecyclerViewCategories.layoutManager = GridLayoutManager(context, 1)
+        mRecyclerViewCategories.addItemDecoration(dividerItemDecoration)
+        mRecyclerViewCategories.setController(musicController)
     }
 
     private fun updateMusicController() {
@@ -73,11 +94,13 @@ class MusicSectionFragment : Fragment(), MusicController.AdapterCallbacks {
     private fun dummyPlaylistData() {
         val lorem = LoremIpsum.getInstance()
 
-        val playlists: MutableList<Playlist> = ArrayList()
+        val images = arrayOf("https://hdwallsource.com/img/2013/19/anime-girls-2426.jpg", "http://animefanatika.co.za/afwp/wp-content/uploads/2016/01/2015-cover.jpg", "https://vignette.wikia.nocookie.net/date-a-live/images/e/e0/MA048001_1.png/revision/latest?cb=20130704113347", "https://www.w3schools.com/w3css/img_fjords.jpg", "http://www.ptahai.com/wp-content/uploads/2016/06/Best-Reverse-Image-Search-Engines-Apps-And-Its-Uses-2016.jpg", "https://www.smashingmagazine.com/wp-content/uploads/2015/06/10-dithering-opt.jpg")
 
-        (0..10).mapTo(playlists) { Playlist(it, lorem.getTitle(3, 5), "xxxurl", "yyyurl") }
-
-        (0..50).forEach { i -> categories.add(Category(i, lorem.getTitle(2, 4), lorem.getTitle(5, 8), playlists)); }
+        (0..20).forEach { i ->
+            val playlists: MutableList<Playlist> = ArrayList()
+            (0..5).mapTo(playlists) { Playlist(it, lorem.getTitle(3, 5), "xxxurl", images[Random().nextInt(images.size)]) }
+            categories.add(Category(i, "$i - ${lorem.getTitle(2, 4)}", lorem.getTitle(5, 8), playlists))
+        }
     }
 
     companion object {
