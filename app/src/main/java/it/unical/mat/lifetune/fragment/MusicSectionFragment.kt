@@ -5,9 +5,10 @@ import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.SearchView
-import android.util.Log
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.View
+import android.view.ViewGroup
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.airbnb.epoxy.EpoxyRecyclerView
@@ -44,24 +45,8 @@ class MusicSectionFragment : Fragment(), MusicController.AdapterCallbacks {
         onCreateViewTasks(view)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
-        super.onCreateOptionsMenu(menu, inflater)
+    override fun onPlaylistClicked(category: Category?, position: Int) {
 
-        actionBarMenu = menu
-    }
-
-    override fun onPlaylistClicked(category: Category, position: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun onSearchMusicFocused() {
-        Log.d(TAG, "onSearchMusicFocused")
-
-        val menuItemSearch = actionBarMenu!!.findItem(R.id.action_search)
-        menuItemSearch.expandActionView()
-        val searchView = menuItemSearch.actionView as SearchView
-        searchView.requestFocus()
-        searchView.requestFocusFromTouch()
     }
 
     private fun onCreateViewTasks(view: View) {
