@@ -4,33 +4,36 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.support.v4.app.FragmentTransaction
+import android.support.design.widget.TabLayout
 import android.support.v4.view.ViewPager
-import android.support.v7.app.ActionBar
 import android.support.v7.app.AppCompatActivity
-import android.view.Menu
+import android.util.Log
 import butterknife.BindView
 import butterknife.ButterKnife
+import com.arlib.floatingsearchview.FloatingSearchView
+import com.arlib.floatingsearchview.suggestions.model.SearchSuggestion
 import com.firebase.ui.auth.IdpResponse
+import com.google.android.exoplayer2.DefaultLoadControl
+import com.google.android.exoplayer2.DefaultRenderersFactory
 import com.google.android.exoplayer2.ExoPlayerFactory
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory
 import com.google.android.exoplayer2.source.DynamicConcatenatingMediaSource
 import com.google.android.exoplayer2.source.ExtractorMediaSource
 import com.google.android.exoplayer2.source.MediaSource
-import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView
-import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
 import it.unical.mat.lifetune.R
 import it.unical.mat.lifetune.adapter.AppSectionsPagerAdapter
+import it.unical.mat.lifetune.data.ColorSuggestion
+import it.unical.mat.lifetune.data.DataHelper
 
 
-class MainActivity : AppCompatActivity(), ActionBar.TabListener {
-
+class MainActivity : AppCompatActivity() {
     private lateinit var mAppSectionsPagerAdapter: AppSectionsPagerAdapter
 
-    private lateinit var mActionBar : ActionBar
+    @BindView(R.id.tabs)
+    lateinit var mTabLayout: TabLayout
 
     @BindView(R.id.pager)
     lateinit var mViewPager: ViewPager
@@ -38,18 +41,17 @@ class MainActivity : AppCompatActivity(), ActionBar.TabListener {
     @BindView(R.id.music_player)
     lateinit var mMusicPlayer: SimpleExoPlayerView
 
+    @BindView(R.id.floating_search_view)
+    lateinit var mFloatingSearchView: FloatingSearchView
+
+    private var mLastQuery = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         onCreateTasks()
-    }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        super.onCreateOptionsMenu(menu)
-
-        menuInflater.inflate(R.menu.options_menu, menu)
-
-        return true
+        setupFloatingSearchView()
     }
 
     override fun onDestroy() {
@@ -58,24 +60,10 @@ class MainActivity : AppCompatActivity(), ActionBar.TabListener {
         onDestroyTasks()
     }
 
-    override fun onTabReselected(tab: ActionBar.Tab?, ft: FragmentTransaction?) {
-
-    }
-
-    override fun onTabUnselected(tab: ActionBar.Tab?, ft: FragmentTransaction?) {
-
-    }
-
-    override fun onTabSelected(tab: ActionBar.Tab?, ft: FragmentTransaction?) {
-        mViewPager.currentItem = tab!!.position
-    }
-
     private fun onCreateTasks() {
         setContentView(R.layout.activity_main)
 
         ButterKnife.bind(this)
-
-        setupActionBar()
 
         setupViewPager()
 
@@ -86,18 +74,6 @@ class MainActivity : AppCompatActivity(), ActionBar.TabListener {
         mMusicPlayer.player.release()
     }
 
-    private fun setupActionBar() {
-        // Set up the action bar.
-        mActionBar = supportActionBar!!
-
-        // Specify that the Home/Up button should not be enabled, since there is no hierarchical
-        // parent.
-        mActionBar.setHomeButtonEnabled(false)
-
-        // Specify that we will be displaying tabs in the action bar.
-        mActionBar.navigationMode = ActionBar.NAVIGATION_MODE_TABS
-    }
-
     private fun setupViewPager() {
         // Create the adapter that will return a fragment for each of the three primary sections
         // of the app.
@@ -106,40 +82,16 @@ class MainActivity : AppCompatActivity(), ActionBar.TabListener {
         // Set up the ViewPager, attaching the adapter and setting up a listener for when the
         // user swipes between sections.
         mViewPager.adapter = mAppSectionsPagerAdapter
-        mViewPager.addOnPageChangeListener(object : ViewPager.SimpleOnPageChangeListener() {
-            override fun onPageSelected(position: Int) {
-                // When swiping between different app sections, select the corresponding tab.
-                // We can also use ActionBar.Tab#select() to do this if we have a reference to the
-                // Tab.
-                mActionBar.setSelectedNavigationItem(position)
-            }
-        })
 
-        // For each of the sections in the app, add a tab to the action bar.
-        (0 until mAppSectionsPagerAdapter.count).forEach { i ->
-            // Create a tab with text corresponding to the page title defined by the adapter.
-            // Also specify this Activity object, which implements the TabListener interface, as the
-            // listener for when this tab is selected.
-            mActionBar.addTab(
-                    mActionBar.newTab()
-                            .setText(mAppSectionsPagerAdapter.getPageTitle(i))
-                            .setTabListener(this))
-        }
+        mTabLayout.setupWithViewPager(mViewPager)
     }
 
     private fun setupMusicPlayer() {
-
-        val bandwidthMeter = DefaultBandwidthMeter()
-        val videoTrackSelectionFactory = AdaptiveTrackSelection.Factory(bandwidthMeter)
-        val trackSelector = DefaultTrackSelector(videoTrackSelectionFactory)
-
-        mMusicPlayer.player = ExoPlayerFactory.newSimpleInstance(this, trackSelector)
-
-//        mMusicPlayer.player = ExoPlayerFactory.newSimpleInstance(
-//                DefaultRenderersFactory(this),
-//                DefaultTrackSelector(),
-//                DefaultLoadControl()
-//        )
+        mMusicPlayer.player = ExoPlayerFactory.newSimpleInstance(
+                DefaultRenderersFactory(this),
+                DefaultTrackSelector(),
+                DefaultLoadControl()
+        )
 
         playMusic(dummyMediaSources())
     }
@@ -149,6 +101,7 @@ class MainActivity : AppCompatActivity(), ActionBar.TabListener {
         mMusicPlayer.player.playWhenReady = true
     }
 
+    // TODO need to add real data source
     private fun dummyMediaSources() : DynamicConcatenatingMediaSource {
         val dynamicConcatenatingMediaSource = DynamicConcatenatingMediaSource()
         val mediaSources = ArrayList<MediaSource>()
@@ -169,11 +122,82 @@ class MainActivity : AppCompatActivity(), ActionBar.TabListener {
               DefaultExtractorsFactory(), null, null)
     }
 
+    private fun setupFloatingSearchView() {
+        mFloatingSearchView.setOnQueryChangeListener { oldQuery, newQuery ->
+            if (oldQuery.isNotBlank() && newQuery.isBlank()) {
+                mFloatingSearchView.clearSuggestions()
+            } else {
+
+                //this shows the top left circular progress
+                //you can call it where ever you want, but
+                //it makes sense to do it when loading something in
+                //the background.
+                mFloatingSearchView.showProgress()
+
+                //simulates a query call to a data source
+                //with a new query.
+                DataHelper.findSuggestions(this@MainActivity, newQuery, 5,
+                        FIND_SUGGESTION_SIMULATED_DELAY) { results ->
+                    Log.d(TAG, "setupFloatingSearchView#setOnQueryChangeListener ${results.size}")
+
+                    //this will swap the data and
+                    //render the collapse/expand animations as necessary
+                    mFloatingSearchView.swapSuggestions(results)
+
+                    //let the users know that the background
+                    //process has completed
+                    mFloatingSearchView.hideProgress()
+                }
+            }
+        }
+
+        mFloatingSearchView.setOnSearchListener(object : FloatingSearchView.OnSearchListener {
+            override fun onSearchAction(currentQuery: String?) {
+
+                mLastQuery = currentQuery!!
+
+                DataHelper.findColors(this@MainActivity, currentQuery
+                ) { results ->
+                    Log.d(TAG, "setupFloatingSearchView#setOnSearchListener ${results.size}")
+                }
+            }
+
+            override fun onSuggestionClicked(searchSuggestion: SearchSuggestion?) {
+
+                val colorSuggestion = searchSuggestion as ColorSuggestion
+
+                DataHelper.findColors(this@MainActivity, colorSuggestion.body
+                ) { results ->
+                    Log.d(TAG, "setupFloatingSearchView#setOnSearchListener ${results.size}")
+                }
+
+                mLastQuery = searchSuggestion.getBody()
+            }
+
+        })
+
+        mFloatingSearchView.setOnFocusChangeListener(object : FloatingSearchView.OnFocusChangeListener {
+            override fun onFocus() {
+
+                //show suggestions when search bar gains focus (typically history suggestions)
+                mFloatingSearchView.swapSuggestions(DataHelper.getHistory(this@MainActivity, 3))
+            }
+
+            override fun onFocusCleared() {
+                //set the title of the bar so that when focus is returned a new query begins
+                mFloatingSearchView.setSearchBarTitle(mLastQuery)
+            }
+        })
+
+    }
+
     companion object {
 
         private val TAG = MainActivity::class.java.canonicalName
 
         private val EXTRA_IDP_RESPONSE = "extra_idp_response"
+
+        private val FIND_SUGGESTION_SIMULATED_DELAY = 250L
 
         fun createIntent(context: Context, idpResponse: IdpResponse?): Intent {
 
