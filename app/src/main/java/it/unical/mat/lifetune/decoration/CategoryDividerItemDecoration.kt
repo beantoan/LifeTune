@@ -19,7 +19,7 @@ class CategoryDividerItemDecoration(context: Context, orientation: Int)
         // we want to retrieve the position in the list
         val position = params.viewAdapterPosition
 
-        if (position < state!!.itemCount - 1 && position > 0) {
+        if (position < state!!.itemCount - 1) {
             super.getItemOffsets(outRect, view, parent, state)
         } else {
             outRect!!.setEmpty()
