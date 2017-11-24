@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.support.design.widget.AppBarLayout
 import android.support.design.widget.TabLayout
 import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
@@ -29,7 +30,7 @@ import it.unical.mat.lifetune.data.ColorSuggestion
 import it.unical.mat.lifetune.data.DataHelper
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), AppBarLayout.OnOffsetChangedListener {
     private lateinit var mAppSectionsPagerAdapter: AppSectionsPagerAdapter
 
     @BindView(R.id.tabs)
@@ -43,6 +44,9 @@ class MainActivity : AppCompatActivity() {
 
     @BindView(R.id.floating_search_view)
     lateinit var mFloatingSearchView: FloatingSearchView
+
+    @BindView(R.id.app_bar_layout)
+    lateinit var mAppBarLayout: AppBarLayout
 
     private var mLastQuery = ""
 
@@ -60,6 +64,10 @@ class MainActivity : AppCompatActivity() {
         onDestroyTasks()
     }
 
+    override fun onOffsetChanged(appBarLayout: AppBarLayout?, verticalOffset: Int) {
+        mFloatingSearchView.translationY = verticalOffset.toFloat()
+    }
+
     private fun onCreateTasks() {
         setContentView(R.layout.activity_main)
 
@@ -68,6 +76,8 @@ class MainActivity : AppCompatActivity() {
         setupViewPager()
 
         setupMusicPlayer()
+
+        mAppBarLayout.addOnOffsetChangedListener(this)
     }
 
     private fun onDestroyTasks() {
@@ -138,7 +148,7 @@ class MainActivity : AppCompatActivity() {
                 //with a new query.
                 DataHelper.findSuggestions(this@MainActivity, newQuery, 5,
                         FIND_SUGGESTION_SIMULATED_DELAY) { results ->
-                    Log.d(TAG, "setupFloatingSearchView#setOnQueryChangeListener ${results.size}")
+                    Log.d(TAG, "setupFloatingSearchView#setOnQueryChangeListener")
 
                     //this will swap the data and
                     //render the collapse/expand animations as necessary
@@ -158,7 +168,7 @@ class MainActivity : AppCompatActivity() {
 
                 DataHelper.findColors(this@MainActivity, currentQuery
                 ) { results ->
-                    Log.d(TAG, "setupFloatingSearchView#setOnSearchListener ${results.size}")
+                    Log.d(TAG, "setupFloatingSearchView#setOnSearchListener")
                 }
             }
 
@@ -168,7 +178,7 @@ class MainActivity : AppCompatActivity() {
 
                 DataHelper.findColors(this@MainActivity, colorSuggestion.body
                 ) { results ->
-                    Log.d(TAG, "setupFloatingSearchView#setOnSearchListener ${results.size}")
+                    Log.d(TAG, "setupFloatingSearchView#setOnSearchListener")
                 }
 
                 mLastQuery = searchSuggestion.getBody()
