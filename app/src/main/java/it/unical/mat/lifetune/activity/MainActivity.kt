@@ -148,7 +148,7 @@ class MainActivity : AppCompatActivity(), AppBarLayout.OnOffsetChangedListener {
                 //with a new query.
                 DataHelper.findSuggestions(this@MainActivity, newQuery, 5,
                         FIND_SUGGESTION_SIMULATED_DELAY) { results ->
-                    Log.d(TAG, "setupFloatingSearchView#setOnQueryChangeListener ${results.size}")
+                    Log.d(TAG, "setupFloatingSearchView#setOnQueryChangeListener")
 
                     //this will swap the data and
                     //render the collapse/expand animations as necessary
@@ -168,7 +168,7 @@ class MainActivity : AppCompatActivity(), AppBarLayout.OnOffsetChangedListener {
 
                 DataHelper.findColors(this@MainActivity, currentQuery
                 ) { results ->
-                    Log.d(TAG, "setupFloatingSearchView#setOnSearchListener ${results.size}")
+                    Log.d(TAG, "setupFloatingSearchView#setOnSearchListener")
                 }
             }
 
@@ -178,7 +178,7 @@ class MainActivity : AppCompatActivity(), AppBarLayout.OnOffsetChangedListener {
 
                 DataHelper.findColors(this@MainActivity, colorSuggestion.body
                 ) { results ->
-                    Log.d(TAG, "setupFloatingSearchView#setOnSearchListener ${results.size}")
+                    Log.d(TAG, "setupFloatingSearchView#setOnSearchListener")
                 }
 
                 mLastQuery = searchSuggestion.getBody()
