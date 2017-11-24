@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,6 +19,7 @@ import it.unical.mat.lifetune.decoration.CategoryDividerItemDecoration
 import it.unical.mat.lifetune.entity.Category
 import it.unical.mat.lifetune.entity.Playlist
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 /**
@@ -28,9 +30,9 @@ class MusicSectionFragment : Fragment(), MusicController.AdapterCallbacks {
     @BindView(R.id.categories)
     lateinit var mRecyclerViewCategories: EpoxyRecyclerView
 
-    private val musicController: MusicController = MusicController(this)
+    lateinit var musicController: MusicController
 
-    private var categories: MutableList<Category> = ArrayList()
+    private var categories: List<Category> = ArrayList()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_music_section, container, false)
@@ -47,33 +49,43 @@ class MusicSectionFragment : Fragment(), MusicController.AdapterCallbacks {
     }
 
     private fun onCreateViewTasks(view: View) {
-        setHasOptionsMenu(true)
+        Log.d(TAG, "onCreateViewTasks")
 
         ButterKnife.bind(this, view)
 
         setupRecyclerViewCategories()
 
-        dummyPlaylistData()
+        setupMusicController()
 
-        updateMusicController()
+        updateMusicController(dummyPlaylistData())
     }
 
     private fun setupRecyclerViewCategories() {
-        val dividerItemDecoration = CategoryDividerItemDecoration(activity!!, DividerItemDecoration.VERTICAL)
+        Log.d(TAG, "setupRecyclerViewCategories")
+
         val dividerDrawable = ContextCompat.getDrawable(context!!, R.drawable.category_divider)
-        dividerItemDecoration.setDrawable(dividerDrawable!!)
+        val dividerItemDecoration = CategoryDividerItemDecoration(activity!!, DividerItemDecoration.VERTICAL, dividerDrawable!!)
 
         mRecyclerViewCategories.layoutManager = LinearLayoutManager(context)
         mRecyclerViewCategories.addItemDecoration(dividerItemDecoration)
+    }
+
+    private fun setupMusicController() {
+        Log.d(TAG, "setupMusicController")
+        musicController = MusicController(this)
+
+        mRecyclerViewCategories.clear()
         mRecyclerViewCategories.setController(musicController)
     }
 
-    private fun updateMusicController() {
-        musicController.setData(categories)
+    private fun updateMusicController(data: List<Category>) {
+        musicController.setData(data)
     }
 
     // TODO add temporary data
-    private fun dummyPlaylistData() {
+    private fun dummyPlaylistData(): List<Category> {
+        val data = ArrayList<Category>()
+
         val lorem = LoremIpsum.getInstance()
 
         val images = arrayOf(
@@ -90,8 +102,10 @@ class MusicSectionFragment : Fragment(), MusicController.AdapterCallbacks {
         (0..20).forEach { i ->
             val playlists: MutableList<Playlist> = ArrayList()
             (0..5).mapTo(playlists) { Playlist(it, lorem.getTitle(3, 5), "xxxurl", images[Random().nextInt(countImages)]) }
-            categories.add(Category(i, "$i - ${lorem.getTitle(2, 4)}", lorem.getTitle(5, 8), playlists))
+            data.add(Category(i, "$i - ${lorem.getTitle(2, 4)}", lorem.getTitle(5, 8), playlists))
         }
+
+        return data
     }
 
     companion object {
