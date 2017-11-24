@@ -1,7 +1,6 @@
 package it.unical.mat.lifetune.view;
 
 import android.content.Context;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 
 import com.airbnb.epoxy.Carousel;
@@ -18,6 +17,6 @@ public class CategoryCarouselView extends Carousel {
 
     @Override
     protected LayoutManager createLayoutManager() {
-        return new GridLayoutManager(getContext(), SPAN_COUNT, LinearLayoutManager.HORIZONTAL, false);
+        return new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
     }
 }

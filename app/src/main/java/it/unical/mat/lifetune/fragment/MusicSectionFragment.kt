@@ -4,9 +4,8 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.DividerItemDecoration
-import android.support.v7.widget.GridLayoutManager
+import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
-import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
 import butterknife.BindView
@@ -32,8 +31,6 @@ class MusicSectionFragment : Fragment(), MusicController.AdapterCallbacks {
     private val musicController: MusicController = MusicController(this)
 
     private var categories: MutableList<Category> = ArrayList()
-
-    private var actionBarMenu: Menu? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_music_section, container, false)
@@ -66,7 +63,7 @@ class MusicSectionFragment : Fragment(), MusicController.AdapterCallbacks {
         val dividerDrawable = ContextCompat.getDrawable(context!!, R.drawable.category_divider)
         dividerItemDecoration.setDrawable(dividerDrawable!!)
 
-        mRecyclerViewCategories.layoutManager = GridLayoutManager(context, 1)
+        mRecyclerViewCategories.layoutManager = LinearLayoutManager(context)
         mRecyclerViewCategories.addItemDecoration(dividerItemDecoration)
         mRecyclerViewCategories.setController(musicController)
     }
@@ -79,11 +76,20 @@ class MusicSectionFragment : Fragment(), MusicController.AdapterCallbacks {
     private fun dummyPlaylistData() {
         val lorem = LoremIpsum.getInstance()
 
-        val images = arrayOf("https://hdwallsource.com/img/2013/19/anime-girls-2426.jpg", "http://animefanatika.co.za/afwp/wp-content/uploads/2016/01/2015-cover.jpg", "https://vignette.wikia.nocookie.net/date-a-live/images/e/e0/MA048001_1.png/revision/latest?cb=20130704113347", "https://www.w3schools.com/w3css/img_fjords.jpg", "http://www.ptahai.com/wp-content/uploads/2016/06/Best-Reverse-Image-Search-Engines-Apps-And-Its-Uses-2016.jpg", "https://www.smashingmagazine.com/wp-content/uploads/2015/06/10-dithering-opt.jpg")
+        val images = arrayOf(
+                "https://hdwallsource.com/img/2013/19/anime-girls-2426.jpg",
+                "http://animefanatika.co.za/afwp/wp-content/uploads/2016/01/2015-cover.jpg",
+                "https://vignette.wikia.nocookie.net/date-a-live/images/e/e0/MA048001_1.png/revision/latest?cb=20130704113347",
+                "https://www.w3schools.com/w3css/img_fjords.jpg",
+                "http://www.ptahai.com/wp-content/uploads/2016/06/Best-Reverse-Image-Search-Engines-Apps-And-Its-Uses-2016.jpg",
+                "https://www.smashingmagazine.com/wp-content/uploads/2015/06/10-dithering-opt.jpg"
+        )
+
+        val countImages = images.size
 
         (0..20).forEach { i ->
             val playlists: MutableList<Playlist> = ArrayList()
-            (0..5).mapTo(playlists) { Playlist(it, lorem.getTitle(3, 5), "xxxurl", images[Random().nextInt(images.size)]) }
+            (0..5).mapTo(playlists) { Playlist(it, lorem.getTitle(3, 5), "xxxurl", images[Random().nextInt(countImages)]) }
             categories.add(Category(i, "$i - ${lorem.getTitle(2, 4)}", lorem.getTitle(5, 8), playlists))
         }
     }
