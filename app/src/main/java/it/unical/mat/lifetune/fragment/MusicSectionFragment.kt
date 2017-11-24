@@ -100,8 +100,10 @@ class MusicSectionFragment : Fragment(), MusicController.AdapterCallbacks {
         val countImages = images.size
 
         (0..20).forEach { i ->
-            val playlists: MutableList<Playlist> = ArrayList()
-            (0..5).mapTo(playlists) { Playlist(it, lorem.getTitle(3, 5), "xxxurl", images[Random().nextInt(countImages)]) }
+            val playlists = (0..5).map {
+                Playlist(it, lorem.getTitle(3, 5), "xxxurl", images[Random().nextInt(countImages)])
+            }
+
             data.add(Category(i, "$i - ${lorem.getTitle(2, 4)}", lorem.getTitle(5, 8), playlists))
         }
 
