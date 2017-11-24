@@ -6,4 +6,5 @@
     <dimen name="nav_header_height">176dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="music_player_height">80sp</dimen>
+    <dimen name="float_search_view_placeholder_height">64dp</dimen>
 </resources>
