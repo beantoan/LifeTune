@@ -17,7 +17,6 @@ package it.unical.mat.lifetune.adapter;
  */
 
 import android.app.Activity;
-import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -78,12 +77,6 @@ public class SearchResultsListAdapter extends RecyclerView.Adapter<SearchResults
     public void onBindViewHolder(ViewHolder holder, final int position) {
 
         ColorWrapper colorSuggestion = mDataSet.get(position);
-        holder.mColorName.setText(colorSuggestion.getName());
-        holder.mColorValue.setText(colorSuggestion.getHex());
-
-        int color = Color.parseColor(colorSuggestion.getHex());
-        holder.mColorName.setTextColor(color);
-        holder.mColorValue.setTextColor(color);
 
         if (mLastAnimatedItemPosition < position) {
             animateItem(holder.itemView);
