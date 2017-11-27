@@ -19,14 +19,12 @@
             android:id="@+id/app_bar_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
             tools:context=".activity.MainActivity">
 
             <android.support.design.widget.CollapsingToolbarLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layout_scrollFlags="scroll|enterAlways|snap"
-                app:popupTheme="@style/AppTheme.PopupOverlay"
                 app:titleEnabled="false">
 
                 <View
@@ -40,8 +38,9 @@
                 android:id="@+id/tabs"
                 android:layout_width="match_parent"
                 android:layout_height="50sp"
-                app:tabSelectedTextColor="?android:attr/textColorPrimaryInverse"
-                app:tabIndicatorColor="?android:attr/textColorPrimaryInverse"
+                app:tabTextColor="@color/lightGray"
+                app:tabSelectedTextColor="@color/lightGray"
+                app:tabIndicatorColor="@color/lightGray"
                 app:layout_collapseMode="pin"
                 app:tabIndicatorHeight="4sp" />
 
@@ -85,7 +84,6 @@
         android:id="@+id/floating_search_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:theme="@style/AppTheme.PopupOverlay"
         app:floatingSearch_close_search_on_keyboard_dismiss="false"
         app:floatingSearch_dimBackground="true"
         app:floatingSearch_dismissOnOutsideTouch="true"
