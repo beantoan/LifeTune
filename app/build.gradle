@@ -77,7 +77,7 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 
-    kapt 'com.android.databinding:compiler:3.0.0'
+    kapt 'com.android.databinding:compiler:3.0.1'
 
     implementation 'com.airbnb.android:epoxy:2.7.2'
     implementation 'com.airbnb.android:epoxy-databinding:2.7.2'
