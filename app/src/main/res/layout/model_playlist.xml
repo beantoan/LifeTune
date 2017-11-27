@@ -12,8 +12,8 @@
     </data>
 
     <android.support.v7.widget.CardView
-        android:layout_width="120sp"
-        android:layout_height="170sp">
+        android:layout_width="130sp"
+        android:layout_height="180sp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -22,9 +22,9 @@
 
             <ImageView
                 android:id="@+id/playlist_thumb"
-                android:src="@drawable/ic_image_black_24dp"
+                android:src="@drawable/no_image"
                 android:layout_width="match_parent"
-                android:layout_height="120sp" />
+                android:layout_height="130sp" />
 
             <TextView
                 android:layout_width="match_parent"

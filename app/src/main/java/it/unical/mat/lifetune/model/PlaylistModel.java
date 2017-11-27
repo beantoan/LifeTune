@@ -32,12 +32,12 @@ public abstract class PlaylistModel extends DataBindingEpoxyModel {
 
         ImageView image = view.findViewById(R.id.playlist_thumb);
 
-        int imageSize = 120;
+        int imageSize = 130;
 
         Picasso.with(view.getContext())
                 .load(playlist.getThumbUrl())
-                .placeholder(R.drawable.ic_image_black_24dp)
-                .error(R.drawable.ic_image_black_24dp)
+                .placeholder(R.drawable.no_image)
+                .error(R.drawable.no_image)
                 .resize(imageSize, imageSize)
                 .centerCrop()
                 .into(image);
