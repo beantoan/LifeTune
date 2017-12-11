@@ -5,10 +5,14 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.AppBarLayout
+import android.support.design.widget.NavigationView
 import android.support.design.widget.TabLayout
+import android.support.v4.view.GravityCompat
 import android.support.v4.view.ViewPager
+import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import android.view.MenuItem
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.arlib.floatingsearchview.FloatingSearchView
@@ -28,9 +32,14 @@ import it.unical.mat.lifetune.R
 import it.unical.mat.lifetune.adapter.AppSectionsPagerAdapter
 import it.unical.mat.lifetune.data.ColorSuggestion
 import it.unical.mat.lifetune.data.DataHelper
+import kotlinx.android.synthetic.main.activity_main.*
 
 
-class MainActivity : AppCompatActivity(), AppBarLayout.OnOffsetChangedListener {
+class MainActivity :
+        AppCompatActivity(),
+        NavigationView.OnNavigationItemSelectedListener,
+        AppBarLayout.OnOffsetChangedListener {
+
     private lateinit var mAppSectionsPagerAdapter: AppSectionsPagerAdapter
 
     @BindView(R.id.tabs)
@@ -68,8 +77,36 @@ class MainActivity : AppCompatActivity(), AppBarLayout.OnOffsetChangedListener {
         mFloatingSearchView.translationY = verticalOffset.toFloat()
     }
 
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        // Handle navigation view item clicks here.
+        when (item.itemId) {
+            R.id.nav_play_music -> {
+                // Handle the camera action
+            }
+            R.id.nav_my_activities -> {
+
+            }
+            R.id.nav_schedules -> {
+
+            }
+        }
+
+        drawer_layout.closeDrawer(GravityCompat.START)
+        return true
+    }
+
+    override fun onBackPressed() {
+        if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
+            drawer_layout.closeDrawer(GravityCompat.START)
+        } else {
+            super.onBackPressed()
+        }
+    }
+    
     private fun onCreateTasks() {
         setContentView(R.layout.activity_main)
+
+        setupNavigationDrawer()
 
         ButterKnife.bind(this)
 
@@ -78,10 +115,21 @@ class MainActivity : AppCompatActivity(), AppBarLayout.OnOffsetChangedListener {
         setupMusicPlayer()
 
         mAppBarLayout.addOnOffsetChangedListener(this)
+
+        mFloatingSearchView.attachNavigationDrawerToMenuButton(drawer_layout)
     }
 
     private fun onDestroyTasks() {
         mMusicPlayer.player.release()
+    }
+
+    private fun setupNavigationDrawer() {
+        val toggle = ActionBarDrawerToggle(
+                this, drawer_layout, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
+        drawer_layout.addDrawerListener(toggle)
+        toggle.syncState()
+
+        nav_view.setNavigationItemSelectedListener(this)
     }
 
     private fun setupViewPager() {
