@@ -16,16 +16,20 @@
             android:id="@+id/nav_schedules"
             android:title="Schedules"
             android:icon="@drawable/ic_schedule_black_24dp" />
+        <item
+            android:id="@+id/nav_nearby_locations"
+            android:title="Nearby Locations"
+            android:icon="@drawable/ic_location_on_black_24dp" />
     </group>
 
-    <item android:title="Communicate">
+    <item android:title="Settings">
         <menu>
             <item
                 android:id="@+id/nav_share"
-                android:title="Share" />
+                android:title="My Profile" />
             <item
                 android:id="@+id/nav_send"
-                android:title="Send" />
+                android:title="Logout" />
         </menu>
     </item>
 
