@@ -10,20 +10,16 @@ import it.unical.mat.lifetune.R
 /**
  * Created by beantoan on 11/17/17.
  */
-
-/**
- * A dummy fragment representing a section of the app, but that simply displays dummy text.
- */
-class SchedulesSectionFragment : Fragment() {
+class MyActivitiesFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
 
-        val rootView = inflater.inflate(R.layout.fragment_schedules_section, container, false)
+        val rootView = inflater.inflate(R.layout.fragment_my_activities, container, false)
 
         return rootView
     }
 
     companion object {
-        private val TAG = SchedulesSectionFragment::class.java.canonicalName
+        val TAG = MyActivitiesFragment::class.java.canonicalName
     }
 }

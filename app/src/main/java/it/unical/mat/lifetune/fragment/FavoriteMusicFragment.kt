@@ -25,7 +25,7 @@ import kotlin.collections.ArrayList
 /**
  * Created by beantoan on 11/17/17.
  */
-class MusicSectionFragment : Fragment(), MusicController.AdapterCallbacks {
+class FavoriteMusicFragment : Fragment(), MusicController.AdapterCallbacks {
 
     @BindView(R.id.categories)
     lateinit var mRecyclerViewCategories: EpoxyRecyclerView
@@ -35,7 +35,7 @@ class MusicSectionFragment : Fragment(), MusicController.AdapterCallbacks {
     private var categories: List<Category> = ArrayList()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_music_section, container, false)
+        return inflater.inflate(R.layout.fragment_favorite_music, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -99,7 +99,7 @@ class MusicSectionFragment : Fragment(), MusicController.AdapterCallbacks {
 
         val countImages = images.size
 
-        (0..20).forEach { i ->
+        (0..3).forEach { i ->
             val playlists = (0..5).map {
                 Playlist(it, lorem.getTitle(3, 5), "xxxurl", images[Random().nextInt(countImages)])
             }
@@ -111,6 +111,6 @@ class MusicSectionFragment : Fragment(), MusicController.AdapterCallbacks {
     }
 
     companion object {
-        private val TAG = MusicSectionFragment::class.java.canonicalName
+        private val TAG = FavoriteMusicFragment::class.java.canonicalName
     }
 }
