@@ -22,6 +22,12 @@ class MainActivity :
         AppCompatActivity(),
         NavigationView.OnNavigationItemSelectedListener {
 
+    private var playMusicFragment: PlayMusicFragment? = null
+
+    private var myActivitiesFragment: MyActivitiesFragment? = null
+
+    private var schedulesFragment: SchedulesFragment? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -31,16 +37,13 @@ class MainActivity :
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.nav_play_music -> {
-                ActivityUtils.replaceFragmentToPlaceholder(supportFragmentManager,
-                        PlayMusicFragment(), R.id.content_main_placeholder, PlayMusicFragment.TAG)
+                showPlayMusicFragment()
             }
             R.id.nav_my_activities -> {
-                ActivityUtils.replaceFragmentToPlaceholder(supportFragmentManager,
-                        MyActivitiesFragment(), R.id.content_main_placeholder, MyActivitiesFragment.TAG)
+                showMyActivitiesFragment()
             }
             R.id.nav_schedules -> {
-                ActivityUtils.replaceFragmentToPlaceholder(supportFragmentManager,
-                        SchedulesFragment(), R.id.content_main_placeholder, SchedulesFragment.TAG)
+                showSchedulesFragment()
             }
         }
 
@@ -62,8 +65,8 @@ class MainActivity :
 
         setupNavigationDrawer()
 
-        ActivityUtils.replaceFragmentToPlaceholder(supportFragmentManager,
-                PlayMusicFragment(), R.id.content_main_placeholder, PlayMusicFragment.TAG)
+        nav_view.setCheckedItem(R.id.nav_play_music)
+        nav_view.menu.performIdentifierAction(R.id.nav_play_music, 0)
     }
 
     private fun setupNavigationDrawer() {
@@ -77,6 +80,34 @@ class MainActivity :
 
     fun getDrawerLayout(): DrawerLayout? {
         return drawer_layout
+    }
+
+    private fun showPlayMusicFragment() {
+        if (playMusicFragment == null) {
+            playMusicFragment = PlayMusicFragment()
+        }
+
+        ActivityUtils.addOrAttachFragment(supportFragmentManager,
+                playMusicFragment!!, R.id.content_main_placeholder, PlayMusicFragment.TAG)
+    }
+
+    private fun showMyActivitiesFragment() {
+        if (myActivitiesFragment == null) {
+            myActivitiesFragment = MyActivitiesFragment()
+        }
+
+        ActivityUtils.addOrAttachFragment(supportFragmentManager,
+                myActivitiesFragment!!, R.id.content_main_placeholder, MyActivitiesFragment.TAG)
+    }
+
+    private fun showSchedulesFragment() {
+        if (schedulesFragment == null) {
+            schedulesFragment = SchedulesFragment()
+        }
+
+        ActivityUtils.addOrAttachFragment(supportFragmentManager,
+                schedulesFragment!!, R.id.content_main_placeholder, SchedulesFragment.TAG)
+
     }
 
     companion object {

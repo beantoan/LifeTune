@@ -37,6 +37,8 @@ object ActivityUtils {
      */
     fun addFragmentToActivity(fragmentManager: FragmentManager,
                               fragment: Fragment, frameId: Int, tag: String?) {
+        detachFragments(fragmentManager)
+
         val transaction = fragmentManager.beginTransaction()
         if (tag == null) {
             transaction.add(frameId, fragment)
@@ -55,6 +57,38 @@ object ActivityUtils {
             transaction.replace(frameId, fragment, tag)
         }
         transaction.addToBackStack(null)
+
+        transaction.commit()
+    }
+
+    fun detachFragments(fragmentManager: FragmentManager) {
+        val transaction = fragmentManager.beginTransaction()
+
+        fragmentManager.fragments.forEach { fragment -> transaction.detach(fragment) }
+
+        transaction.commit()
+    }
+
+    fun attachFragment(fragmentManager: FragmentManager, tag: String) {
+        detachFragments(fragmentManager)
+
+        val transaction = fragmentManager.beginTransaction()
+        transaction.attach(fragmentManager.findFragmentByTag(tag))
+        transaction.commit()
+    }
+
+    fun addOrAttachFragment(fragmentManager: FragmentManager, fragment: Fragment, frameId: Int, tag: String) {
+        detachFragments(fragmentManager)
+
+        val existedFragment = fragmentManager.findFragmentByTag(tag)
+
+        val transaction = fragmentManager.beginTransaction()
+
+        if (existedFragment == null) {
+            transaction.add(frameId, fragment, tag)
+        } else {
+            transaction.attach(existedFragment)
+        }
 
         transaction.commit()
     }
