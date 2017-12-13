@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_play_music"
+            android:title="Play music"
+            android:icon="@drawable/ic_music_note_black_24dp" />
+        <item
+            android:id="@+id/nav_my_activities"
+            android:title="My Activities"
+            android:icon="@drawable/ic_directions_run_black_24dp" />
+        <item
+            android:id="@+id/nav_schedules"
+            android:title="Schedules"
+            android:icon="@drawable/ic_schedule_black_24dp" />
+        <item
+            android:id="@+id/nav_nearby_locations"
+            android:title="Nearby Locations"
+            android:icon="@drawable/ic_location_on_black_24dp" />
+    </group>
+
+    <item android:title="Settings">
+        <menu>
+            <item
+                android:id="@+id/nav_share"
+                android:title="My Profile" />
+            <item
+                android:id="@+id/nav_send"
+                android:title="Logout" />
+        </menu>
+    </item>
+
+</menu>

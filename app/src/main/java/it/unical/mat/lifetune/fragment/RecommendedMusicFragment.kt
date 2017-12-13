@@ -9,15 +9,13 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import butterknife.BindView
-import butterknife.ButterKnife
-import com.airbnb.epoxy.EpoxyRecyclerView
 import com.thedeanda.lorem.LoremIpsum
 import it.unical.mat.lifetune.R
 import it.unical.mat.lifetune.controller.MusicController
 import it.unical.mat.lifetune.decoration.CategoryDividerItemDecoration
 import it.unical.mat.lifetune.entity.Category
 import it.unical.mat.lifetune.entity.Playlist
+import kotlinx.android.synthetic.main.fragment_recommended_music.*
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -25,17 +23,14 @@ import kotlin.collections.ArrayList
 /**
  * Created by beantoan on 11/17/17.
  */
-class MusicSectionFragment : Fragment(), MusicController.AdapterCallbacks {
-
-    @BindView(R.id.categories)
-    lateinit var mRecyclerViewCategories: EpoxyRecyclerView
+class RecommendedMusicFragment : Fragment(), MusicController.AdapterCallbacks {
 
     lateinit var musicController: MusicController
 
     private var categories: List<Category> = ArrayList()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_music_section, container, false)
+        return inflater.inflate(R.layout.fragment_recommended_music, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -51,8 +46,6 @@ class MusicSectionFragment : Fragment(), MusicController.AdapterCallbacks {
     private fun onCreateViewTasks(view: View) {
         Log.d(TAG, "onCreateViewTasks")
 
-        ButterKnife.bind(this, view)
-
         setupRecyclerViewCategories()
 
         setupMusicController()
@@ -66,16 +59,16 @@ class MusicSectionFragment : Fragment(), MusicController.AdapterCallbacks {
         val dividerDrawable = ContextCompat.getDrawable(context!!, R.drawable.category_divider)
         val dividerItemDecoration = CategoryDividerItemDecoration(activity!!, DividerItemDecoration.VERTICAL, dividerDrawable!!)
 
-        mRecyclerViewCategories.layoutManager = LinearLayoutManager(context)
-        mRecyclerViewCategories.addItemDecoration(dividerItemDecoration)
+        recycler_view_categories.layoutManager = LinearLayoutManager(context)
+        recycler_view_categories.addItemDecoration(dividerItemDecoration)
     }
 
     private fun setupMusicController() {
         Log.d(TAG, "setupMusicController")
         musicController = MusicController(this)
 
-        mRecyclerViewCategories.clear()
-        mRecyclerViewCategories.setController(musicController)
+        recycler_view_categories.clear()
+        recycler_view_categories.setController(musicController)
     }
 
     private fun updateMusicController(data: List<Category>) {
@@ -111,6 +104,6 @@ class MusicSectionFragment : Fragment(), MusicController.AdapterCallbacks {
     }
 
     companion object {
-        private val TAG = MusicSectionFragment::class.java.canonicalName
+        private val TAG = RecommendedMusicFragment::class.java.canonicalName
     }
 }

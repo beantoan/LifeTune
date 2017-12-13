@@ -1,0 +1,30 @@
+package it.unical.mat.lifetune.adapter
+
+import android.support.v4.app.Fragment
+import android.support.v4.app.FragmentManager
+import android.support.v4.app.FragmentPagerAdapter
+import it.unical.mat.lifetune.fragment.FavoriteMusicFragment
+import it.unical.mat.lifetune.fragment.RecommendedMusicFragment
+
+/**
+ * Created by beantoan on 11/17/17.
+ */
+class PlayMusicPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
+
+    override fun getItem(i: Int): Fragment = when (i) {
+        0 -> RecommendedMusicFragment()
+        else -> FavoriteMusicFragment()
+    }
+
+    override fun getCount(): Int = TAB_COUNT
+
+    override fun getPageTitle(position: Int): CharSequence = when (position) {
+        0 -> "Recommendation"
+        else -> "Favourite"
+    }
+
+    companion object {
+        val TAG = PlayMusicPagerAdapter::class.java.canonicalName
+        private val TAB_COUNT = 2
+    }
+}

@@ -25,6 +25,8 @@ class BootActivity : AppCompatActivity() {
 
             selectedProviders.add(IdpConfig.Builder(AuthUI.FACEBOOK_PROVIDER).build())
 
+            selectedProviders.add(IdpConfig.Builder(AuthUI.TWITTER_PROVIDER).build())
+
             selectedProviders.add(IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build())
 
             selectedProviders.add(IdpConfig.Builder(AuthUI.PHONE_VERIFICATION_PROVIDER).build())
