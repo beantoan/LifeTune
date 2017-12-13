@@ -3,15 +3,11 @@ package it.unical.mat.lifetune.fragment
 import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.AppBarLayout
-import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
-import android.support.v4.view.ViewPager
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import butterknife.BindView
-import butterknife.ButterKnife
 import com.arlib.floatingsearchview.FloatingSearchView
 import com.arlib.floatingsearchview.suggestions.model.SearchSuggestion
 import com.google.android.exoplayer2.DefaultLoadControl
@@ -22,13 +18,13 @@ import com.google.android.exoplayer2.source.DynamicConcatenatingMediaSource
 import com.google.android.exoplayer2.source.ExtractorMediaSource
 import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
-import com.google.android.exoplayer2.ui.SimpleExoPlayerView
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
 import it.unical.mat.lifetune.R
 import it.unical.mat.lifetune.activity.MainActivity
 import it.unical.mat.lifetune.adapter.PlayMusicPagerAdapter
 import it.unical.mat.lifetune.data.ColorSuggestion
 import it.unical.mat.lifetune.data.DataHelper
+import kotlinx.android.synthetic.main.fragment_play_music.*
 
 /**
  * Created by beantoan on 12/12/17.
@@ -38,29 +34,10 @@ class PlayMusicFragment : Fragment(),
 
     private lateinit var mPlayMusicPagerAdapter: PlayMusicPagerAdapter
 
-    @BindView(R.id.tabs)
-    lateinit var mTabLayout: TabLayout
-
-    @BindView(R.id.pager)
-    lateinit var mViewPager: ViewPager
-
-    @BindView(R.id.music_player)
-    lateinit var mMusicPlayer: SimpleExoPlayerView
-
-    @BindView(R.id.floating_search_view)
-    lateinit var mFloatingSearchView: FloatingSearchView
-
-    @BindView(R.id.app_bar_layout)
-    lateinit var mAppBarLayout: AppBarLayout
-
     private var mLastQuery = ""
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_play_music, container, false)
-
-        ButterKnife.bind(this, view)
-
-        return view
+        return inflater.inflate(R.layout.fragment_play_music, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -76,7 +53,7 @@ class PlayMusicFragment : Fragment(),
     }
 
     override fun onOffsetChanged(appBarLayout: AppBarLayout?, verticalOffset: Int) {
-        mFloatingSearchView.translationY = verticalOffset.toFloat()
+        floating_search_view.translationY = verticalOffset.toFloat()
     }
 
     private fun onViewCreatedTasks() {
@@ -86,13 +63,13 @@ class PlayMusicFragment : Fragment(),
 
         setupFloatingSearchView()
 
-        mAppBarLayout.addOnOffsetChangedListener(this)
+        app_bar_layout.addOnOffsetChangedListener(this)
 
-        mFloatingSearchView.attachNavigationDrawerToMenuButton((activity as MainActivity).getDrawerLayout()!!)
+        floating_search_view.attachNavigationDrawerToMenuButton((activity as MainActivity).getDrawerLayout()!!)
     }
 
     private fun onDestroyTasks() {
-        mMusicPlayer.player.release()
+        music_player.player.release()
     }
 
     private fun setupViewPager() {
@@ -102,13 +79,13 @@ class PlayMusicFragment : Fragment(),
 
         // Set up the ViewPager, attaching the adapter and setting up a listener for when the
         // user swipes between sections.
-        mViewPager.adapter = mPlayMusicPagerAdapter
+        pager.adapter = mPlayMusicPagerAdapter
 
-        mTabLayout.setupWithViewPager(mViewPager)
+        tabs.setupWithViewPager(pager)
     }
 
     private fun setupMusicPlayer() {
-        mMusicPlayer.player = ExoPlayerFactory.newSimpleInstance(
+        music_player.player = ExoPlayerFactory.newSimpleInstance(
                 DefaultRenderersFactory(activity),
                 DefaultTrackSelector(),
                 DefaultLoadControl()
@@ -118,8 +95,8 @@ class PlayMusicFragment : Fragment(),
     }
 
     private fun playMusic(dynamicConcatenatingMediaSource: DynamicConcatenatingMediaSource) {
-        mMusicPlayer.player.prepare(dynamicConcatenatingMediaSource)
-        mMusicPlayer.player.playWhenReady = true
+        music_player.player.prepare(dynamicConcatenatingMediaSource)
+        music_player.player.playWhenReady = true
     }
 
     // TODO need to add real data source
@@ -127,7 +104,7 @@ class PlayMusicFragment : Fragment(),
         val dynamicConcatenatingMediaSource = DynamicConcatenatingMediaSource()
         val mediaSources = ArrayList<MediaSource>()
 
-        val songUrls = arrayListOf<String>(
+        val songUrls = arrayListOf(
                 "http://test.flanet.vn/1.mp3", "http://test.flanet.vn/2.mp3"
         )
 
@@ -138,22 +115,22 @@ class PlayMusicFragment : Fragment(),
         return dynamicConcatenatingMediaSource
     }
 
-    private fun buildMediaSource(uri: Uri): MediaSource {
+    private fun buildMediaSource(uri: Uri): ExtractorMediaSource {
         return ExtractorMediaSource(uri, DefaultHttpDataSourceFactory("ua"),
                 DefaultExtractorsFactory(), null, null)
     }
 
     private fun setupFloatingSearchView() {
-        mFloatingSearchView.setOnQueryChangeListener { oldQuery, newQuery ->
+        floating_search_view.setOnQueryChangeListener { oldQuery, newQuery ->
             if (oldQuery.isNotBlank() && newQuery.isBlank()) {
-                mFloatingSearchView.clearSuggestions()
+                floating_search_view.clearSuggestions()
             } else {
 
                 //this shows the top left circular progress
                 //you can call it where ever you want, but
                 //it makes sense to do it when loading something in
                 //the background.
-                mFloatingSearchView.showProgress()
+                floating_search_view.showProgress()
 
                 //simulates a query call to a data source
                 //with a new query.
@@ -163,16 +140,16 @@ class PlayMusicFragment : Fragment(),
 
                     //this will swap the data and
                     //render the collapse/expand animations as necessary
-                    mFloatingSearchView.swapSuggestions(results)
+                    floating_search_view.swapSuggestions(results)
 
                     //let the users know that the background
                     //process has completed
-                    mFloatingSearchView.hideProgress()
+                    floating_search_view.hideProgress()
                 }
             }
         }
 
-        mFloatingSearchView.setOnSearchListener(object : FloatingSearchView.OnSearchListener {
+        floating_search_view.setOnSearchListener(object : FloatingSearchView.OnSearchListener {
             override fun onSearchAction(currentQuery: String?) {
 
                 mLastQuery = currentQuery!!
@@ -197,16 +174,16 @@ class PlayMusicFragment : Fragment(),
 
         })
 
-        mFloatingSearchView.setOnFocusChangeListener(object : FloatingSearchView.OnFocusChangeListener {
+        floating_search_view.setOnFocusChangeListener(object : FloatingSearchView.OnFocusChangeListener {
             override fun onFocus() {
 
                 //show suggestions when search bar gains focus (typically history suggestions)
-                mFloatingSearchView.swapSuggestions(DataHelper.getHistory(activity, 3))
+                floating_search_view.swapSuggestions(DataHelper.getHistory(activity, 3))
             }
 
             override fun onFocusCleared() {
                 //set the title of the bar so that when focus is returned a new query begins
-                mFloatingSearchView.setSearchBarTitle(mLastQuery)
+                floating_search_view.setSearchBarTitle(mLastQuery)
             }
         })
     }
