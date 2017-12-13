@@ -11,11 +11,13 @@ import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
 import com.beantoan.smsbackup.util.ActivityUtils
 import com.firebase.ui.auth.IdpResponse
+import com.google.firebase.auth.FirebaseAuth
 import it.unical.mat.lifetune.R
 import it.unical.mat.lifetune.fragment.MyActivitiesFragment
 import it.unical.mat.lifetune.fragment.PlayMusicFragment
 import it.unical.mat.lifetune.fragment.SchedulesFragment
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.nav_header_main.view.*
 
 
 class MainActivity :
@@ -63,6 +65,8 @@ class MainActivity :
     private fun onCreateTasks() {
         setContentView(R.layout.activity_main)
 
+        showUserInfo()
+
         setupNavigationDrawer()
 
         nav_view.setCheckedItem(R.id.nav_play_music)
@@ -76,6 +80,15 @@ class MainActivity :
         toggle.syncState()
 
         nav_view.setNavigationItemSelectedListener(this)
+    }
+
+    private fun showUserInfo() {
+        val header = nav_view.getHeaderView(0)
+
+        val authUser = FirebaseAuth.getInstance().currentUser!!
+
+        header.user_fullname.text = authUser.displayName
+        header.user_email.text = authUser.email ?: authUser.phoneNumber
     }
 
     fun getDrawerLayout(): DrawerLayout? {
