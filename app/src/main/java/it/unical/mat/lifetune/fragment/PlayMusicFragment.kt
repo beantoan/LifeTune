@@ -7,6 +7,8 @@ import android.support.v4.app.Fragment
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.INVISIBLE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import com.arlib.floatingsearchview.FloatingSearchView
 import com.arlib.floatingsearchview.suggestions.model.SearchSuggestion
@@ -75,7 +77,7 @@ class PlayMusicFragment : Fragment(),
     private fun setupViewPager() {
         // Create the adapter that will return a fragment for each of the three primary sections
         // of the app.
-        mPlayMusicPagerAdapter = PlayMusicPagerAdapter(activity!!.supportFragmentManager)
+        mPlayMusicPagerAdapter = PlayMusicPagerAdapter(this, activity!!.supportFragmentManager)
 
         // Set up the ViewPager, attaching the adapter and setting up a listener for when the
         // user swipes between sections.
@@ -91,6 +93,8 @@ class PlayMusicFragment : Fragment(),
                 DefaultLoadControl()
         )
 
+        hideMusicPlayer()
+
         playMusic(dummyMediaSources())
     }
 
@@ -99,13 +103,28 @@ class PlayMusicFragment : Fragment(),
         music_player.player.playWhenReady = true
     }
 
+    private fun displayMusicPlayer(isShown: Boolean) = when {
+        isShown -> music_player.visibility = VISIBLE
+        else -> music_player.visibility = INVISIBLE
+    }
+
+    fun showMusicPlayer() {
+        displayMusicPlayer(true)
+    }
+
+    fun hideMusicPlayer() {
+        displayMusicPlayer(false)
+    }
+
     // TODO need to add real data source
     private fun dummyMediaSources(): DynamicConcatenatingMediaSource {
         val dynamicConcatenatingMediaSource = DynamicConcatenatingMediaSource()
         val mediaSources = ArrayList<MediaSource>()
 
         val songUrls = arrayListOf(
-                "http://test.flanet.vn/1.mp3", "http://test.flanet.vn/2.mp3"
+                "https://r1---eu.nixcdn.com/NhacCuaTui955/NguoiTinhMuaDong-HaVan-5308927.mp3?st=091TkbAG1BmP1qV1DdY3dw&e=1513246936&t=1513160536589",
+                "https://r1---eu.nixcdn.com/NhacCuaTui955/NguoiTinhMuaDong-HaVan-5308927.mp3?st=091TkbAG1BmP1qV1DdY3dw&e=1513246936&t=1513160536589",
+                "https://r1---eu.nixcdn.com/NhacCuaTui955/NguoiTinhMuaDong-HaVan-5308927.mp3?st=091TkbAG1BmP1qV1DdY3dw&e=1513246936&t=1513160536589"
         )
 
         songUrls.forEach { mediaSources.add(buildMediaSource(Uri.parse(it))) }
