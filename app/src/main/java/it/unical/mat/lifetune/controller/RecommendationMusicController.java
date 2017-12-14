@@ -7,17 +7,19 @@ import com.airbnb.epoxy.TypedEpoxyController;
 import java.util.List;
 
 import it.unical.mat.lifetune.entity.Category;
+import it.unical.mat.lifetune.entity.Playlist;
 import it.unical.mat.lifetune.model.CategoryModelGroup;
 
-public class MusicController extends TypedEpoxyController<List<Category>> {
-    private static final String TAG = MusicController.class.getCanonicalName();
+public class RecommendationMusicController extends TypedEpoxyController<List<Category>> {
+    private static final String TAG = RecommendationMusicController.class.getCanonicalName();
 
     public interface AdapterCallbacks {
-        void onPlaylistClicked(Category category, int position);
+        void onPlaylistClicked(Playlist playlist, int position);
     }
+
     private final AdapterCallbacks callbacks;
 
-    public MusicController(AdapterCallbacks _callbacks) {
+    public RecommendationMusicController(AdapterCallbacks _callbacks) {
         this.callbacks = _callbacks;
         setDebugLoggingEnabled(true);
     }

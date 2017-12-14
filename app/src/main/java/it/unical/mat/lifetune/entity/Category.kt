@@ -2,45 +2,26 @@ package it.unical.mat.lifetune.entity
 
 import android.databinding.BaseObservable
 import android.databinding.Bindable
+import com.google.gson.annotations.SerializedName
+import it.unical.mat.lifetune.BR
 
 /**
- * Created by beantoan on 11/20/17.
+ * Created by beantoan on 12/14/17.
  */
-class Category(
-        var id: Int,
-        private var _title: String?,
-        private var _description: String?,
-        private var _playlists: List<Playlist>) : BaseObservable() {
 
-    var title: String?
-        @Bindable get() = _title
-        set(value) {
-            if (!_title.equals(value)) {
-                _title = value
+data class Category(
+        @get:Bindable var id: Int,
+        @SerializedName("title") internal var title: String,
+        @SerializedName("recommendation", alternate = ["favourite"]) @get:Bindable var playlists: List<Playlist>
+) : BaseObservable() {
 
-                notifyPropertyChanged(it.unical.mat.lifetune.BR.title)
-            }
-        }
+    @Bindable
+    fun getTitle(): String {
+        return title
+    }
 
-    var description: String?
-        @Bindable get() = _description
-        set(value) {
-            if (!_description.equals(value)) {
-                _description = value
-
-                notifyPropertyChanged(it.unical.mat.lifetune.BR.description)
-            }
-        }
-
-    var playlists: List<Playlist>
-        @Bindable get() = _playlists
-        set(value) {
-            _playlists = value
-        }
-
-    init {
-        title = _title
-        description = _description
-        playlists = _playlists
+    fun setTitle(title: String) {
+        this.title = title
+        notifyPropertyChanged(BR.title)
     }
 }

@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import it.unical.mat.lifetune.R;
-import it.unical.mat.lifetune.controller.MusicController;
+import it.unical.mat.lifetune.controller.RecommendationMusicController;
 import it.unical.mat.lifetune.entity.Category;
 import it.unical.mat.lifetune.entity.Playlist;
 import it.unical.mat.lifetune.view.CategoryCarouselViewModel_;
@@ -15,14 +15,14 @@ import it.unical.mat.lifetune.view.CategoryCarouselViewModel_;
 public class CategoryModelGroup extends EpoxyModelGroup {
     public final Category data;
 
-    public CategoryModelGroup(Category _category, MusicController.AdapterCallbacks callbacks) {
+    public CategoryModelGroup(Category _category, RecommendationMusicController.AdapterCallbacks callbacks) {
         super(R.layout.model_group_category, buildModels(_category, callbacks));
         this.data = _category;
         id(data.getId());
     }
 
     private static List<EpoxyModel<?>> buildModels(Category category,
-                                                   MusicController.AdapterCallbacks callbacks) {
+                                                   RecommendationMusicController.AdapterCallbacks callbacks) {
         List<Playlist> playlists = category.getPlaylists();
         ArrayList<EpoxyModel<?>> models = new ArrayList<>();
 
@@ -37,7 +37,7 @@ public class CategoryModelGroup extends EpoxyModelGroup {
             playlistModels.add(new PlaylistModel_(playlist)
                     .id(playlist.getId(), category.getId())
                     .clickListener((model, parentView, clickedView, position) -> {
-                        callbacks.onPlaylistClicked(category, position);
+                        callbacks.onPlaylistClicked(playlist, position);
                     }));
         }
 

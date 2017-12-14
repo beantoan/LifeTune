@@ -14,15 +14,15 @@ import it.unical.mat.lifetune.entity.Playlist;
 
 import static com.airbnb.epoxy.EpoxyAttribute.Option.DoNotHash;
 
-@EpoxyModelClass(layout = R.layout.model_playlist)
-public abstract class PlaylistModel extends DataBindingEpoxyModel {
+@EpoxyModelClass(layout = R.layout.model_full_playlist)
+public abstract class FullPlaylistModel extends DataBindingEpoxyModel {
     @EpoxyAttribute(DoNotHash)
     View.OnClickListener clickListener;
 
     @EpoxyAttribute(DoNotHash)
     Playlist playlist;
 
-    public PlaylistModel(Playlist _playlist) {
+    public FullPlaylistModel(Playlist _playlist) {
         playlist = _playlist;
     }
 
