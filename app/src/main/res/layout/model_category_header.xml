@@ -19,18 +19,9 @@
             android:layout_marginStart="16sp"
             android:layout_marginRight="16sp"
             android:layout_marginLeft="16sp"
+            android:layout_marginTop="16sp"
             android:text='@{category.title}'
             android:textAppearance="@style/TextAppearance.AppCompat.Headline"/>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16sp"
-            android:layout_marginStart="18sp"
-            android:text='@{category.description}'
-            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-            android:layout_marginRight="16sp"
-            android:layout_marginLeft="18sp" />
     </LinearLayout>
 
 </layout>
