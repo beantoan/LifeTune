@@ -26,8 +26,10 @@ import kotlinx.android.synthetic.main.fragment_favorite_music.*
  */
 class FavoriteMusicFragment : BaseMusicFragment(), FavouriteMusicController.AdapterCallbacks {
 
-    lateinit var favouriteMusicController: FavouriteMusicController
-    
+    lateinit var controller: FavouriteMusicController
+
+    private var playlists: List<Playlist> = ArrayList()
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_favorite_music, container, false)
     }
@@ -68,18 +70,18 @@ class FavoriteMusicFragment : BaseMusicFragment(), FavouriteMusicController.Adap
 
     private fun setupMusicController() {
         Log.d(TAG, "setupMusicController")
-        favouriteMusicController = FavouriteMusicController(this)
+        controller = FavouriteMusicController(this)
 
         recycler_view_playlists.clear()
-        recycler_view_playlists.setController(favouriteMusicController)
+        recycler_view_playlists.setController(controller)
     }
 
     private fun updateMusicController(data: List<Playlist>) {
-        favouriteMusicController.setData(data)
+        controller.setData(data)
     }
 
     private fun callFavouritePlaylistsService() {
-        if (AppUtils.isInternetConnected(activity!!.applicationContext)) {
+        if (AppUtils.isInternetConnected(activity!!.applicationContext) && playlists.isEmpty()) {
             val playlistService = ApiServiceFactory.create(PlaylistServiceInterface::class.java)
 
             getCompositeDisposable().add(playlistService.favourite()
@@ -90,8 +92,12 @@ class FavoriteMusicFragment : BaseMusicFragment(), FavouriteMusicController.Adap
         }
     }
 
-    private fun showPlaylists(playlists: List<Playlist>) {
+    private fun showPlaylists(_playlists: List<Playlist>) {
+        playlists = _playlists
+        
         updateMusicController(playlists)
+
+        this.playMusicFragment.showMusicPlayer()
     }
 
 
