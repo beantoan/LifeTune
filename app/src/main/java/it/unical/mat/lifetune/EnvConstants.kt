@@ -7,5 +7,5 @@ package it.unical.mat.lifetune
  * ./ngrok http -subdomain=ghtk 80
  */
 object EnvConstants {
-    val BASE_API_URL = "https://lifetune.ngrok.io/"
+    val BASE_API_URL = "http://lifetune.eu.ngrok.io/"
 }
