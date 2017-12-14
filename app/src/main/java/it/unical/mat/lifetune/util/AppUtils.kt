@@ -63,20 +63,24 @@ object AppUtils {
 
                 val packageName = activity.packageName
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
-                    intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                    intent.data = Uri.parse("package:" + packageName)
-                } else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.FROYO) {
-                    intent = Intent(Intent.ACTION_VIEW)
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                    intent.setClassName("com.android.settings", "com.android.settings.InstalledAppDetails")
-                    intent.putExtra("pkg", packageName)
-                } else {
-                    intent = Intent(Intent.ACTION_VIEW)
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                    intent.setClassName("com.android.settings", "com.android.settings.InstalledAppDetails")
-                    intent.putExtra("com.android.settings.ApplicationPkgName", packageName)
+                when {
+                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD -> {
+                        intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                        intent.data = Uri.parse("package:" + packageName)
+                    }
+                    Build.VERSION.SDK_INT == Build.VERSION_CODES.FROYO -> {
+                        intent = Intent(Intent.ACTION_VIEW)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                        intent.setClassName("com.android.settings", "com.android.settings.InstalledAppDetails")
+                        intent.putExtra("pkg", packageName)
+                    }
+                    else -> {
+                        intent = Intent(Intent.ACTION_VIEW)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                        intent.setClassName("com.android.settings", "com.android.settings.InstalledAppDetails")
+                        intent.putExtra("com.android.settings.ApplicationPkgName", packageName)
+                    }
                 }
 
                 activity.startActivity(intent)
