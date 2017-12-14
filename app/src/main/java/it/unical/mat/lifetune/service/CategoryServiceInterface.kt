@@ -10,4 +10,7 @@ import retrofit2.http.GET
 interface CategoryServiceInterface {
     @GET("categories.json")
     fun index(): Single<List<Category>>
+
+    @GET("categories/recommendation.json")
+    fun recommendation(): Single<List<Category>>
 }
