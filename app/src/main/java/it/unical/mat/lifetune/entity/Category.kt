@@ -12,7 +12,7 @@ import it.unical.mat.lifetune.BR
 data class Category(
         @get:Bindable var id: Int,
         @SerializedName("title") internal var title: String,
-        @SerializedName("playlists") @get:Bindable var playlists: List<Playlist>
+        @SerializedName("recommendation", alternate = ["favourite"]) @get:Bindable var playlists: List<Playlist>
 ) : BaseObservable() {
 
     @Bindable
