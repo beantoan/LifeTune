@@ -98,7 +98,7 @@ class BootActivity : AppCompatActivity() {
     private fun showFireBaseAuthUI() {
         startActivityForResult(
                 AuthUI.getInstance().createSignInIntentBuilder()
-                        .setLogo(R.drawable.ic_google_color_144dp)
+                        .setLogo(R.drawable.logo)
                         .setAvailableProviders(selectedProviders)
                         .setTosUrl(GOOGLE_TOS_URL)
                         .setPrivacyPolicyUrl(GOOGLE_PRIVACY_POLICY_URL)
