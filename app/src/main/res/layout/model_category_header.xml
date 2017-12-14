@@ -19,7 +19,7 @@
             android:layout_marginStart="16sp"
             android:layout_marginRight="16sp"
             android:layout_marginLeft="16sp"
-            android:layout_marginTop="16sp"
+            android:layout_marginTop="8sp"
             android:text='@{category.title}'
             android:textAppearance="@style/TextAppearance.AppCompat.Headline"/>
     </LinearLayout>
