@@ -14,6 +14,7 @@ import it.unical.mat.lifetune.R
 import it.unical.mat.lifetune.controller.FavouriteMusicController
 import it.unical.mat.lifetune.decoration.RecyclerViewDividerItemDecoration
 import it.unical.mat.lifetune.entity.Playlist
+import it.unical.mat.lifetune.entity.Song
 import it.unical.mat.lifetune.service.ApiServiceFactory
 import it.unical.mat.lifetune.service.PlaylistServiceInterface
 import it.unical.mat.lifetune.util.AppUtils
@@ -38,6 +39,10 @@ class FavoriteMusicFragment : BaseMusicFragment(), FavouriteMusicController.Adap
     }
 
     override fun onPlaylistClicked(playlist: Playlist, position: Int) {
+
+    }
+
+    override fun onSongClicked(song: Song?, position: Int) {
 
     }
 
