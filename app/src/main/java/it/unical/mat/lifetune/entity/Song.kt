@@ -7,12 +7,8 @@ import com.google.gson.annotations.SerializedName
 /**
  * Created by beantoan on 11/20/17.
  */
-data class Playlist(
+data class Song(
         @SerializedName("id") var id: Int,
         @SerializedName("title") @get:Bindable var title: String,
-        @SerializedName("desc") @get:Bindable var desc: String,
-        @SerializedName("url") @get:Bindable var url: String,
-        @SerializedName("img") @get:Bindable var img: String,
-        @SerializedName("favourite") @get:Bindable var songs: List<Song>
-
+        @SerializedName("url") @get:Bindable var url: String
 ) : BaseObservable()

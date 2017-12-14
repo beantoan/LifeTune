@@ -7,13 +7,16 @@ import com.airbnb.epoxy.TypedEpoxyController;
 import java.util.List;
 
 import it.unical.mat.lifetune.entity.Playlist;
-import it.unical.mat.lifetune.model.FullPlaylistModel_;
+import it.unical.mat.lifetune.entity.Song;
+import it.unical.mat.lifetune.model.FullPlaylistModelGroup;
 
 public class FavouriteMusicController extends TypedEpoxyController<List<Playlist>> {
     private static final String TAG = FavouriteMusicController.class.getCanonicalName();
 
     public interface AdapterCallbacks {
         void onPlaylistClicked(Playlist playlist, int position);
+
+        void onSongClicked(Song song, int position);
     }
 
     private final AdapterCallbacks callbacks;
@@ -26,11 +29,7 @@ public class FavouriteMusicController extends TypedEpoxyController<List<Playlist
     @Override
     protected void buildModels(List<Playlist> playlists) {
         for (Playlist playlist : playlists) {
-            add(new FullPlaylistModel_(playlist)
-                    .id(playlist.getId())
-                    .clickListener((model, parentView, clickedView, position) -> {
-                        callbacks.onPlaylistClicked(playlist, position);
-                    }));
+            add(new FullPlaylistModelGroup(playlist, callbacks));
         }
     }
 
