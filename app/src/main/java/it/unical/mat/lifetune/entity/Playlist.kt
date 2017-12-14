@@ -2,43 +2,15 @@ package it.unical.mat.lifetune.entity
 
 import android.databinding.BaseObservable
 import android.databinding.Bindable
+import com.google.gson.annotations.SerializedName
 
 /**
  * Created by beantoan on 11/20/17.
  */
-class Playlist(
-        var id: Int,
-        private var _title: String?,
-        private var _url: String?,
-        private var _thumbUrl: String?) : BaseObservable() {
-
-    var title: String?
-        @Bindable get() = _title
-        set(value) {
-            if (!_title.equals(value)) {
-                _title = value
-            }
-        }
-
-    var url: String?
-        @Bindable get() = _url
-        set(value) {
-            if (!_url.equals(value)) {
-                _url = value
-            }
-        }
-
-    var thumbUrl: String?
-        @Bindable get() = _thumbUrl
-        set(value) {
-            if (!_thumbUrl.equals(value)) {
-                _thumbUrl = value
-            }
-        }
-
-    init {
-        title = _title
-        url = _url
-        thumbUrl = _thumbUrl
-    }
-}
+data class Playlist(
+        @SerializedName("id") var id: Int,
+        @SerializedName("title") @get:Bindable var title: String,
+        @SerializedName("desc") @get:Bindable var desc: String,
+        @SerializedName("url") @get:Bindable var url: String,
+        @SerializedName("img") @get:Bindable var img: String
+) : BaseObservable()
