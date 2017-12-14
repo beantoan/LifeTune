@@ -11,7 +11,7 @@ import android.view.View
 /**
  * Created by beantoan on 11/21/17.
  */
-class CategoryDividerItemDecoration(context: Context, orientation: Int, drawable: Drawable)
+class RecyclerViewDividerItemDecoration(context: Context, orientation: Int, drawable: Drawable)
     : DividerItemDecoration(context, orientation) {
 
     init {

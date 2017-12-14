@@ -8,9 +8,23 @@ import io.reactivex.disposables.CompositeDisposable
  */
 abstract class BaseMusicFragment : Fragment() {
 
-    internal val mCompositeDisposable = CompositeDisposable()
+    private var mCompositeDisposable: CompositeDisposable? = null
 
     internal lateinit var playMusicFragment: PlayMusicFragment
+
+    override fun onDestroy() {
+        mCompositeDisposable!!.clear()
+
+        super.onDestroy()
+    }
+
+    protected fun getCompositeDisposable(): CompositeDisposable {
+        if (mCompositeDisposable == null) {
+            mCompositeDisposable = CompositeDisposable()
+        }
+
+        return mCompositeDisposable!!
+    }
 
     companion object {
         private val TAG = BaseMusicFragment::class.java.canonicalName

@@ -8,20 +8,25 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import it.unical.mat.lifetune.R
-import it.unical.mat.lifetune.controller.RecommendationMusicController
-import it.unical.mat.lifetune.decoration.CategoryDividerItemDecoration
-import it.unical.mat.lifetune.entity.Category
+import it.unical.mat.lifetune.controller.FavouriteMusicController
+import it.unical.mat.lifetune.decoration.RecyclerViewDividerItemDecoration
+import it.unical.mat.lifetune.entity.Playlist
+import it.unical.mat.lifetune.service.ApiServiceFactory
+import it.unical.mat.lifetune.service.PlaylistServiceInterface
+import it.unical.mat.lifetune.util.AppUtils
 import kotlinx.android.synthetic.main.fragment_favorite_music.*
 
 
 /**
  * Created by beantoan on 11/17/17.
  */
-class FavoriteMusicFragment : BaseMusicFragment(), RecommendationMusicController.AdapterCallbacks {
+class FavoriteMusicFragment : BaseMusicFragment(), FavouriteMusicController.AdapterCallbacks {
 
-    lateinit var recommendationMusicController: RecommendationMusicController
-
+    lateinit var favouriteMusicController: FavouriteMusicController
+    
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_favorite_music, container, false)
     }
@@ -32,7 +37,7 @@ class FavoriteMusicFragment : BaseMusicFragment(), RecommendationMusicController
         onCreateViewTasks(view)
     }
 
-    override fun onPlaylistClicked(category: Category?, position: Int) {
+    override fun onPlaylistClicked(playlist: Playlist, position: Int) {
 
     }
 
@@ -42,39 +47,58 @@ class FavoriteMusicFragment : BaseMusicFragment(), RecommendationMusicController
         setupRecyclerViewCategories()
 
         setupMusicController()
+
+        callFavouritePlaylistsService()
     }
 
     private fun setupRecyclerViewCategories() {
         Log.d(TAG, "setupRecyclerViewCategories")
 
         val dividerDrawable = ContextCompat.getDrawable(activity!!.applicationContext, R.drawable.category_divider)
-        val dividerItemDecoration = CategoryDividerItemDecoration(activity!!.applicationContext, DividerItemDecoration.VERTICAL, dividerDrawable!!)
+        val dividerItemDecoration = RecyclerViewDividerItemDecoration(activity!!.applicationContext, DividerItemDecoration.VERTICAL, dividerDrawable!!)
 
-        recycler_view_categories.layoutManager = LinearLayoutManager(activity!!.applicationContext)
-        recycler_view_categories.addItemDecoration(dividerItemDecoration)
+        recycler_view_playlists.layoutManager = LinearLayoutManager(activity!!.applicationContext)
+        recycler_view_playlists.addItemDecoration(dividerItemDecoration)
     }
 
     private fun setupMusicController() {
         Log.d(TAG, "setupMusicController")
-        recommendationMusicController = RecommendationMusicController(this)
+        favouriteMusicController = FavouriteMusicController(this)
 
-        recycler_view_categories.clear()
-        recycler_view_categories.setController(recommendationMusicController)
+        recycler_view_playlists.clear()
+        recycler_view_playlists.setController(favouriteMusicController)
     }
 
-    private fun updateMusicController(data: List<Category>) {
-        recommendationMusicController.setData(data)
+    private fun updateMusicController(data: List<Playlist>) {
+        favouriteMusicController.setData(data)
     }
+
+    private fun callFavouritePlaylistsService() {
+        if (AppUtils.isInternetConnected(activity!!.applicationContext)) {
+            val playlistService = ApiServiceFactory.create(PlaylistServiceInterface::class.java)
+
+            getCompositeDisposable().add(playlistService.favourite()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe { playlists -> showPlaylists(playlists) }
+            )
+        }
+    }
+
+    private fun showPlaylists(playlists: List<Playlist>) {
+        updateMusicController(playlists)
+    }
+
 
     companion object {
         private val TAG = FavoriteMusicFragment::class.java.canonicalName
 
         fun newInstance(playMusicFragment: PlayMusicFragment): FavoriteMusicFragment {
-            val favoriteMusicFragment = FavoriteMusicFragment()
+            val fragment = FavoriteMusicFragment()
 
-            favoriteMusicFragment.playMusicFragment = playMusicFragment
+            fragment.playMusicFragment = playMusicFragment
 
-            return favoriteMusicFragment
+            return fragment
         }
     }
 }

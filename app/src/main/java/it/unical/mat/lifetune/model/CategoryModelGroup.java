@@ -37,7 +37,7 @@ public class CategoryModelGroup extends EpoxyModelGroup {
             playlistModels.add(new PlaylistModel_(playlist)
                     .id(playlist.getId(), category.getId())
                     .clickListener((model, parentView, clickedView, position) -> {
-                        callbacks.onPlaylistClicked(category, position);
+                        callbacks.onPlaylistClicked(playlist, position);
                     }));
         }
 

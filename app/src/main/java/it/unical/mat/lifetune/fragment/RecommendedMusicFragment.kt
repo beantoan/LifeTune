@@ -12,8 +12,9 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import it.unical.mat.lifetune.R
 import it.unical.mat.lifetune.controller.RecommendationMusicController
-import it.unical.mat.lifetune.decoration.CategoryDividerItemDecoration
+import it.unical.mat.lifetune.decoration.RecyclerViewDividerItemDecoration
 import it.unical.mat.lifetune.entity.Category
+import it.unical.mat.lifetune.entity.Playlist
 import it.unical.mat.lifetune.service.ApiServiceFactory
 import it.unical.mat.lifetune.service.CategoryServiceInterface
 import it.unical.mat.lifetune.util.AppUtils
@@ -24,8 +25,11 @@ import kotlinx.android.synthetic.main.fragment_recommended_music.*
  * Created by beantoan on 11/17/17.
  */
 class RecommendedMusicFragment : BaseMusicFragment(), RecommendationMusicController.AdapterCallbacks {
-    lateinit var recommendationMusicController: RecommendationMusicController
 
+    private lateinit var recommendationMusicController: RecommendationMusicController
+
+    private var categories: List<Category> = ArrayList()
+    
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_recommended_music, container, false)
     }
@@ -36,13 +40,7 @@ class RecommendedMusicFragment : BaseMusicFragment(), RecommendationMusicControl
         onCreateViewTasks(view)
     }
 
-    override fun onDestroy() {
-        mCompositeDisposable.clear()
-
-        super.onDestroy()
-    }
-
-    override fun onPlaylistClicked(category: Category?, position: Int) {
+    override fun onPlaylistClicked(playlist: Playlist, position: Int) {
 
     }
 
@@ -53,14 +51,14 @@ class RecommendedMusicFragment : BaseMusicFragment(), RecommendationMusicControl
 
         setupMusicController()
 
-        callCategoriesIndexService()
+        callRecommendationCategoriesService()
     }
 
     private fun setupRecyclerViewCategories() {
         Log.d(TAG, "setupRecyclerViewCategories")
 
         val dividerDrawable = ContextCompat.getDrawable(activity!!.applicationContext, R.drawable.category_divider)
-        val dividerItemDecoration = CategoryDividerItemDecoration(activity!!.applicationContext, DividerItemDecoration.VERTICAL, dividerDrawable!!)
+        val dividerItemDecoration = RecyclerViewDividerItemDecoration(activity!!.applicationContext, DividerItemDecoration.VERTICAL, dividerDrawable!!)
 
         recycler_view_categories.layoutManager = LinearLayoutManager(activity!!.applicationContext)
         recycler_view_categories.addItemDecoration(dividerItemDecoration)
@@ -78,11 +76,12 @@ class RecommendedMusicFragment : BaseMusicFragment(), RecommendationMusicControl
         recommendationMusicController.setData(data)
     }
 
-    private fun callCategoriesIndexService() {
-        if (AppUtils.isInternetConnected(activity!!.applicationContext)) {
+    private fun callRecommendationCategoriesService() {
+        if (AppUtils.isInternetConnected(activity!!.applicationContext) && categories.isEmpty()) {
             val categoryService = ApiServiceFactory.create(CategoryServiceInterface::class.java)
 
-            mCompositeDisposable.add(categoryService.recommendation()
+            getCompositeDisposable().add(
+                    categoryService.recommendation()
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe { categories -> showCategories(categories) }
@@ -90,7 +89,9 @@ class RecommendedMusicFragment : BaseMusicFragment(), RecommendationMusicControl
         }
     }
 
-    private fun showCategories(categories: List<Category>) {
+    private fun showCategories(_categories: List<Category>) {
+        categories = _categories
+
         updateMusicController(categories)
 
         this.playMusicFragment.showMusicPlayer()
@@ -100,11 +101,11 @@ class RecommendedMusicFragment : BaseMusicFragment(), RecommendationMusicControl
         private val TAG = RecommendedMusicFragment::class.java.canonicalName
 
         fun newInstance(playMusicFragment: PlayMusicFragment): RecommendedMusicFragment {
-            val recommendedMusicFragment = RecommendedMusicFragment()
+            val fragment = RecommendedMusicFragment()
 
-            recommendedMusicFragment.playMusicFragment = playMusicFragment
+            fragment.playMusicFragment = playMusicFragment
 
-            return recommendedMusicFragment
+            return fragment
         }
     }
 }
