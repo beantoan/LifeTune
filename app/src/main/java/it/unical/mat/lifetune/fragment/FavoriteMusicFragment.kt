@@ -94,10 +94,10 @@ class FavoriteMusicFragment : Fragment(), MusicController.AdapterCallbacks {
 
         (0..3).forEach { i ->
             val playlists = (0..5).map {
-                Playlist(it, lorem.getTitle(3, 5), "xxxurl", images[Random().nextInt(countImages)])
+                Playlist(it, lorem.getTitle(3, 5), lorem.getTitle(15, 20), "xxxurl", images[Random().nextInt(countImages)])
             }
 
-            data.add(Category(i, "$i - ${lorem.getTitle(2, 4)}", lorem.getTitle(5, 8), playlists))
+            data.add(Category(i, "$i - ${lorem.getTitle(2, 4)}", playlists))
         }
 
         return data
