@@ -11,7 +11,7 @@ import android.view.ViewGroup
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import it.unical.mat.lifetune.R
-import it.unical.mat.lifetune.controller.MusicController
+import it.unical.mat.lifetune.controller.RecommendationMusicController
 import it.unical.mat.lifetune.decoration.CategoryDividerItemDecoration
 import it.unical.mat.lifetune.entity.Category
 import it.unical.mat.lifetune.service.ApiServiceFactory
@@ -23,8 +23,8 @@ import kotlinx.android.synthetic.main.fragment_recommended_music.*
 /**
  * Created by beantoan on 11/17/17.
  */
-class RecommendedMusicFragment : BaseMusicFragment(), MusicController.AdapterCallbacks {
-    lateinit var musicController: MusicController
+class RecommendedMusicFragment : BaseMusicFragment(), RecommendationMusicController.AdapterCallbacks {
+    lateinit var recommendationMusicController: RecommendationMusicController
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_recommended_music, container, false)
@@ -68,14 +68,14 @@ class RecommendedMusicFragment : BaseMusicFragment(), MusicController.AdapterCal
 
     private fun setupMusicController() {
         Log.d(TAG, "setupMusicController")
-        musicController = MusicController(this)
+        recommendationMusicController = RecommendationMusicController(this)
 
         recycler_view_categories.clear()
-        recycler_view_categories.setController(musicController)
+        recycler_view_categories.setController(recommendationMusicController)
     }
 
     private fun updateMusicController(data: List<Category>) {
-        musicController.setData(data)
+        recommendationMusicController.setData(data)
     }
 
     private fun callCategoriesIndexService() {

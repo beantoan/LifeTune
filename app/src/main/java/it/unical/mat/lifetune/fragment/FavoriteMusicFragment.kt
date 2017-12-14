@@ -9,7 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import it.unical.mat.lifetune.R
-import it.unical.mat.lifetune.controller.MusicController
+import it.unical.mat.lifetune.controller.RecommendationMusicController
 import it.unical.mat.lifetune.decoration.CategoryDividerItemDecoration
 import it.unical.mat.lifetune.entity.Category
 import kotlinx.android.synthetic.main.fragment_favorite_music.*
@@ -18,9 +18,9 @@ import kotlinx.android.synthetic.main.fragment_favorite_music.*
 /**
  * Created by beantoan on 11/17/17.
  */
-class FavoriteMusicFragment : BaseMusicFragment(), MusicController.AdapterCallbacks {
+class FavoriteMusicFragment : BaseMusicFragment(), RecommendationMusicController.AdapterCallbacks {
 
-    lateinit var musicController: MusicController
+    lateinit var recommendationMusicController: RecommendationMusicController
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_favorite_music, container, false)
@@ -56,14 +56,14 @@ class FavoriteMusicFragment : BaseMusicFragment(), MusicController.AdapterCallba
 
     private fun setupMusicController() {
         Log.d(TAG, "setupMusicController")
-        musicController = MusicController(this)
+        recommendationMusicController = RecommendationMusicController(this)
 
         recycler_view_categories.clear()
-        recycler_view_categories.setController(musicController)
+        recycler_view_categories.setController(recommendationMusicController)
     }
 
     private fun updateMusicController(data: List<Category>) {
-        musicController.setData(data)
+        recommendationMusicController.setData(data)
     }
 
     companion object {
