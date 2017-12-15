@@ -15,6 +15,7 @@ import it.unical.mat.lifetune.controller.RecommendationMusicController
 import it.unical.mat.lifetune.decoration.RecyclerViewDividerItemDecoration
 import it.unical.mat.lifetune.entity.Category
 import it.unical.mat.lifetune.entity.Playlist
+import it.unical.mat.lifetune.entity.Song
 import it.unical.mat.lifetune.service.ApiServiceFactory
 import it.unical.mat.lifetune.util.AppDialog
 import it.unical.mat.lifetune.util.AppUtils
@@ -41,7 +42,7 @@ class RecommendedMusicFragment : BaseMusicFragment(), RecommendationMusicControl
     }
 
     override fun onPlaylistClicked(playlist: Playlist, position: Int) {
-        callPlaylistSongsService()
+        callPlaylistSongsService(playlist)
     }
 
     private fun onCreateViewTasks(view: View) {
@@ -105,27 +106,21 @@ class RecommendedMusicFragment : BaseMusicFragment(), RecommendationMusicControl
 
         updateMusicController(categories)
 
-        if (categories.isEmpty()) {
-            this.playMusicFragment.hideMusicPlayer()
-        } else {
-            this.playMusicFragment.showMusicPlayer()
-        }
-
         AppDialog.hideProgress(activity!!)
     }
 
-    private fun callPlaylistSongsService() {
+    private fun callPlaylistSongsService(playlist: Playlist) {
         if (AppUtils.isInternetConnected(activity!!.applicationContext)) {
             getCompositeDisposable().add(
-                    ApiServiceFactory.createCategoryService().recommendation()
+                    ApiServiceFactory.createPlaylistService().songs(playlist.id)
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(
-                                    { categories -> showCategories(categories) },
+                                    { songs -> playSongs(songs) },
                                     { error ->
-                                        Log.e(TAG, "callRecommendationCategoriesService", error)
+                                        Log.e(TAG, "callPlaylistSongsService", error)
 
-                                        showCategories(ArrayList())
+                                        playSongs(ArrayList())
 
                                         AppDialog.error(R.string.api_service_error_title, R.string.api_service_error_message, activity!!)
                                     }
@@ -134,6 +129,10 @@ class RecommendedMusicFragment : BaseMusicFragment(), RecommendationMusicControl
         } else {
             AppDialog.error(R.string.no_internet_error_title, R.string.no_internet_error_message, activity!!)
         }
+    }
+
+    private fun playSongs(songs: List<Song>) {
+        this.playMusicFragment.playSongs(songs)
     }
 
     companion object {

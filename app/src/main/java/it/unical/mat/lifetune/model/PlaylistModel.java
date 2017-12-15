@@ -42,6 +42,8 @@ public abstract class PlaylistModel extends DataBindingEpoxyModel {
                 .centerCrop()
                 .into(image);
 
+        view.setOnClickListener(clickListener);
+
         return view;
     }
 }
