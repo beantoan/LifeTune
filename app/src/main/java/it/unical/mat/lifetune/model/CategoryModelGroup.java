@@ -34,11 +34,13 @@ public class CategoryModelGroup extends EpoxyModelGroup {
         // Add a list of Playlist into CategoryCarousel
         List<PlaylistModel_> playlistModels = new ArrayList<>();
         for (Playlist playlist : playlists) {
-            playlistModels.add(new PlaylistModel_(playlist)
+            playlistModels.add(
+                    new PlaylistModel_(playlist)
                     .id(playlist.getId(), category.getId())
                     .clickListener((model, parentView, clickedView, position) -> {
                         callbacks.onPlaylistClicked(playlist, position);
-                    }));
+                    })
+            );
         }
 
         CategoryCarouselViewModel_ categoryCarouselViewModel = new CategoryCarouselViewModel_();
