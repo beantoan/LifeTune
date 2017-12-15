@@ -82,25 +82,29 @@ class FavoriteMusicFragment : BaseMusicFragment(), FavouriteMusicController.Adap
     }
 
     private fun callFavouritePlaylistsService() {
-        if (AppUtils.isInternetConnected(activity!!.applicationContext) && playlists.isEmpty()) {
-            AppDialog.showProgress(R.string.progress_dialog_waiting_message, activity!!)
+        if (playlists.isEmpty()) {
+            if (AppUtils.isInternetConnected(activity!!.applicationContext)) {
+                AppDialog.showProgress(R.string.progress_dialog_waiting_message, activity!!)
 
-            val playlistService = ApiServiceFactory.create(PlaylistServiceInterface::class.java)
+                val playlistService = ApiServiceFactory.create(PlaylistServiceInterface::class.java)
 
-            getCompositeDisposable().add(playlistService.favourite()
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                            { playlists -> showPlaylists(playlists) },
-                            { error ->
-                                Log.e(TAG, "callFavouritePlaylistsService", error)
+                getCompositeDisposable().add(playlistService.favourite()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                                { playlists -> showPlaylists(playlists) },
+                                { error ->
+                                    Log.e(TAG, "callFavouritePlaylistsService", error)
 
-                                showPlaylists(ArrayList())
+                                    showPlaylists(ArrayList())
 
-                                AppDialog.error(R.string.api_service_error_title, R.string.api_service_error_message, activity!!)
-                            }
-                    )
-            )
+                                    AppDialog.error(R.string.api_service_error_title, R.string.api_service_error_message, activity!!)
+                                }
+                        )
+                )
+            } else {
+                AppDialog.error(R.string.no_internet_error_title, R.string.no_internet_error_message, activity!!)
+            }
         }
     }
 

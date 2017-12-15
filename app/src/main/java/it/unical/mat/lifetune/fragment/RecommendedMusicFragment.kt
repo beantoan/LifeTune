@@ -78,24 +78,28 @@ class RecommendedMusicFragment : BaseMusicFragment(), RecommendationMusicControl
     }
 
     private fun callRecommendationCategoriesService() {
-        if (AppUtils.isInternetConnected(activity!!.applicationContext) && categories.isEmpty()) {
-            val categoryService = ApiServiceFactory.create(CategoryServiceInterface::class.java)
+        if (categories.isEmpty()) {
+            if (AppUtils.isInternetConnected(activity!!.applicationContext)) {
+                val categoryService = ApiServiceFactory.create(CategoryServiceInterface::class.java)
 
-            getCompositeDisposable().add(
-                    categoryService.recommendation()
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(
-                                    { categories -> showCategories(categories) },
-                                    { error ->
-                                        Log.e(TAG, "callRecommendationCategoriesService", error)
+                getCompositeDisposable().add(
+                        categoryService.recommendation()
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(
+                                        { categories -> showCategories(categories) },
+                                        { error ->
+                                            Log.e(TAG, "callRecommendationCategoriesService", error)
 
-                                        showCategories(ArrayList())
+                                            showCategories(ArrayList())
 
-                                        AppDialog.error(R.string.api_service_error_title, R.string.api_service_error_message, activity!!)
-                                    }
-                            )
-            )
+                                            AppDialog.error(R.string.api_service_error_title, R.string.api_service_error_message, activity!!)
+                                        }
+                                )
+                )
+            } else {
+                AppDialog.error(R.string.no_internet_error_title, R.string.no_internet_error_message, activity!!)
+            }
         }
     }
 

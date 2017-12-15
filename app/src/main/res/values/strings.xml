@@ -19,5 +19,8 @@
     <string name="progress_dialog_waiting_message">Waiting for a minute</string>
     <string name="api_service_error_title">An error occurred</string>
     <string name="api_service_error_message">Please check your wifi or mobile data connection. If it works perfectly, please contact to beantoan@gmail.com for helps. Thanks.</string>
+    <string name="no_internet_error_title">No internet connection</string>
+    <string name="no_internet_error_message">Please check your wifi or mobile data connection</string>
+
 
 </resources>
