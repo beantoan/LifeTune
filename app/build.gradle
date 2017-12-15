@@ -50,8 +50,9 @@ project.android.buildTypes.all { buildType ->
                     implicitlyAddAutoModels     : "true"
             ]
 }
-
 dependencies {
+    implementation 'com.google.gms:google-services:3.1.0'
+
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
     implementation "com.android.support:appcompat-v7:$android_support_version"
