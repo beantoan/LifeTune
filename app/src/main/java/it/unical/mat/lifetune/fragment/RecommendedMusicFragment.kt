@@ -16,7 +16,6 @@ import it.unical.mat.lifetune.decoration.RecyclerViewDividerItemDecoration
 import it.unical.mat.lifetune.entity.Category
 import it.unical.mat.lifetune.entity.Playlist
 import it.unical.mat.lifetune.service.ApiServiceFactory
-import it.unical.mat.lifetune.service.CategoryServiceInterface
 import it.unical.mat.lifetune.util.AppDialog
 import it.unical.mat.lifetune.util.AppUtils
 import kotlinx.android.synthetic.main.fragment_recommended_music.*
@@ -80,10 +79,8 @@ class RecommendedMusicFragment : BaseMusicFragment(), RecommendationMusicControl
     private fun callRecommendationCategoriesService() {
         if (categories.isEmpty()) {
             if (AppUtils.isInternetConnected(activity!!.applicationContext)) {
-                val categoryService = ApiServiceFactory.create(CategoryServiceInterface::class.java)
-
                 getCompositeDisposable().add(
-                        categoryService.recommendation()
+                        ApiServiceFactory.createCategoryService().recommendation()
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe(
