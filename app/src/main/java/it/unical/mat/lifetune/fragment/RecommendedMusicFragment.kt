@@ -17,6 +17,7 @@ import it.unical.mat.lifetune.entity.Category
 import it.unical.mat.lifetune.entity.Playlist
 import it.unical.mat.lifetune.service.ApiServiceFactory
 import it.unical.mat.lifetune.service.CategoryServiceInterface
+import it.unical.mat.lifetune.util.AppDialog
 import it.unical.mat.lifetune.util.AppUtils
 import kotlinx.android.synthetic.main.fragment_recommended_music.*
 
@@ -84,7 +85,16 @@ class RecommendedMusicFragment : BaseMusicFragment(), RecommendationMusicControl
                     categoryService.recommendation()
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe { categories -> showCategories(categories) }
+                            .subscribe(
+                                    { categories -> showCategories(categories) },
+                                    { error ->
+                                        Log.e(TAG, "callRecommendationCategoriesService", error)
+
+                                        showCategories(ArrayList())
+
+                                        AppDialog.error(R.string.api_service_error_title, R.string.api_service_error_message, activity!!)
+                                    }
+                            )
             )
         }
     }
@@ -94,7 +104,13 @@ class RecommendedMusicFragment : BaseMusicFragment(), RecommendationMusicControl
 
         updateMusicController(categories)
 
-        this.playMusicFragment.showMusicPlayer()
+        if (categories.isEmpty()) {
+            this.playMusicFragment.hideMusicPlayer()
+        } else {
+            this.playMusicFragment.showMusicPlayer()
+        }
+
+        AppDialog.hideProgress(activity!!)
     }
 
     companion object {

@@ -17,6 +17,7 @@ import it.unical.mat.lifetune.entity.Playlist
 import it.unical.mat.lifetune.entity.Song
 import it.unical.mat.lifetune.service.ApiServiceFactory
 import it.unical.mat.lifetune.service.PlaylistServiceInterface
+import it.unical.mat.lifetune.util.AppDialog
 import it.unical.mat.lifetune.util.AppUtils
 import kotlinx.android.synthetic.main.fragment_favorite_music.*
 
@@ -82,12 +83,23 @@ class FavoriteMusicFragment : BaseMusicFragment(), FavouriteMusicController.Adap
 
     private fun callFavouritePlaylistsService() {
         if (AppUtils.isInternetConnected(activity!!.applicationContext) && playlists.isEmpty()) {
+            AppDialog.showProgress(R.string.progress_dialog_waiting_message, activity!!)
+
             val playlistService = ApiServiceFactory.create(PlaylistServiceInterface::class.java)
 
             getCompositeDisposable().add(playlistService.favourite()
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe { playlists -> showPlaylists(playlists) }
+                    .subscribe(
+                            { playlists -> showPlaylists(playlists) },
+                            { error ->
+                                Log.e(TAG, "callFavouritePlaylistsService", error)
+
+                                showPlaylists(ArrayList())
+
+                                AppDialog.error(R.string.api_service_error_title, R.string.api_service_error_message, activity!!)
+                            }
+                    )
             )
         }
     }
@@ -97,7 +109,13 @@ class FavoriteMusicFragment : BaseMusicFragment(), FavouriteMusicController.Adap
         
         updateMusicController(playlists)
 
-        this.playMusicFragment.showMusicPlayer()
+        if (playlists.isEmpty()) {
+            this.playMusicFragment.hideMusicPlayer()
+        } else {
+            this.playMusicFragment.showMusicPlayer()
+        }
+
+        AppDialog.hideProgress(activity!!)
     }
 
 
