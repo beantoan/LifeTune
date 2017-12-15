@@ -111,12 +111,6 @@ class FavoriteMusicFragment : BaseMusicFragment(), FavouriteMusicController.Adap
         
         updateMusicController(playlists)
 
-        if (playlists.isEmpty()) {
-            this.playMusicFragment.hideMusicPlayer()
-        } else {
-            this.playMusicFragment.showMusicPlayer()
-        }
-
         AppDialog.hideProgress(activity!!)
     }
 
