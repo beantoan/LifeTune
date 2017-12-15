@@ -16,7 +16,6 @@ import it.unical.mat.lifetune.decoration.RecyclerViewDividerItemDecoration
 import it.unical.mat.lifetune.entity.Playlist
 import it.unical.mat.lifetune.entity.Song
 import it.unical.mat.lifetune.service.ApiServiceFactory
-import it.unical.mat.lifetune.service.PlaylistServiceInterface
 import it.unical.mat.lifetune.util.AppDialog
 import it.unical.mat.lifetune.util.AppUtils
 import kotlinx.android.synthetic.main.fragment_favorite_music.*
@@ -86,9 +85,8 @@ class FavoriteMusicFragment : BaseMusicFragment(), FavouriteMusicController.Adap
             if (AppUtils.isInternetConnected(activity!!.applicationContext)) {
                 AppDialog.showProgress(R.string.progress_dialog_waiting_message, activity!!)
 
-                val playlistService = ApiServiceFactory.create(PlaylistServiceInterface::class.java)
-
-                getCompositeDisposable().add(playlistService.favourite()
+                getCompositeDisposable().add(
+                        ApiServiceFactory.createPlaylistService().favourite()
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(

@@ -42,7 +42,7 @@ class RecommendedMusicFragment : BaseMusicFragment(), RecommendationMusicControl
     }
 
     override fun onPlaylistClicked(playlist: Playlist, position: Int) {
-
+        callPlaylistSongsService()
     }
 
     private fun onCreateViewTasks(view: View) {
@@ -115,6 +115,28 @@ class RecommendedMusicFragment : BaseMusicFragment(), RecommendationMusicControl
         }
 
         AppDialog.hideProgress(activity!!)
+    }
+
+    private fun callPlaylistSongsService() {
+        if (AppUtils.isInternetConnected(activity!!.applicationContext)) {
+            getCompositeDisposable().add(
+                    ApiServiceFactory.createCategoryService().recommendation()
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(
+                                    { categories -> showCategories(categories) },
+                                    { error ->
+                                        Log.e(TAG, "callRecommendationCategoriesService", error)
+
+                                        showCategories(ArrayList())
+
+                                        AppDialog.error(R.string.api_service_error_title, R.string.api_service_error_message, activity!!)
+                                    }
+                            )
+            )
+        } else {
+            AppDialog.error(R.string.no_internet_error_title, R.string.no_internet_error_message, activity!!)
+        }
     }
 
     companion object {

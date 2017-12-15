@@ -41,4 +41,10 @@ object ApiServiceFactory {
     fun <T> create(service: Class<T>): T {
         return ApiServiceFactory.getRetrofit().create(service)
     }
+
+    fun createCategoryService(): CategoryServiceInterface =
+            ApiServiceFactory.create(CategoryServiceInterface::class.java)
+
+    fun createPlaylistService(): PlaylistServiceInterface =
+            ApiServiceFactory.create(PlaylistServiceInterface::class.java)
 }
