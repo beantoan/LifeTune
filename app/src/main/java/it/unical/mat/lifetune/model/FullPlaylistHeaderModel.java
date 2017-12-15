@@ -15,14 +15,12 @@ import it.unical.mat.lifetune.entity.Playlist;
 import static com.airbnb.epoxy.EpoxyAttribute.Option.DoNotHash;
 
 @EpoxyModelClass(layout = R.layout.model_full_playlist_header)
-public abstract class FullPlaylistModel extends DataBindingEpoxyModel {
-    @EpoxyAttribute(DoNotHash)
-    View.OnClickListener clickListener;
+abstract class FullPlaylistHeaderModel extends DataBindingEpoxyModel {
 
     @EpoxyAttribute(DoNotHash)
     Playlist playlist;
 
-    public FullPlaylistModel(Playlist _playlist) {
+    FullPlaylistHeaderModel(Playlist _playlist) {
         playlist = _playlist;
     }
 
@@ -30,7 +28,7 @@ public abstract class FullPlaylistModel extends DataBindingEpoxyModel {
     protected View buildView(ViewGroup parent) {
         View view = super.buildView(parent);
 
-        ImageView image = view.findViewById(R.id.playlist_img);
+        ImageView image = view.findViewById(R.id.full_playlist_img);
 
         int imageSize = 130;
 

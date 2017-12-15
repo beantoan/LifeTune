@@ -8,14 +8,14 @@ import com.airbnb.epoxy.ModelView;
 import com.airbnb.epoxy.ModelView.Size;
 
 @ModelView(autoLayout = Size.MATCH_WIDTH_WRAP_HEIGHT)
-public class CategoryCarouselView extends Carousel {
+public class FullPlaylistCarouselView extends Carousel {
 
-    public CategoryCarouselView(Context context) {
+    public FullPlaylistCarouselView(Context context) {
         super(context);
     }
 
     @Override
     protected LayoutManager createLayoutManager() {
-        return new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+        return new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
     }
 }

@@ -3,6 +3,8 @@
 
     <data>
 
+        <import type="org.apache.commons.lang3.StringUtils" />
+
         <variable
             name="playlist"
             type="it.unical.mat.lifetune.entity.Playlist" />
@@ -12,26 +14,26 @@
             type="android.view.View.OnClickListener" />
     </data>
 
-    <android.support.v7.widget.CardView
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal"
-            android:layout_marginTop="16sp"
-            android:layout_marginBottom="16sp"
-            android:layout_marginEnd="16sp"
-            android:layout_marginRight="16sp"
-            android:layout_marginStart="16sp"
-            android:layout_marginLeft="16sp">
+            android:layout_marginTop="8sp"
+            android:layout_marginEnd="8sp"
+            android:layout_marginRight="8sp"
+            android:layout_marginStart="8sp"
+            android:layout_marginLeft="8sp">
 
             <ImageView
-                android:id="@+id/playlist_img"
+                android:id="@+id/full_playlist_img"
                 android:src="@drawable/no_image"
                 android:layout_width="130sp"
-                android:layout_height="130sp" />
+                android:layout_height="130sp"
+                android:layout_marginTop="4sp" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -44,7 +46,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text='@{playlist.title}'
+                    android:text='@{String.format("%s (%s bài)", playlist.title, playlist.songs.size())}'
                     android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
 
                 <TextView
@@ -55,5 +57,5 @@
                     android:textAppearance="@style/TextAppearance.AppCompat.Small" />
             </LinearLayout>
         </LinearLayout>
-    </android.support.v7.widget.CardView>
+    </FrameLayout>
 </layout>

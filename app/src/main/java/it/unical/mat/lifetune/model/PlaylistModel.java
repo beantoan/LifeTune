@@ -22,7 +22,7 @@ public abstract class PlaylistModel extends DataBindingEpoxyModel {
     @EpoxyAttribute(DoNotHash)
     Playlist playlist;
 
-    public PlaylistModel(Playlist _playlist) {
+    PlaylistModel(Playlist _playlist) {
         playlist = _playlist;
     }
 
