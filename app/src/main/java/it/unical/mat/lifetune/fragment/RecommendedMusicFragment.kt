@@ -17,6 +17,7 @@ import it.unical.mat.lifetune.entity.Category
 import it.unical.mat.lifetune.entity.Playlist
 import it.unical.mat.lifetune.service.ApiServiceFactory
 import it.unical.mat.lifetune.service.CategoryServiceInterface
+import it.unical.mat.lifetune.util.AppDialog
 import it.unical.mat.lifetune.util.AppUtils
 import kotlinx.android.synthetic.main.fragment_recommended_music.*
 
@@ -26,10 +27,10 @@ import kotlinx.android.synthetic.main.fragment_recommended_music.*
  */
 class RecommendedMusicFragment : BaseMusicFragment(), RecommendationMusicController.AdapterCallbacks {
 
-    private lateinit var recommendationMusicController: RecommendationMusicController
+    private lateinit var controller: RecommendationMusicController
 
     private var categories: List<Category> = ArrayList()
-    
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_recommended_music, container, false)
     }
@@ -66,14 +67,14 @@ class RecommendedMusicFragment : BaseMusicFragment(), RecommendationMusicControl
 
     private fun setupMusicController() {
         Log.d(TAG, "setupMusicController")
-        recommendationMusicController = RecommendationMusicController(this)
+        controller = RecommendationMusicController(this)
 
         recycler_view_categories.clear()
-        recycler_view_categories.setController(recommendationMusicController)
+        recycler_view_categories.setController(controller)
     }
 
     private fun updateMusicController(data: List<Category>) {
-        recommendationMusicController.setData(data)
+        controller.setData(data)
     }
 
     private fun callRecommendationCategoriesService() {
@@ -84,7 +85,16 @@ class RecommendedMusicFragment : BaseMusicFragment(), RecommendationMusicControl
                     categoryService.recommendation()
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe { categories -> showCategories(categories) }
+                            .subscribe(
+                                    { categories -> showCategories(categories) },
+                                    { error ->
+                                        Log.e(TAG, "callRecommendationCategoriesService", error)
+
+                                        showCategories(ArrayList())
+
+                                        AppDialog.error(R.string.api_service_error_title, R.string.api_service_error_message, activity!!)
+                                    }
+                            )
             )
         }
     }
@@ -94,7 +104,13 @@ class RecommendedMusicFragment : BaseMusicFragment(), RecommendationMusicControl
 
         updateMusicController(categories)
 
-        this.playMusicFragment.showMusicPlayer()
+        if (categories.isEmpty()) {
+            this.playMusicFragment.hideMusicPlayer()
+        } else {
+            this.playMusicFragment.showMusicPlayer()
+        }
+
+        AppDialog.hideProgress(activity!!)
     }
 
     companion object {

@@ -17,6 +17,7 @@ import it.unical.mat.lifetune.entity.Playlist
 import it.unical.mat.lifetune.entity.Song
 import it.unical.mat.lifetune.service.ApiServiceFactory
 import it.unical.mat.lifetune.service.PlaylistServiceInterface
+import it.unical.mat.lifetune.util.AppDialog
 import it.unical.mat.lifetune.util.AppUtils
 import kotlinx.android.synthetic.main.fragment_favorite_music.*
 
@@ -26,8 +27,10 @@ import kotlinx.android.synthetic.main.fragment_favorite_music.*
  */
 class FavoriteMusicFragment : BaseMusicFragment(), FavouriteMusicController.AdapterCallbacks {
 
-    lateinit var favouriteMusicController: FavouriteMusicController
-    
+    lateinit var controller: FavouriteMusicController
+
+    private var playlists: List<Playlist> = ArrayList()
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_favorite_music, container, false)
     }
@@ -68,30 +71,51 @@ class FavoriteMusicFragment : BaseMusicFragment(), FavouriteMusicController.Adap
 
     private fun setupMusicController() {
         Log.d(TAG, "setupMusicController")
-        favouriteMusicController = FavouriteMusicController(this)
+        controller = FavouriteMusicController(this)
 
         recycler_view_playlists.clear()
-        recycler_view_playlists.setController(favouriteMusicController)
+        recycler_view_playlists.setController(controller)
     }
 
     private fun updateMusicController(data: List<Playlist>) {
-        favouriteMusicController.setData(data)
+        controller.setData(data)
     }
 
     private fun callFavouritePlaylistsService() {
-        if (AppUtils.isInternetConnected(activity!!.applicationContext)) {
+        if (AppUtils.isInternetConnected(activity!!.applicationContext) && playlists.isEmpty()) {
+            AppDialog.showProgress(R.string.progress_dialog_waiting_message, activity!!)
+
             val playlistService = ApiServiceFactory.create(PlaylistServiceInterface::class.java)
 
             getCompositeDisposable().add(playlistService.favourite()
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe { playlists -> showPlaylists(playlists) }
+                    .subscribe(
+                            { playlists -> showPlaylists(playlists) },
+                            { error ->
+                                Log.e(TAG, "callFavouritePlaylistsService", error)
+
+                                showPlaylists(ArrayList())
+
+                                AppDialog.error(R.string.api_service_error_title, R.string.api_service_error_message, activity!!)
+                            }
+                    )
             )
         }
     }
 
-    private fun showPlaylists(playlists: List<Playlist>) {
+    private fun showPlaylists(_playlists: List<Playlist>) {
+        playlists = _playlists
+        
         updateMusicController(playlists)
+
+        if (playlists.isEmpty()) {
+            this.playMusicFragment.hideMusicPlayer()
+        } else {
+            this.playMusicFragment.showMusicPlayer()
+        }
+
+        AppDialog.hideProgress(activity!!)
     }
 
 

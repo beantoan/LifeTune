@@ -1,7 +1,6 @@
 package it.unical.mat.lifetune.service
 
 
-import com.facebook.stetho.okhttp3.StethoInterceptor
 import it.unical.mat.lifetune.EnvConstants
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -23,7 +22,6 @@ object ApiServiceFactory {
 
             val client = OkHttpClient.Builder()
                     .addInterceptor(logging)
-                    .addNetworkInterceptor(StethoInterceptor())
                     .build()
 
             ApiServiceFactory.retrofit = Retrofit.Builder()
