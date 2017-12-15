@@ -80,10 +80,29 @@ class FavoriteMusicFragment : BaseMusicFragment(), FavouriteMusicController.Adap
         controller.setData(data)
     }
 
+    private fun displayLoading(isShown: Boolean) {
+        val layoutParams = favourite_music_loading.layoutParams
+
+        layoutParams.height = when {
+            isShown -> ViewGroup.LayoutParams.WRAP_CONTENT
+            else -> 0
+        }
+
+        favourite_music_loading.layoutParams = layoutParams
+    }
+
+    private fun showLoading() {
+        displayLoading(true)
+    }
+
+    private fun hideLoading() {
+        displayLoading(false)
+    }
+
     private fun callFavouritePlaylistsService() {
         if (playlists.isEmpty()) {
             if (AppUtils.isInternetConnected(activity!!.applicationContext)) {
-                AppDialog.showProgress(R.string.progress_dialog_waiting_message, activity!!)
+                showLoading()
 
                 getCompositeDisposable().add(
                         ApiServiceFactory.createPlaylistService().favourite()
@@ -111,7 +130,7 @@ class FavoriteMusicFragment : BaseMusicFragment(), FavouriteMusicController.Adap
         
         updateMusicController(playlists)
 
-        AppDialog.hideProgress(activity!!)
+        hideLoading()
     }
 
 

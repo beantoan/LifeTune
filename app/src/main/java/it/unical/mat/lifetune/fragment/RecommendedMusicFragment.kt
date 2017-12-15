@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import it.unical.mat.lifetune.R
@@ -71,15 +72,38 @@ class RecommendedMusicFragment : BaseMusicFragment(), RecommendationMusicControl
 
         recycler_view_categories.clear()
         recycler_view_categories.setController(controller)
+
+        updateMusicController(ArrayList())
     }
 
     private fun updateMusicController(data: List<Category>) {
         controller.setData(data)
     }
 
+    private fun displayLoading(isShown: Boolean) {
+        val layoutParams = recommendation_music_loading.layoutParams
+
+        layoutParams.height = when {
+            isShown -> WRAP_CONTENT
+            else -> 0
+        }
+
+        recommendation_music_loading.layoutParams = layoutParams
+    }
+
+    private fun showLoading() {
+        displayLoading(true)
+    }
+
+    private fun hideLoading() {
+        displayLoading(false)
+    }
+
     private fun callRecommendationCategoriesService() {
         if (categories.isEmpty()) {
             if (AppUtils.isInternetConnected(activity!!.applicationContext)) {
+                showLoading()
+
                 getCompositeDisposable().add(
                         ApiServiceFactory.createCategoryService().recommendation()
                                 .subscribeOn(Schedulers.io())
@@ -106,11 +130,12 @@ class RecommendedMusicFragment : BaseMusicFragment(), RecommendationMusicControl
 
         updateMusicController(categories)
 
-        AppDialog.hideProgress(activity!!)
+        hideLoading()
     }
 
     private fun callPlaylistSongsService(playlist: Playlist) {
         if (AppUtils.isInternetConnected(activity!!.applicationContext)) {
+
             getCompositeDisposable().add(
                     ApiServiceFactory.createPlaylistService().songs(playlist.id)
                             .subscribeOn(Schedulers.io())
