@@ -26,6 +26,7 @@ import it.unical.mat.lifetune.activity.MainActivity
 import it.unical.mat.lifetune.adapter.PlayMusicPagerAdapter
 import it.unical.mat.lifetune.data.ColorSuggestion
 import it.unical.mat.lifetune.data.DataHelper
+import it.unical.mat.lifetune.entity.Song
 import kotlinx.android.synthetic.main.fragment_play_music.*
 
 /**
@@ -94,8 +95,6 @@ class PlayMusicFragment : Fragment(),
         )
 
         hideMusicPlayer()
-
-        playMusic(dummyMediaSources())
     }
 
     private fun playMusic(dynamicConcatenatingMediaSource: DynamicConcatenatingMediaSource) {
@@ -116,22 +115,21 @@ class PlayMusicFragment : Fragment(),
         displayMusicPlayer(false)
     }
 
-    // TODO need to add real data source
-    private fun dummyMediaSources(): DynamicConcatenatingMediaSource {
-        val dynamicConcatenatingMediaSource = DynamicConcatenatingMediaSource()
-        val mediaSources = ArrayList<MediaSource>()
+    fun playSongs(songs: List<Song>) {
+        if (songs.isEmpty()) {
+            this.hideMusicPlayer()
+        } else {
+            this.showMusicPlayer()
 
-        val songUrls = arrayListOf(
-                "https://r1---eu.nixcdn.com/NhacCuaTui955/NguoiTinhMuaDong-HaVan-5308927.mp3?st=091TkbAG1BmP1qV1DdY3dw&e=1513246936&t=1513160536589",
-                "https://r1---eu.nixcdn.com/NhacCuaTui955/NguoiTinhMuaDong-HaVan-5308927.mp3?st=091TkbAG1BmP1qV1DdY3dw&e=1513246936&t=1513160536589",
-                "https://r1---eu.nixcdn.com/NhacCuaTui955/NguoiTinhMuaDong-HaVan-5308927.mp3?st=091TkbAG1BmP1qV1DdY3dw&e=1513246936&t=1513160536589"
-        )
+            val dynamicConcatenatingMediaSource = DynamicConcatenatingMediaSource()
+            val mediaSources = ArrayList<MediaSource>()
 
-        songUrls.forEach { mediaSources.add(buildMediaSource(Uri.parse(it))) }
+            songs.forEach { mediaSources.add(buildMediaSource(Uri.parse(it.url))) }
 
-        dynamicConcatenatingMediaSource.addMediaSources(mediaSources)
+            dynamicConcatenatingMediaSource.addMediaSources(mediaSources)
 
-        return dynamicConcatenatingMediaSource
+            playMusic(dynamicConcatenatingMediaSource)
+        }
     }
 
     private fun buildMediaSource(uri: Uri): ExtractorMediaSource {
