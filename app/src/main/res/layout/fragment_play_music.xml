@@ -37,12 +37,12 @@
             <android.support.design.widget.TabLayout
                 android:id="@+id/tabs"
                 android:layout_width="match_parent"
-                android:layout_height="50sp"
+                android:layout_height="50dp"
                 app:tabTextColor="@color/lightGray"
                 app:tabSelectedTextColor="@color/lightGray"
                 app:tabIndicatorColor="@color/lightGray"
                 app:layout_collapseMode="pin"
-                app:tabIndicatorHeight="4sp" />
+                app:tabIndicatorHeight="4dp" />
 
         </android.support.design.widget.AppBarLayout>
 
@@ -90,9 +90,9 @@
         app:floatingSearch_dimBackground="true"
         app:floatingSearch_dismissOnOutsideTouch="true"
         app:floatingSearch_leftActionMode="showHamburger"
-        app:floatingSearch_searchBarMarginLeft="8sp"
-        app:floatingSearch_searchBarMarginTop="8sp"
-        app:floatingSearch_searchBarMarginRight="8sp"
+        app:floatingSearch_searchBarMarginLeft="8dp"
+        app:floatingSearch_searchBarMarginTop="8dp"
+        app:floatingSearch_searchBarMarginRight="8dp"
         app:floatingSearch_searchHint="@string/search_music_title"
         app:floatingSearch_showSearchKey="true"
         app:floatingSearch_suggestionsListAnimDuration="250" />

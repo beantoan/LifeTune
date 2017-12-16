@@ -8,18 +8,19 @@
     <LinearLayout
         android:id="@+id/recommendation_music_loading"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:orientation="vertical">
 
         <ProgressBar
+            style="?android:attr/progressBarStyle"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="?android:attr/progressBarStyle" />
+            android:layout_height="wrap_content" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/progress_dialog_waiting_message" />
+            android:text="@string/progress_dialog_waiting_message"
+            android:textAlignment="center" />
     </LinearLayout>
 
     <com.airbnb.epoxy.EpoxyRecyclerView
