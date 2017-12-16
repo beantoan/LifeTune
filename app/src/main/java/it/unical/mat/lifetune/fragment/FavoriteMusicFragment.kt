@@ -80,7 +80,7 @@ class FavoriteMusicFragment : BaseMusicFragment(), FavouriteMusicController.Adap
         controller.setData(data)
     }
 
-    private fun displayLoading(isShown: Boolean) {
+    override fun displayLoading(isShown: Boolean) {
         val layoutParams = favourite_music_loading.layoutParams
 
         layoutParams.height = when {
@@ -89,14 +89,6 @@ class FavoriteMusicFragment : BaseMusicFragment(), FavouriteMusicController.Adap
         }
 
         favourite_music_loading.layoutParams = layoutParams
-    }
-
-    private fun showLoading() {
-        displayLoading(true)
-    }
-
-    private fun hideLoading() {
-        displayLoading(false)
     }
 
     private fun callFavouritePlaylistsService() {
