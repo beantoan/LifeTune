@@ -44,7 +44,7 @@ public class CategoryModelGroup extends EpoxyModelGroup {
         }
 
         CategoryCarouselViewModel_ categoryCarouselViewModel = new CategoryCarouselViewModel_();
-        categoryCarouselViewModel.id("categories");
+        categoryCarouselViewModel.id("playlists-" + String.valueOf(category.getId()));
         categoryCarouselViewModel.models(playlistModels);
 
         models.add(categoryCarouselViewModel);

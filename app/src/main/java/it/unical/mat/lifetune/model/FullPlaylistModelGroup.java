@@ -42,7 +42,7 @@ public class FullPlaylistModelGroup extends EpoxyModelGroup {
         }
 
         FullPlaylistCarouselViewModel_ fullPlaylistCarouselViewModel = new FullPlaylistCarouselViewModel_();
-        fullPlaylistCarouselViewModel.id("songs");
+        fullPlaylistCarouselViewModel.id("songs-" + String.valueOf(playlist.getId()));
         fullPlaylistCarouselViewModel.models(songModels);
 
         models.add(fullPlaylistCarouselViewModel);
