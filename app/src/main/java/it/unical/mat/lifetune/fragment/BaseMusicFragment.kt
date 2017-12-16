@@ -26,6 +26,16 @@ abstract class BaseMusicFragment : Fragment() {
         return mCompositeDisposable!!
     }
 
+    protected abstract fun displayLoading(isShown: Boolean)
+
+    protected fun showLoading() {
+        displayLoading(true)
+    }
+
+    protected fun hideLoading() {
+        displayLoading(false)
+    }
+
     companion object {
         private val TAG = BaseMusicFragment::class.java.canonicalName
     }

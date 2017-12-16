@@ -7,8 +7,6 @@ import android.support.v4.app.Fragment
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.INVISIBLE
-import android.view.View.VISIBLE
 import android.view.ViewGroup
 import com.arlib.floatingsearchview.FloatingSearchView
 import com.arlib.floatingsearchview.suggestions.model.SearchSuggestion
@@ -102,9 +100,15 @@ class PlayMusicFragment : Fragment(),
         music_player.player.playWhenReady = true
     }
 
-    private fun displayMusicPlayer(isShown: Boolean) = when {
-        isShown -> music_player.visibility = VISIBLE
-        else -> music_player.visibility = INVISIBLE
+    private fun displayMusicPlayer(isShown: Boolean) {
+        val layoutParams = music_player.layoutParams
+
+        val height = resources.getDimension(R.dimen.music_player_height).toInt()
+
+        layoutParams.height = when {
+            isShown -> height
+            else -> 0
+        }                                 
     }
 
     fun showMusicPlayer() {
@@ -124,7 +128,7 @@ class PlayMusicFragment : Fragment(),
             val dynamicConcatenatingMediaSource = DynamicConcatenatingMediaSource()
             val mediaSources = ArrayList<MediaSource>()
 
-            songs.forEach { mediaSources.add(buildMediaSource(Uri.parse(it.url))) }
+            songs.forEach { mediaSources.add(buildMediaSource(Uri.parse(it.mp3_url))) }
 
             dynamicConcatenatingMediaSource.addMediaSources(mediaSources)
 

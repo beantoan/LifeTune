@@ -80,7 +80,7 @@ class RecommendedMusicFragment : BaseMusicFragment(), RecommendationMusicControl
         controller.setData(data)
     }
 
-    private fun displayLoading(isShown: Boolean) {
+    override fun displayLoading(isShown: Boolean) {
         val layoutParams = recommendation_music_loading.layoutParams
 
         layoutParams.height = when {
@@ -89,14 +89,6 @@ class RecommendedMusicFragment : BaseMusicFragment(), RecommendationMusicControl
         }
 
         recommendation_music_loading.layoutParams = layoutParams
-    }
-
-    private fun showLoading() {
-        displayLoading(true)
-    }
-
-    private fun hideLoading() {
-        displayLoading(false)
     }
 
     private fun callRecommendationCategoriesService() {
@@ -135,6 +127,7 @@ class RecommendedMusicFragment : BaseMusicFragment(), RecommendationMusicControl
 
     private fun callPlaylistSongsService(playlist: Playlist) {
         if (AppUtils.isInternetConnected(activity!!.applicationContext)) {
+            showLoading()
 
             getCompositeDisposable().add(
                     ApiServiceFactory.createPlaylistService().songs(playlist.id)
@@ -158,6 +151,7 @@ class RecommendedMusicFragment : BaseMusicFragment(), RecommendationMusicControl
 
     private fun playSongs(songs: List<Song>) {
         this.playMusicFragment.playSongs(songs)
+        hideLoading()
     }
 
     companion object {
