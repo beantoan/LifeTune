@@ -46,6 +46,17 @@ class RecommendedMusicFragment : BaseMusicFragment(), RecommendationMusicControl
         callPlaylistSongsService(playlist)
     }
 
+    override fun displayLoading(isShown: Boolean) {
+        val layoutParams = recommendation_music_loading.layoutParams
+
+        layoutParams.height = when {
+            isShown -> WRAP_CONTENT
+            else -> 0
+        }
+
+        recommendation_music_loading.layoutParams = layoutParams
+    }
+
     private fun onCreateViewTasks(view: View) {
         Log.d(TAG, "onCreateViewTasks")
 
@@ -54,6 +65,8 @@ class RecommendedMusicFragment : BaseMusicFragment(), RecommendationMusicControl
         setupMusicController()
 
         callRecommendationCategoriesService()
+
+        determineDisplayMusicPlayer()
     }
 
     private fun setupRecyclerViewCategories() {
@@ -73,22 +86,13 @@ class RecommendedMusicFragment : BaseMusicFragment(), RecommendationMusicControl
         recycler_view_categories.clear()
         recycler_view_categories.setController(controller)
 
-        updateMusicController(ArrayList())
+        if (categories.isNotEmpty()) {
+            updateMusicController(categories)
+        }
     }
 
     private fun updateMusicController(data: List<Category>) {
         controller.setData(data)
-    }
-
-    override fun displayLoading(isShown: Boolean) {
-        val layoutParams = recommendation_music_loading.layoutParams
-
-        layoutParams.height = when {
-            isShown -> WRAP_CONTENT
-            else -> 0
-        }
-
-        recommendation_music_loading.layoutParams = layoutParams
     }
 
     private fun callRecommendationCategoriesService() {
@@ -101,20 +105,26 @@ class RecommendedMusicFragment : BaseMusicFragment(), RecommendationMusicControl
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe(
-                                        { categories -> showCategories(categories) },
-                                        { error ->
-                                            Log.e(TAG, "callRecommendationCategoriesService", error)
-
-                                            showCategories(ArrayList())
-
-                                            AppDialog.error(R.string.api_service_error_title, R.string.api_service_error_message, activity!!)
-                                        }
+                                        { categories -> onRecommendationCategoriesServiceSuccess(categories) },
+                                        { error -> onRecommendationCategoriesServiceFailure(error) }
                                 )
                 )
             } else {
                 AppDialog.error(R.string.no_internet_error_title, R.string.no_internet_error_message, activity!!)
             }
         }
+    }
+
+    private fun onRecommendationCategoriesServiceSuccess(categories: List<Category>) {
+        showCategories(categories)
+    }
+
+    private fun onRecommendationCategoriesServiceFailure(error: Throwable) {
+        Log.e(TAG, "onRecommendationCategoriesServiceFailure", error)
+
+        showCategories(ArrayList())
+
+        AppDialog.error(R.string.api_service_error_title, R.string.api_service_error_message, activity!!)
     }
 
     private fun showCategories(_categories: List<Category>) {
@@ -134,14 +144,8 @@ class RecommendedMusicFragment : BaseMusicFragment(), RecommendationMusicControl
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(
-                                    { songs -> playSongs(songs) },
-                                    { error ->
-                                        Log.e(TAG, "callPlaylistSongsService", error)
-
-                                        playSongs(ArrayList())
-
-                                        AppDialog.error(R.string.api_service_error_title, R.string.api_service_error_message, activity!!)
-                                    }
+                                    { songs -> onPlaylistSongsServiceSuccess(playlist, songs) },
+                                    { error -> onPlaylistSongsServiceFailure(error) }
                             )
             )
         } else {
@@ -149,9 +153,22 @@ class RecommendedMusicFragment : BaseMusicFragment(), RecommendationMusicControl
         }
     }
 
-    private fun playSongs(songs: List<Song>) {
-        this.playMusicFragment.playSongs(songs)
-        hideLoading()
+    private fun onPlaylistSongsServiceSuccess(playlist: Playlist, songs: List<Song>) {
+        playlist.songs = songs
+
+        currentPlaylist = playlist
+
+        playSongs(songs)
+    }
+
+    private fun onPlaylistSongsServiceFailure(error: Throwable) {
+        Log.e(TAG, "onPlaylistSongsServiceFailure", error)
+
+        currentPlaylist = null
+
+        playSongs(ArrayList())
+
+        AppDialog.error(R.string.api_service_error_title, R.string.api_service_error_message, activity!!)
     }
 
     companion object {

@@ -120,6 +120,8 @@ class PlayMusicFragment : Fragment(),
     }
 
     fun playSongs(songs: List<Song>) {
+        music_player.player.stop()
+
         if (songs.isEmpty()) {
             this.hideMusicPlayer()
         } else {

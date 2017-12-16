@@ -41,7 +41,7 @@ class FavoriteMusicFragment : BaseMusicFragment(), FavouriteMusicController.Adap
     }
 
     override fun onPlaylistClicked(playlist: Playlist, position: Int) {
-
+        playSongs(playlist.songs)
     }
 
     override fun onSongClicked(song: Song?, position: Int) {
@@ -74,6 +74,10 @@ class FavoriteMusicFragment : BaseMusicFragment(), FavouriteMusicController.Adap
 
         recycler_view_playlists.clear()
         recycler_view_playlists.setController(controller)
+
+        if (playlists.isNotEmpty()) {
+            updateMusicController(playlists)
+        }
     }
 
     private fun updateMusicController(data: List<Playlist>) {
@@ -101,20 +105,26 @@ class FavoriteMusicFragment : BaseMusicFragment(), FavouriteMusicController.Adap
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
-                                { playlists -> showPlaylists(playlists) },
-                                { error ->
-                                    Log.e(TAG, "callFavouritePlaylistsService", error)
-
-                                    showPlaylists(ArrayList())
-
-                                    AppDialog.error(R.string.api_service_error_title, R.string.api_service_error_message, activity!!)
-                                }
+                                { playlists -> onFavouritePlaylistsServiceSuccess(playlists) },
+                                { error -> onFavouritePlaylistsServiceFailure(error) }
                         )
                 )
             } else {
                 AppDialog.error(R.string.no_internet_error_title, R.string.no_internet_error_message, activity!!)
             }
         }
+    }
+
+    private fun onFavouritePlaylistsServiceSuccess(playlists: List<Playlist>) {
+        showPlaylists(playlists)
+    }
+
+    private fun onFavouritePlaylistsServiceFailure(error: Throwable) {
+        Log.e(TAG, "onFavouritePlaylistsServiceFailure", error)
+
+        showPlaylists(ArrayList())
+
+        AppDialog.error(R.string.api_service_error_title, R.string.api_service_error_message, activity!!)
     }
 
     private fun showPlaylists(_playlists: List<Playlist>) {
@@ -124,7 +134,6 @@ class FavoriteMusicFragment : BaseMusicFragment(), FavouriteMusicController.Adap
 
         hideLoading()
     }
-
 
     companion object {
         private val TAG = FavoriteMusicFragment::class.java.canonicalName
