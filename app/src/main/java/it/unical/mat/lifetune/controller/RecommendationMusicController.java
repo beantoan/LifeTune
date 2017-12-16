@@ -11,6 +11,7 @@ import it.unical.mat.lifetune.entity.Playlist;
 import it.unical.mat.lifetune.model.CategoryModelGroup;
 
 public class RecommendationMusicController extends TypedEpoxyController<List<Category>> {
+
     private static final String TAG = RecommendationMusicController.class.getCanonicalName();
 
     public interface AdapterCallbacks {
