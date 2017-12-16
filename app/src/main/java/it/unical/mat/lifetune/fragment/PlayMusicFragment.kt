@@ -58,28 +58,28 @@ class PlayMusicFragment : Fragment(),
     }
 
     private fun onViewCreatedTasks() {
+        Log.d(TAG, "onViewCreatedTasks")
+        
         setupViewPager()
-
-        setupMusicPlayer()
 
         setupFloatingSearchView()
 
         app_bar_layout.addOnOffsetChangedListener(this)
 
         floating_search_view.attachNavigationDrawerToMenuButton((activity as MainActivity).getDrawerLayout()!!)
+
+        setupMusicPlayer()
     }
 
     private fun onDestroyTasks() {
+        Log.d(TAG, "onDestroyTasks")
+
         music_player.player.release()
     }
 
     private fun setupViewPager() {
-        // Create the adapter that will return a fragment for each of the three primary sections
-        // of the app.
         mPlayMusicPagerAdapter = PlayMusicPagerAdapter(this, activity!!.supportFragmentManager)
 
-        // Set up the ViewPager, attaching the adapter and setting up a listener for when the
-        // user swipes between sections.
         pager.adapter = mPlayMusicPagerAdapter
 
         tabs.setupWithViewPager(pager)
@@ -91,8 +91,6 @@ class PlayMusicFragment : Fragment(),
                 DefaultTrackSelector(),
                 DefaultLoadControl()
         )
-
-        hideMusicPlayer()
     }
 
     private fun playMusic(dynamicConcatenatingMediaSource: DynamicConcatenatingMediaSource) {
@@ -101,14 +99,10 @@ class PlayMusicFragment : Fragment(),
     }
 
     private fun displayMusicPlayer(isShown: Boolean) {
-        val layoutParams = music_player.layoutParams
-
-        val height = resources.getDimension(R.dimen.music_player_height).toInt()
-
-        layoutParams.height = when {
-            isShown -> height
+        music_player.layoutParams.height = when {
+            isShown -> resources.getDimension(R.dimen.music_player_height).toInt()
             else -> 0
-        }                                 
+        }
     }
 
     fun showMusicPlayer() {
@@ -148,25 +142,14 @@ class PlayMusicFragment : Fragment(),
             if (oldQuery.isNotBlank() && newQuery.isBlank()) {
                 floating_search_view.clearSuggestions()
             } else {
-
-                //this shows the top left circular progress
-                //you can call it where ever you want, but
-                //it makes sense to do it when loading something in
-                //the background.
                 floating_search_view.showProgress()
 
-                //simulates a query call to a data source
-                //with a new query.
                 DataHelper.findSuggestions(activity, newQuery, 5,
                         PlayMusicFragment.FIND_SUGGESTION_SIMULATED_DELAY) { results ->
                     Log.d(PlayMusicFragment.TAG, "setupFloatingSearchView#setOnQueryChangeListener")
 
-                    //this will swap the data and
-                    //render the collapse/expand animations as necessary
                     floating_search_view.swapSuggestions(results)
 
-                    //let the users know that the background
-                    //process has completed
                     floating_search_view.hideProgress()
                 }
             }
@@ -200,12 +183,10 @@ class PlayMusicFragment : Fragment(),
         floating_search_view.setOnFocusChangeListener(object : FloatingSearchView.OnFocusChangeListener {
             override fun onFocus() {
 
-                //show suggestions when search bar gains focus (typically history suggestions)
                 floating_search_view.swapSuggestions(DataHelper.getHistory(activity, 3))
             }
 
             override fun onFocusCleared() {
-                //set the title of the bar so that when focus is returned a new query begins
                 floating_search_view.setSearchBarTitle(mLastQuery)
             }
         })
