@@ -8,6 +8,7 @@ import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.MenuItem
 import com.beantoan.smsbackup.util.ActivityUtils
 import com.firebase.ui.auth.IdpResponse
@@ -31,12 +32,16 @@ class MainActivity :
     private var schedulesFragment: SchedulesFragment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d(TAG, "onCreate")
+
         super.onCreate(savedInstanceState)
 
         onCreateTasks()
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        Log.d(TAG, "onNavigationItemSelected")
+
         when (item.itemId) {
             R.id.nav_play_music -> {
                 showPlayMusicFragment()
@@ -55,6 +60,8 @@ class MainActivity :
     }
 
     override fun onBackPressed() {
+        Log.d(TAG, "onBackPressed")
+
         if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
             drawer_layout.closeDrawer(GravityCompat.START)
         } else {
@@ -63,6 +70,8 @@ class MainActivity :
     }
     
     private fun onCreateTasks() {
+        Log.d(TAG, "onCreateTasks")
+
         setContentView(R.layout.activity_main)
 
         showUserInfo()
@@ -74,6 +83,8 @@ class MainActivity :
     }
 
     private fun setupNavigationDrawer() {
+        Log.d(TAG, "setupNavigationDrawer")
+
         val toggle = ActionBarDrawerToggle(
                 this, drawer_layout, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
         drawer_layout.addDrawerListener(toggle)
@@ -83,6 +94,8 @@ class MainActivity :
     }
 
     private fun showUserInfo() {
+        Log.d(TAG, "showUserInfo")
+
         val header = nav_view.getHeaderView(0)
 
         val authUser = FirebaseAuth.getInstance().currentUser!!
@@ -96,6 +109,8 @@ class MainActivity :
     }
 
     private fun showPlayMusicFragment() {
+        Log.d(TAG, "showPlayMusicFragment")
+
         if (playMusicFragment == null) {
             playMusicFragment = PlayMusicFragment()
         }
@@ -105,6 +120,8 @@ class MainActivity :
     }
 
     private fun showMyActivitiesFragment() {
+        Log.d(TAG, "showMyActivitiesFragment")
+
         if (myActivitiesFragment == null) {
             myActivitiesFragment = MyActivitiesFragment()
         }
@@ -114,6 +131,8 @@ class MainActivity :
     }
 
     private fun showSchedulesFragment() {
+        Log.d(TAG, "showSchedulesFragment")
+
         if (schedulesFragment == null) {
             schedulesFragment = SchedulesFragment()
         }

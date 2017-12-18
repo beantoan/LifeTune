@@ -6,6 +6,7 @@ import android.support.annotation.MainThread
 import android.support.annotation.StringRes
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import com.android.android.uamp.ui.MusicPlayerActivity
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.AuthUI.IdpConfig
@@ -36,12 +37,16 @@ class BootActivity : AppCompatActivity() {
         }
 
     public override fun onStart() {
+        Log.d(TAG, "onStart")
+
         super.onStart()
 
         boot()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+        Log.d(TAG, "onActivityResult")
+
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == RC_SIGN_IN) {
             handleSignInResponse(resultCode, data)
@@ -52,6 +57,8 @@ class BootActivity : AppCompatActivity() {
     }
 
     private fun boot() {
+        Log.d(TAG, "boot")
+
         val auth = FirebaseAuth.getInstance()
 
         if (auth.currentUser != null) {
@@ -64,6 +71,8 @@ class BootActivity : AppCompatActivity() {
 
     @MainThread
     private fun handleSignInResponse(resultCode: Int, data: Intent) {
+        Log.d(TAG, "handleSignInResponse")
+
         val response = IdpResponse.fromResultIntent(data)
 
         // Successfully signed in
@@ -98,6 +107,8 @@ class BootActivity : AppCompatActivity() {
      * Show FireBaseUI for authenticating
      */
     private fun showFireBaseAuthUI() {
+        Log.d(TAG, "showFireBaseAuthUI")
+
         startActivityForResult(
                 AuthUI.getInstance().createSignInIntentBuilder()
                         .setLogo(R.drawable.logo)
@@ -113,10 +124,14 @@ class BootActivity : AppCompatActivity() {
      * @param response
      */
     private fun showMainActivity(response: IdpResponse?) {
+        Log.d(TAG, "showMainActivity")
+
         startActivity(MainActivity.createIntent(this, response))
     }
 
     private fun showMusicPlaylerActivity() {
+        Log.d(TAG, "showMusicPlaylerActivity")
+
         startActivity(Intent(this, MusicPlayerActivity::class.java))
     }
 
@@ -126,6 +141,8 @@ class BootActivity : AppCompatActivity() {
     }
 
     companion object {
+        private val TAG = BootActivity::class.java.canonicalName
+
         private val GOOGLE_TOS_URL = "https://www.google.com/policies/terms/"
         private val GOOGLE_PRIVACY_POLICY_URL = "https://www.google.com/policies/privacy/"
 
