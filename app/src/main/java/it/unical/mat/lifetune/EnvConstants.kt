@@ -8,4 +8,5 @@ package it.unical.mat.lifetune
  */
 object EnvConstants {
     val BASE_API_URL = "http://lifetune.eu.ngrok.io/"
+    val NCT_BASE_URL = "https://www.nhaccuatui.com/"
 }

@@ -27,6 +27,7 @@ import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.support.v7.app.AppCompatActivity;
 
 import com.android.android.uamp.MusicService;
 import com.android.android.uamp.R;
@@ -37,7 +38,7 @@ import com.android.android.uamp.utils.ResourceHelper;
 /**
  * Base activity for activities that need to show a playback control fragment when media is playing.
  */
-public abstract class BaseActivity extends ActionBarCastActivity implements MediaBrowserProvider {
+public abstract class BaseActivity extends AppCompatActivity implements MediaBrowserProvider {
 
     private static final String TAG = LogHelper.makeLogTag(BaseActivity.class);
 

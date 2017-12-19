@@ -1,6 +1,7 @@
 package it.unical.mat.lifetune.fragment
 
 import android.os.Bundle
+import android.support.annotation.UiThread
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
@@ -16,7 +17,7 @@ import it.unical.mat.lifetune.controller.RecommendationMusicController
 import it.unical.mat.lifetune.decoration.RecyclerViewDividerItemDecoration
 import it.unical.mat.lifetune.entity.Category
 import it.unical.mat.lifetune.entity.Playlist
-import it.unical.mat.lifetune.entity.Song
+import it.unical.mat.lifetune.entity.PlaylistXml
 import it.unical.mat.lifetune.service.ApiServiceFactory
 import it.unical.mat.lifetune.util.AppDialog
 import it.unical.mat.lifetune.util.AppUtils
@@ -102,8 +103,8 @@ class RecommendedMusicFragment : BaseMusicFragment(), RecommendationMusicControl
 
                 getCompositeDisposable().add(
                         ApiServiceFactory.createCategoryService().recommendation()
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribeOn(Schedulers.io()) // "work" on io thread
+                                .observeOn(AndroidSchedulers.mainThread()) // "listen" on UIThread
                                 .subscribe(
                                         { categories -> onRecommendationCategoriesServiceSuccess(categories) },
                                         { error -> onRecommendationCategoriesServiceFailure(error) }
@@ -116,6 +117,8 @@ class RecommendedMusicFragment : BaseMusicFragment(), RecommendationMusicControl
     }
 
     private fun onRecommendationCategoriesServiceSuccess(categories: List<Category>) {
+        Log.d(TAG, "onRecommendationCategoriesServiceSuccess")
+
         showCategories(categories)
     }
 
@@ -140,11 +143,11 @@ class RecommendedMusicFragment : BaseMusicFragment(), RecommendationMusicControl
             showLoading()
 
             getCompositeDisposable().add(
-                    ApiServiceFactory.createPlaylistService().songs(playlist.id)
+                    ApiServiceFactory.createPlaylistXmlService().songs(playlist.xmlUrl)
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(
-                                    { songs -> onPlaylistSongsServiceSuccess(playlist, songs) },
+                                    { playlistXml -> onPlaylistSongsServiceSuccess(playlist, playlistXml) },
                                     { error -> onPlaylistSongsServiceFailure(error) }
                             )
             )
@@ -153,18 +156,14 @@ class RecommendedMusicFragment : BaseMusicFragment(), RecommendationMusicControl
         }
     }
 
-    private fun onPlaylistSongsServiceSuccess(playlist: Playlist, songs: List<Song>) {
-        playlist.songs = songs
-
-        currentPlaylist = playlist
-
-        playSongs(songs)
+    @UiThread
+    private fun onPlaylistSongsServiceSuccess(playlist: Playlist, playlistXml: PlaylistXml) {
+        playSongs(playlistXml)
     }
 
+    @UiThread
     private fun onPlaylistSongsServiceFailure(error: Throwable) {
         Log.e(TAG, "onPlaylistSongsServiceFailure", error)
-
-        currentPlaylist = null
 
         playSongs(ArrayList())
 

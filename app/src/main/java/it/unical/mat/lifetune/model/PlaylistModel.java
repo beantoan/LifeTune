@@ -36,8 +36,8 @@ public abstract class PlaylistModel extends DataBindingEpoxyModel {
 
         Picasso.with(view.getContext())
                 .load(playlist.getImg())
-                .placeholder(R.drawable.no_image)
-                .error(R.drawable.no_image)
+                .placeholder(R.drawable.ic_default_art)
+                .error(R.drawable.ic_default_art)
                 .resize(imageSize, imageSize)
                 .centerCrop()
                 .into(image);

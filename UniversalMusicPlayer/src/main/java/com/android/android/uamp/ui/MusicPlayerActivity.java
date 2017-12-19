@@ -18,6 +18,7 @@ package com.android.android.uamp.ui;
 import android.app.FragmentTransaction;
 import android.app.SearchManager;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.media.MediaBrowserCompat;
@@ -60,7 +61,7 @@ public class MusicPlayerActivity extends BaseActivity
 
         setContentView(R.layout.activity_player);
 
-        initializeToolbar();
+//        initializeToolbar();
         initializeFromParams(savedInstanceState, getIntent());
 
         // Only check if a full screen player is needed on the first time:
@@ -82,8 +83,10 @@ public class MusicPlayerActivity extends BaseActivity
     public void onMediaItemSelected(MediaBrowserCompat.MediaItem item) {
         LogHelper.d(TAG, "onMediaItemSelected, mediaId=" + item.getMediaId());
         if (item.isPlayable()) {
+            String url = "http://r1---eu.nixcdn.com/7c2d215e2d551018648e842fd2706375/5a38503c/NhacCuaTui952/YeuVoiVang-VuDuyKhanh-5251608.mp3";
+
             MediaControllerCompat.getMediaController(MusicPlayerActivity.this).getTransportControls()
-                    .playFromMediaId(item.getMediaId(), null);
+                    .playFromUri(Uri.parse(url), null);
         } else if (item.isBrowsable()) {
             navigateToBrowser(item.getMediaId());
         } else {

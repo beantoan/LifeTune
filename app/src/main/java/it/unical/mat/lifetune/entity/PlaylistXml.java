@@ -15,22 +15,22 @@ import java.util.List;
 @Root(name = "tracklist", strict = false)
 public class PlaylistXml extends BaseObservable {
     @Bindable
-    @ElementList(name = "track", entry = "track", inline = true, type = SongXml.class)
-    List<SongXml> songs;
+    @ElementList(name = "track", entry = "track", inline = true, type = Track.class)
+    List<Track> tracks;
 
 
     public PlaylistXml() {
     }
 
-    public PlaylistXml(List<SongXml> songs) {
-        this.songs = songs;
+    public PlaylistXml(List<Track> tracks) {
+        this.tracks = tracks;
     }
 
-    public List<SongXml> getSongs() {
-        return songs;
+    public List<Track> getTracks() {
+        return tracks;
     }
 
-    public void setSongs(List<SongXml> songs) {
-        this.songs = songs;
+    public void setTracks(List<Track> tracks) {
+        this.tracks = tracks;
     }
 }

@@ -1,1 +1,1 @@
-include ':app', ':UniversalMusicPlayer'
+include ':app'

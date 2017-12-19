@@ -35,12 +35,8 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/UAmpAppTheme"
-        android:banner="@drawable/banner_tv">
+        android:theme="@style/UAmpAppTheme">
 
-        <meta-data
-            android:name="com.google.android.gms.car.application"
-            android:resource="@xml/automotive_app_desc" />
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
@@ -49,11 +45,6 @@
         <activity
             android:name="com.android.android.uamp.ui.MusicPlayerActivity"
             android:label="@string/app_name">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-
             <!-- Use this intent filter to get voice searches, like "Play The Beatles" -->
             <intent-filter>
                 <action android:name="android.media.action.MEDIA_PLAY_FROM_SEARCH" />
@@ -64,41 +55,13 @@
         <!-- Placeholder activity for phone UI -->
         <activity
             android:name="com.android.android.uamp.ui.PlaceholderActivity"
-            android:label="@string/app_name"></activity>
+            android:label="@string/app_name" />
 
         <!-- Proxy activity that opens either the NowPlaying TV or the mobile UI, depending on
         the current environment -->
         <activity
             android:name="com.android.android.uamp.ui.NowPlayingActivity"
-            android:icon="@drawable/ic_launcher"></activity>
-
-        <!--
-             (OPTIONAL) use this meta data to indicate which icon should be
-             used in Android Auto media notifications (for example, when the
-             music changes and the user is looking at another app)
-        -->
-        <meta-data
-            android:name="com.google.android.gms.car.notification.SmallIcon"
-            android:resource="@drawable/ic_notification" />
-
-        <!--
-             (OPTIONAL) use this meta data to override the theme from which Android Auto will
-             look for colors. If you don't set this, Android Auto will look
-             for color attributes in your application theme.
-        -->
-        <meta-data
-            android:name="com.google.android.gms.car.application.theme"
-            android:resource="@style/CarTheme" />
-
-        <!--
-             (OPTIONAL) use this meta data to override the theme from which Android Wear will
-             look for colors. Currently, only background color of the media cards can be set, via
-             colorPrimaryDark. If you don't set this custom theme, Android Wear will look
-             for colorPrimaryDark attribute in your application theme.
-        -->
-        <meta-data
-            android:name="com.google.android.wearable.media.theme"
-            android:resource="@style/WearTheme" />
+            android:icon="@drawable/ic_launcher" />
 
         <!-- Main music service, provides media browsing and media playback services to
          consumers through MediaBrowserService and MediaSession. Consumers connect to it through

@@ -1,6 +1,6 @@
 package it.unical.mat.lifetune.service
 
-import io.reactivex.Single
+import io.reactivex.Flowable
 import it.unical.mat.lifetune.entity.Playlist
 import it.unical.mat.lifetune.entity.Song
 import retrofit2.http.GET
@@ -11,8 +11,8 @@ import retrofit2.http.Path
  */
 interface PlaylistServiceInterface {
     @GET("playlists/favourite.json")
-    fun favourite(): Single<List<Playlist>>
+    fun favourite(): Flowable<List<Playlist>>
 
     @GET("playlists/{id}/songs.json")
-    fun songs(@Path("id") songId: Int): Single<List<Song>>
+    fun songs(@Path("id") songId: Int): Flowable<List<Song>>
 }

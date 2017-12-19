@@ -1,8 +1,13 @@
 package it.unical.mat.lifetune.fragment
 
+import android.os.Bundle
+import android.support.annotation.UiThread
 import android.support.v4.app.Fragment
+import android.util.Log
+import android.view.View
 import io.reactivex.disposables.CompositeDisposable
-import it.unical.mat.lifetune.entity.Playlist
+import it.unical.mat.lifetune.LifeTuneApplication
+import it.unical.mat.lifetune.entity.PlaylistXml
 import it.unical.mat.lifetune.entity.Song
 
 /**
@@ -12,12 +17,33 @@ abstract class BaseMusicFragment : Fragment() {
 
     private var mCompositeDisposable: CompositeDisposable? = null
 
-    protected lateinit var playMusicFragment: PlayMusicFragment
+    protected var playMusicFragment: PlayMusicFragment? = null
 
-    protected var currentPlaylist: Playlist? = null
+    override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d(TAG, "onCreate")
+        super.onCreate(savedInstanceState)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        Log.d(TAG, "onViewCreated")
+
+        super.onViewCreated(view, savedInstanceState)
+    }
+
+    override fun onStop() {
+        Log.d(TAG, "onStop")
+
+        super.onStop()
+    }
 
     override fun onDestroy() {
-        mCompositeDisposable!!.clear()
+        Log.d(TAG, "onDestroy")
+
+        try {
+            mCompositeDisposable?.clear()
+        } catch (err: Exception) {
+            Log.e(TAG, "errorOnDestroy", err)
+        }
 
         super.onDestroy()
     }
@@ -30,26 +56,45 @@ abstract class BaseMusicFragment : Fragment() {
         return mCompositeDisposable!!
     }
 
+    @UiThread
     protected abstract fun displayLoading(isShown: Boolean)
 
+    @UiThread
     protected fun showLoading() {
         displayLoading(true)
     }
 
+    @UiThread
     protected fun hideLoading() {
         displayLoading(false)
     }
 
-    protected fun playSongs(songs: List<Song>) {
-        this.playMusicFragment.playSongs(songs)
+    @UiThread
+    protected fun playSongs(playlistXml: PlaylistXml) {
+        Log.d(TAG, "playSongs")
+
+        this.playMusicFragment?.playSongs(playlistXml)
+
         hideLoading()
     }
 
+    @UiThread
+    protected fun playSongs(songs: List<Song>) {
+        Log.d(TAG, "playSongs")
+
+        this.playMusicFragment?.playSongs(songs)
+
+        hideLoading()
+    }
+
+    @UiThread
     protected fun determineDisplayMusicPlayer() {
-        if (currentPlaylist == null) {
-            this.playMusicFragment.hideMusicPlayer()
+        Log.d(TAG, "determineDisplayMusicPlayer")
+
+        if (LifeTuneApplication.musicPlayer == null || LifeTuneApplication.musicPlayer.tracks.isEmpty()) {
+            this.playMusicFragment?.hideMusicPlayer()
         } else {
-            this.playMusicFragment.showMusicPlayer()
+            this.playMusicFragment?.showMusicPlayer()
         }
     }
 

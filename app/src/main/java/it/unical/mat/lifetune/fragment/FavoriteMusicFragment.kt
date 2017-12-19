@@ -55,7 +55,7 @@ class FavoriteMusicFragment : BaseMusicFragment(), FavouriteMusicController.Adap
 
         setupMusicController()
 
-        callFavouritePlaylistsService()
+//        callFavouritePlaylistsService()
     }
 
     private fun setupRecyclerViewCategories() {

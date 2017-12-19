@@ -6,6 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import it.unical.mat.lifetune.R
+import it.unical.mat.lifetune.activity.MainActivity
+import kotlinx.android.synthetic.main.fragment_my_activities.*
 
 /**
  * Created by beantoan on 11/17/17.
@@ -19,7 +21,21 @@ class MyActivitiesFragment : Fragment() {
         return rootView
     }
 
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        (activity as MainActivity).setSupportActionBar(toolbar)
+    }
+
+
     companion object {
         val TAG = MyActivitiesFragment::class.java.canonicalName
+
+        fun newInstance(): MyActivitiesFragment {
+            val fragment = MyActivitiesFragment()
+
+            return fragment
+        }
     }
 }

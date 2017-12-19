@@ -10,20 +10,18 @@ import android.view.View
 import android.view.ViewGroup
 import com.arlib.floatingsearchview.FloatingSearchView
 import com.arlib.floatingsearchview.suggestions.model.SearchSuggestion
-import com.google.android.exoplayer2.DefaultLoadControl
-import com.google.android.exoplayer2.DefaultRenderersFactory
-import com.google.android.exoplayer2.ExoPlayerFactory
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory
 import com.google.android.exoplayer2.source.DynamicConcatenatingMediaSource
 import com.google.android.exoplayer2.source.ExtractorMediaSource
 import com.google.android.exoplayer2.source.MediaSource
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
+import it.unical.mat.lifetune.LifeTuneApplication
 import it.unical.mat.lifetune.R
 import it.unical.mat.lifetune.activity.MainActivity
 import it.unical.mat.lifetune.adapter.PlayMusicPagerAdapter
 import it.unical.mat.lifetune.data.ColorSuggestion
 import it.unical.mat.lifetune.data.DataHelper
+import it.unical.mat.lifetune.entity.PlaylistXml
 import it.unical.mat.lifetune.entity.Song
 import kotlinx.android.synthetic.main.fragment_play_music.*
 
@@ -38,16 +36,20 @@ class PlayMusicFragment : Fragment(),
     private var mLastQuery = ""
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        Log.d(TAG, "onCreateView")
         return inflater.inflate(R.layout.fragment_play_music, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        Log.d(TAG, "onViewCreated")
         super.onViewCreated(view, savedInstanceState)
 
         onViewCreatedTasks()
     }
 
     override fun onDestroy() {
+        Log.d(TAG, "onDestroy")
+
         super.onDestroy()
 
         onDestroyTasks()
@@ -73,11 +75,11 @@ class PlayMusicFragment : Fragment(),
 
     private fun onDestroyTasks() {
         Log.d(TAG, "onDestroyTasks")
-
-        music_player.player.release()
     }
 
     private fun setupViewPager() {
+        Log.d(TAG, "setupViewPager")
+
         mPlayMusicPagerAdapter = PlayMusicPagerAdapter(this, activity!!.supportFragmentManager)
 
         pager.adapter = mPlayMusicPagerAdapter
@@ -86,11 +88,12 @@ class PlayMusicFragment : Fragment(),
     }
 
     private fun setupMusicPlayer() {
-        music_player.player = ExoPlayerFactory.newSimpleInstance(
-                DefaultRenderersFactory(activity),
-                DefaultTrackSelector(),
-                DefaultLoadControl()
-        )
+        Log.d(TAG, "setupMusicPlayer")
+
+        music_player.player = LifeTuneApplication.musicPlayer
+        music_player.requestFocus()
+        music_player.controllerAutoShow = true
+        music_player.showController()
     }
 
     private fun playMusic(dynamicConcatenatingMediaSource: DynamicConcatenatingMediaSource) {
@@ -114,6 +117,8 @@ class PlayMusicFragment : Fragment(),
     }
 
     fun playSongs(songs: List<Song>) {
+        Log.d(TAG, "playSongs")
+
         music_player.player.stop()
 
         if (songs.isEmpty()) {
@@ -122,9 +127,30 @@ class PlayMusicFragment : Fragment(),
             this.showMusicPlayer()
 
             val dynamicConcatenatingMediaSource = DynamicConcatenatingMediaSource()
+            val mediaSources = songs.map { buildMediaSource(Uri.parse(it.mp3_url)) }
+
+            dynamicConcatenatingMediaSource.addMediaSources(mediaSources)
+
+            playMusic(dynamicConcatenatingMediaSource)
+        }
+    }
+
+    fun playSongs(playlistXml: PlaylistXml) {
+        Log.d(TAG, "playSongs")
+
+        music_player.player.stop()
+
+        if (playlistXml.tracks.isEmpty()) {
+            this.hideMusicPlayer()
+        } else {
+            this.showMusicPlayer()
+
+            LifeTuneApplication.musicPlayer.tracks = playlistXml.tracks
+
+            val dynamicConcatenatingMediaSource = DynamicConcatenatingMediaSource()
             val mediaSources = ArrayList<MediaSource>()
 
-            songs.forEach { mediaSources.add(buildMediaSource(Uri.parse(it.mp3_url))) }
+            playlistXml.tracks.forEach { mediaSources.add(buildMediaSource(Uri.parse(it.url))) }
 
             dynamicConcatenatingMediaSource.addMediaSources(mediaSources)
 
@@ -138,6 +164,8 @@ class PlayMusicFragment : Fragment(),
     }
 
     private fun setupFloatingSearchView() {
+        Log.d(TAG, "setupFloatingSearchView")
+
         floating_search_view.setOnQueryChangeListener { oldQuery, newQuery ->
             if (oldQuery.isNotBlank() && newQuery.isBlank()) {
                 floating_search_view.clearSuggestions()
@@ -197,5 +225,4 @@ class PlayMusicFragment : Fragment(),
 
         private val FIND_SUGGESTION_SIMULATED_DELAY = 250L
     }
-
 }
