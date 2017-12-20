@@ -42,7 +42,7 @@ class FavoriteMusicFragment : BaseMusicFragment(), FavouriteMusicController.Adap
     }
 
     override fun onPlaylistClicked(playlist: Playlist, position: Int) {
-        playSongs(playlist.songs)
+        callPlaylistSongsService(playlist)
     }
 
     override fun onSongClicked(song: Song?, position: Int) {

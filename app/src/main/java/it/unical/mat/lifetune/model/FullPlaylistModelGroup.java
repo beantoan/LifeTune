@@ -29,6 +29,8 @@ public class FullPlaylistModelGroup extends EpoxyModelGroup {
         // Header for CategoryCarousel
         FullPlaylistHeaderModel_ fullPlaylistHeaderModel = new FullPlaylistHeaderModel_(playlist);
         fullPlaylistHeaderModel.id(playlist.getId());
+        fullPlaylistHeaderModel.clickListener((model, parentView, clickedView, position) ->
+                callbacks.onPlaylistClicked(playlist, position));
         models.add(fullPlaylistHeaderModel);
 
         // Add a list of Playlist into PlaylistCarousel
@@ -36,9 +38,9 @@ public class FullPlaylistModelGroup extends EpoxyModelGroup {
         for (Song song : songs) {
             songModels.add(new SongModel_(song)
                     .id(playlist.getId(), song.getId())
-                    .clickListener((model, parentView, clickedView, position) -> {
-                        callbacks.onSongClicked(song, position);
-                    }));
+                    .clickListener((model, parentView, clickedView, position) ->
+                            callbacks.onSongClicked(song, position)
+                    ));
         }
 
         FullPlaylistCarouselViewModel_ fullPlaylistCarouselViewModel = new FullPlaylistCarouselViewModel_();

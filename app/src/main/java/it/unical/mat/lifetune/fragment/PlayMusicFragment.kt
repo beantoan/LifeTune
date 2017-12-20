@@ -119,14 +119,14 @@ class PlayMusicFragment : Fragment(),
         playMusic(dynamicConcatenatingMediaSource)
     }
 
-    fun playSongs(playlistXml: PlaylistXml) {
+    fun playSongs(playlistXml: PlaylistXml?) {
         Log.d(TAG, "playSongs")
 
         music_player.player.stop()
 
         val dynamicConcatenatingMediaSource = DynamicConcatenatingMediaSource()
 
-        if (playlistXml.tracks.isEmpty()) {
+        if (playlistXml == null || playlistXml.tracks.isEmpty()) {
             LifeTuneApplication.musicPlayer.tracks = ArrayList()
         } else {
             LifeTuneApplication.musicPlayer.tracks = playlistXml.tracks

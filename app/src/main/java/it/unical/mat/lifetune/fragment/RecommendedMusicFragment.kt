@@ -1,7 +1,6 @@
 package it.unical.mat.lifetune.fragment
 
 import android.os.Bundle
-import android.support.annotation.UiThread
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
@@ -17,7 +16,6 @@ import it.unical.mat.lifetune.controller.RecommendationMusicController
 import it.unical.mat.lifetune.decoration.RecyclerViewDividerItemDecoration
 import it.unical.mat.lifetune.entity.Category
 import it.unical.mat.lifetune.entity.Playlist
-import it.unical.mat.lifetune.entity.PlaylistXml
 import it.unical.mat.lifetune.service.ApiServiceFactory
 import it.unical.mat.lifetune.util.AppDialog
 import it.unical.mat.lifetune.util.AppUtils
@@ -125,38 +123,6 @@ class RecommendedMusicFragment : BaseMusicFragment(), RecommendationMusicControl
         updateMusicController(categories)
 
         hideLoading()
-    }
-
-    private fun callPlaylistSongsService(playlist: Playlist) {
-        if (AppUtils.isInternetConnected(activity!!.applicationContext)) {
-            showLoading()
-
-            getCompositeDisposable().add(
-                    ApiServiceFactory.createPlaylistXmlService().songs(playlist.key)
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(
-                                    { playlistXml -> onPlaylistSongsServiceSuccess(playlist, playlistXml) },
-                                    { error -> onPlaylistSongsServiceFailure(error) }
-                            )
-            )
-        } else {
-            AppDialog.error(R.string.no_internet_error_title, R.string.no_internet_error_message, activity!!)
-        }
-    }
-
-    @UiThread
-    private fun onPlaylistSongsServiceSuccess(playlist: Playlist, playlistXml: PlaylistXml) {
-        playSongs(playlistXml)
-    }
-
-    @UiThread
-    private fun onPlaylistSongsServiceFailure(error: Throwable) {
-        Log.e(TAG, "onPlaylistSongsServiceFailure", error)
-
-        playSongs(ArrayList())
-
-        AppDialog.error(R.string.api_service_error_title, R.string.api_service_error_message, activity!!)
     }
 
     companion object {
