@@ -1,5 +1,6 @@
 package it.unical.mat.lifetune.activity
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -17,12 +18,15 @@ import it.unical.mat.lifetune.R
 import it.unical.mat.lifetune.fragment.MyActivitiesFragment
 import it.unical.mat.lifetune.fragment.PlayMusicFragment
 import it.unical.mat.lifetune.fragment.SchedulesFragment
+import it.unical.mat.lifetune.util.AppDialog
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.nav_header_main.view.*
-
+import pub.devrel.easypermissions.AfterPermissionGranted
+import pub.devrel.easypermissions.EasyPermissions
 
 class MainActivity :
         AppCompatActivity(),
+        EasyPermissions.PermissionCallbacks,
         NavigationView.OnNavigationItemSelectedListener {
 
     private var playMusicFragment: PlayMusicFragment? = null
@@ -68,7 +72,35 @@ class MainActivity :
             super.onBackPressed()
         }
     }
-    
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        Log.d(TAG, "onRequestPermissionsResult")
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this@MainActivity)
+    }
+
+    override fun onPermissionsDenied(requestCode: Int, perms: MutableList<String>?) {
+        Log.d(TAG, "onPermissionsDenied")
+
+        AppDialog.warning(R.string.request_access_fine_location_error_title,
+                R.string.request_access_fine_location_error_message, this@MainActivity)
+    }
+
+    override fun onPermissionsGranted(requestCode: Int, perms: MutableList<String>?) {
+        Log.d(TAG, "onPermissionsGranted")
+    }
+
+    @AfterPermissionGranted(ACCESS_FINE_LOCATION_REQUEST_CODE)
+    private fun checkFineLocationPermission() {
+        Log.d(TAG, "onPermissionsGranted")
+
+        if (!EasyPermissions.hasPermissions(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+            EasyPermissions.requestPermissions(this, getString(R.string.request_access_fine_location),
+                    ACCESS_FINE_LOCATION_REQUEST_CODE, Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+    }
+
     private fun onCreateTasks() {
         Log.d(TAG, "onCreateTasks")
 
@@ -78,8 +110,7 @@ class MainActivity :
 
         setupNavigationDrawer()
 
-        nav_view.setCheckedItem(R.id.nav_play_music)
-        nav_view.menu.performIdentifierAction(R.id.nav_play_music, 0)
+        checkFineLocationPermission()
     }
 
     private fun setupNavigationDrawer() {
@@ -91,6 +122,9 @@ class MainActivity :
         toggle.syncState()
 
         nav_view.setNavigationItemSelectedListener(this)
+
+        nav_view.setCheckedItem(R.id.nav_play_music)
+        nav_view.menu.performIdentifierAction(R.id.nav_play_music, 0)
     }
 
     private fun showUserInfo() {
@@ -146,6 +180,8 @@ class MainActivity :
 
         private val TAG = MainActivity::class.java.canonicalName
 
+        const val ACCESS_FINE_LOCATION_REQUEST_CODE = 100
+        
         private val EXTRA_IDP_RESPONSE = "extra_idp_response"
 
         fun createIntent(context: Context, idpResponse: IdpResponse?): Intent {
