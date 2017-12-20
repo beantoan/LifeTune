@@ -17,19 +17,22 @@ class PlayMusicPagerAdapter(playMusicFragment: PlayMusicFragment, fragmentManage
     private val favoriteMusicFragment = FavoriteMusicFragment.newInstance(playMusicFragment)
 
     override fun getItem(i: Int): Fragment = when (i) {
-        0 -> recommendationMusicFragment
+        RECOMMENDATION_MUSIC_FRAGMENT -> recommendationMusicFragment
         else -> favoriteMusicFragment
     }
 
     override fun getCount(): Int = TAB_COUNT
 
     override fun getPageTitle(position: Int): CharSequence = when (position) {
-        0 -> "Recommendation"
+        RECOMMENDATION_MUSIC_FRAGMENT -> "Recommendation"
         else -> "Favourite"
     }
 
     companion object {
         val TAG = PlayMusicPagerAdapter::class.java.canonicalName
         private val TAB_COUNT = 2
+
+        val RECOMMENDATION_MUSIC_FRAGMENT = 0
+        val FAVOURITE_MUSIC_FRAGMENT = 1
     }
 }

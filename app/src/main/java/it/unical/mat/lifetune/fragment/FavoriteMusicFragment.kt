@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import it.unical.mat.lifetune.R
+import it.unical.mat.lifetune.adapter.PlayMusicPagerAdapter.Companion.FAVOURITE_MUSIC_FRAGMENT
 import it.unical.mat.lifetune.controller.FavouriteMusicController
 import it.unical.mat.lifetune.decoration.RecyclerViewDividerItemDecoration
 import it.unical.mat.lifetune.entity.Playlist
@@ -55,7 +56,7 @@ class FavoriteMusicFragment : BaseMusicFragment(), FavouriteMusicController.Adap
 
         setupMusicController()
 
-//        callFavouritePlaylistsService()
+        callFavouritePlaylistsService()
     }
 
     private fun setupRecyclerViewCategories() {
@@ -87,7 +88,10 @@ class FavoriteMusicFragment : BaseMusicFragment(), FavouriteMusicController.Adap
     private fun callFavouritePlaylistsService() {
         if (playlists.isEmpty()) {
             if (AppUtils.isInternetConnected(activity!!.applicationContext)) {
-                showLoading()
+
+                if (this.playMusicFragment!!.currentViewPagerItem() == FAVOURITE_MUSIC_FRAGMENT) {
+                    showLoading()
+                }
 
                 getCompositeDisposable().add(
                         ApiServiceFactory.createPlaylistService().favourite()

@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import it.unical.mat.lifetune.R
+import it.unical.mat.lifetune.adapter.PlayMusicPagerAdapter.Companion.RECOMMENDATION_MUSIC_FRAGMENT
 import it.unical.mat.lifetune.controller.RecommendationMusicController
 import it.unical.mat.lifetune.decoration.RecyclerViewDividerItemDecoration
 import it.unical.mat.lifetune.entity.Category
@@ -54,8 +55,6 @@ class RecommendedMusicFragment : BaseMusicFragment(), RecommendationMusicControl
         setupMusicController()
 
         callRecommendationCategoriesService()
-
-        determineDisplayMusicPlayer()
     }
 
     private fun setupRecyclerViewCategories() {
@@ -87,7 +86,9 @@ class RecommendedMusicFragment : BaseMusicFragment(), RecommendationMusicControl
     private fun callRecommendationCategoriesService() {
         if (categories.isEmpty()) {
             if (AppUtils.isInternetConnected(activity!!.applicationContext)) {
-                showLoading()
+                if (this.playMusicFragment!!.currentViewPagerItem() == RECOMMENDATION_MUSIC_FRAGMENT) {
+                    showLoading()
+                }
 
                 getCompositeDisposable().add(
                         ApiServiceFactory.createCategoryService().recommendation()

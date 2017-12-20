@@ -58,8 +58,8 @@ object AppDialog {
 
     private fun initProgressDialog(context: Context) {
         AppDialog.progressDialog = ProgressDialog(context)
-        AppDialog.progressDialog!!.setCancelable(false)
-        AppDialog.progressDialog!!.setCanceledOnTouchOutside(false)
+        AppDialog.progressDialog!!.setCancelable(true)
+        AppDialog.progressDialog!!.setCanceledOnTouchOutside(true)
         AppDialog.progressDialog!!.setMessage(context.getString(R.string.progress_dialog_waiting_message))
     }
 

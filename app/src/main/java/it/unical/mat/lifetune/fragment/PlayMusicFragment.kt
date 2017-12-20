@@ -101,38 +101,22 @@ class PlayMusicFragment : Fragment(),
         music_player.player.playWhenReady = true
     }
 
-    private fun displayMusicPlayer(isShown: Boolean) {
-        music_player.layoutParams.height = when {
-            isShown -> resources.getDimension(R.dimen.music_player_height).toInt()
-            else -> 0
-        }
-    }
-
-    fun showMusicPlayer() {
-        displayMusicPlayer(true)
-    }
-
-    fun hideMusicPlayer() {
-        displayMusicPlayer(false)
-    }
-
     fun playSongs(songs: List<Song>) {
         Log.d(TAG, "playSongs")
 
         music_player.player.stop()
 
-        if (songs.isEmpty()) {
-            this.hideMusicPlayer()
-        } else {
-            this.showMusicPlayer()
+        val dynamicConcatenatingMediaSource = DynamicConcatenatingMediaSource()
 
-            val dynamicConcatenatingMediaSource = DynamicConcatenatingMediaSource()
+        if (songs.isEmpty()) {
+            music_player.player.tracks = ArrayList()
+        } else {
             val mediaSources = songs.map { buildMediaSource(Uri.parse(it.mp3_url)) }
 
             dynamicConcatenatingMediaSource.addMediaSources(mediaSources)
-
-            playMusic(dynamicConcatenatingMediaSource)
         }
+
+        playMusic(dynamicConcatenatingMediaSource)
     }
 
     fun playSongs(playlistXml: PlaylistXml) {
@@ -140,23 +124,24 @@ class PlayMusicFragment : Fragment(),
 
         music_player.player.stop()
 
-        if (playlistXml.tracks.isEmpty()) {
-            this.hideMusicPlayer()
-        } else {
-            this.showMusicPlayer()
+        val dynamicConcatenatingMediaSource = DynamicConcatenatingMediaSource()
 
+        if (playlistXml.tracks.isEmpty()) {
+            LifeTuneApplication.musicPlayer.tracks = ArrayList()
+        } else {
             LifeTuneApplication.musicPlayer.tracks = playlistXml.tracks
 
-            val dynamicConcatenatingMediaSource = DynamicConcatenatingMediaSource()
             val mediaSources = ArrayList<MediaSource>()
 
             playlistXml.tracks.forEach { mediaSources.add(buildMediaSource(Uri.parse(it.url))) }
 
             dynamicConcatenatingMediaSource.addMediaSources(mediaSources)
-
-            playMusic(dynamicConcatenatingMediaSource)
         }
+
+        playMusic(dynamicConcatenatingMediaSource)
     }
+
+    fun currentViewPagerItem(): Int = pager.currentItem
 
     private fun buildMediaSource(uri: Uri): ExtractorMediaSource {
         return ExtractorMediaSource(uri, DefaultHttpDataSourceFactory("ua"),

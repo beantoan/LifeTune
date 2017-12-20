@@ -4,7 +4,6 @@ import android.support.annotation.UiThread
 import android.support.v4.app.Fragment
 import android.util.Log
 import io.reactivex.disposables.CompositeDisposable
-import it.unical.mat.lifetune.LifeTuneApplication
 import it.unical.mat.lifetune.R
 import it.unical.mat.lifetune.entity.PlaylistXml
 import it.unical.mat.lifetune.entity.Song
@@ -73,17 +72,6 @@ abstract class BaseMusicFragment : Fragment() {
         this.playMusicFragment?.playSongs(songs)
 
         hideLoading()
-    }
-
-    @UiThread
-    protected fun determineDisplayMusicPlayer() {
-        Log.d(TAG, "determineDisplayMusicPlayer")
-
-        if (LifeTuneApplication.musicPlayer == null || LifeTuneApplication.musicPlayer.tracks.isEmpty()) {
-            this.playMusicFragment?.hideMusicPlayer()
-        } else {
-            this.playMusicFragment?.showMusicPlayer()
-        }
     }
 
     companion object {
