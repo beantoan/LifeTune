@@ -1,5 +1,7 @@
 package it.unical.mat.lifetune.model;
 
+import android.util.Log;
+
 import com.airbnb.epoxy.EpoxyModel;
 import com.airbnb.epoxy.EpoxyModelGroup;
 
@@ -13,6 +15,9 @@ import it.unical.mat.lifetune.entity.Playlist;
 import it.unical.mat.lifetune.view.CategoryCarouselViewModel_;
 
 public class CategoryModelGroup extends EpoxyModelGroup {
+
+    private static String TAG = CategoryModelGroup.class.getCanonicalName();
+
     public final Category data;
 
     public CategoryModelGroup(Category _category, RecommendationMusicController.AdapterCallbacks callbacks) {
@@ -38,6 +43,7 @@ public class CategoryModelGroup extends EpoxyModelGroup {
                     new PlaylistModel_(playlist)
                     .id(playlist.getId(), category.getId())
                     .clickListener((model, parentView, clickedView, position) -> {
+                        Log.d(TAG, "PlaylistModel_.clickListener");
                         callbacks.onPlaylistClicked(playlist, position);
                     })
             );

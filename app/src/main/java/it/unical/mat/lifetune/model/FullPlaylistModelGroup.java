@@ -1,5 +1,7 @@
 package it.unical.mat.lifetune.model;
 
+import android.util.Log;
+
 import com.airbnb.epoxy.EpoxyModel;
 import com.airbnb.epoxy.EpoxyModelGroup;
 
@@ -13,6 +15,9 @@ import it.unical.mat.lifetune.entity.Song;
 import it.unical.mat.lifetune.view.FullPlaylistCarouselViewModel_;
 
 public class FullPlaylistModelGroup extends EpoxyModelGroup {
+
+    private static String TAG = FullPlaylistModelGroup.class.getCanonicalName();
+
     public final Playlist data;
 
     public FullPlaylistModelGroup(Playlist _playlist, FavouriteMusicController.AdapterCallbacks callbacks) {
@@ -26,11 +31,13 @@ public class FullPlaylistModelGroup extends EpoxyModelGroup {
         List<Song> songs = playlist.getSongs();
         ArrayList<EpoxyModel<?>> models = new ArrayList<>();
 
-        // Header for CategoryCarousel
+        // Header for FullPlaylistCarousel
         FullPlaylistHeaderModel_ fullPlaylistHeaderModel = new FullPlaylistHeaderModel_(playlist);
         fullPlaylistHeaderModel.id(playlist.getId());
-        fullPlaylistHeaderModel.clickListener((model, parentView, clickedView, position) ->
-                callbacks.onPlaylistClicked(playlist, position));
+        fullPlaylistHeaderModel.clickListener((model, parentView, clickedView, position) -> {
+            Log.d(TAG, "FullPlaylistHeaderModel_.clickListener");
+            callbacks.onPlaylistClicked(playlist, position);
+        });
         models.add(fullPlaylistHeaderModel);
 
         // Add a list of Playlist into PlaylistCarousel
