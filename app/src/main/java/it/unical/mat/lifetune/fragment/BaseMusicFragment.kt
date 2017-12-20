@@ -1,14 +1,14 @@
 package it.unical.mat.lifetune.fragment
 
-import android.os.Bundle
 import android.support.annotation.UiThread
 import android.support.v4.app.Fragment
 import android.util.Log
-import android.view.View
 import io.reactivex.disposables.CompositeDisposable
 import it.unical.mat.lifetune.LifeTuneApplication
+import it.unical.mat.lifetune.R
 import it.unical.mat.lifetune.entity.PlaylistXml
 import it.unical.mat.lifetune.entity.Song
+import it.unical.mat.lifetune.util.AppDialog
 
 /**
  * Created by beantoan on 12/14/17.
@@ -18,23 +18,6 @@ abstract class BaseMusicFragment : Fragment() {
     private var mCompositeDisposable: CompositeDisposable? = null
 
     protected var playMusicFragment: PlayMusicFragment? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        Log.d(TAG, "onCreate")
-        super.onCreate(savedInstanceState)
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        Log.d(TAG, "onViewCreated")
-
-        super.onViewCreated(view, savedInstanceState)
-    }
-
-    override fun onStop() {
-        Log.d(TAG, "onStop")
-
-        super.onStop()
-    }
 
     override fun onDestroy() {
         Log.d(TAG, "onDestroy")
@@ -57,7 +40,12 @@ abstract class BaseMusicFragment : Fragment() {
     }
 
     @UiThread
-    protected abstract fun displayLoading(isShown: Boolean)
+    private fun displayLoading(isShown: Boolean) {
+        when {
+            isShown -> AppDialog.showProgress(R.string.progress_dialog_waiting_message, context!!)
+            else -> AppDialog.hideProgress(context!!)
+        }
+    }
 
     @UiThread
     protected fun showLoading() {

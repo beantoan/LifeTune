@@ -26,6 +26,7 @@
         Bean Bean Bean
     </string>
     <string name="no_song_play">There is no song</string>
+    <string name="song_is_be_loading">Song is being loaded ...</string>
 
 
 </resources>

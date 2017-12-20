@@ -2,6 +2,7 @@ package it.unical.mat.lifetune.util
 
 import android.app.Activity
 import android.app.ProgressDialog
+import android.content.Context
 import android.util.Log
 import cn.pedant.SweetAlert.SweetAlertDialog
 import it.unical.mat.lifetune.R
@@ -55,43 +56,39 @@ object AppDialog {
         AppDialog.showAlert(titleId, messageId, SweetAlertDialog.SUCCESS_TYPE, activity)
     }
 
-    private fun initProgressDialog(activity: Activity) {
-        AppDialog.progressDialog = ProgressDialog(activity)
+    private fun initProgressDialog(context: Context) {
+        AppDialog.progressDialog = ProgressDialog(context)
         AppDialog.progressDialog!!.setCancelable(false)
         AppDialog.progressDialog!!.setCanceledOnTouchOutside(false)
-        AppDialog.progressDialog!!.setMessage(activity.getString(R.string.progress_dialog_waiting_message))
+        AppDialog.progressDialog!!.setMessage(context.getString(R.string.progress_dialog_waiting_message))
     }
 
-    fun hideProgress(activity: Activity) {
+    fun hideProgress(context: Context) {
         if (AppDialog.progressDialog != null) {
-            activity.runOnUiThread {
-                try {
-                    AppDialog.progressDialog!!.dismiss()
+            try {
+                AppDialog.progressDialog!!.dismiss()
 
-                } catch (e: Exception) {
-                    Log.e(TAG, "hideProgress", e)
-                }
+            } catch (e: Exception) {
+                Log.e(TAG, "hideProgress", e)
             }
         }
     }
 
-    fun showProgress(messageId: Int?, activity: Activity) {
-        AppDialog.initProgressDialog(activity)
+    fun showProgress(messageId: Int?, context: Context) {
+        AppDialog.initProgressDialog(context)
 
-        AppDialog.hideProgress(activity)
+        AppDialog.hideProgress(context)
 
         if (AppDialog.progressDialog != null) {
             if (messageId != null) {
-                AppDialog.progressDialog!!.setMessage(activity.getString(messageId))
+                AppDialog.progressDialog!!.setMessage(context.getString(messageId))
             }
 
-            activity.runOnUiThread {
-                try {
-                    AppDialog.progressDialog!!.show()
+            try {
+                AppDialog.progressDialog!!.show()
 
-                } catch (e: Exception) {
-                    Log.e(TAG, "showProgress", e)
-                }
+            } catch (e: Exception) {
+                Log.e(TAG, "showProgress", e)
             }
         }
     }

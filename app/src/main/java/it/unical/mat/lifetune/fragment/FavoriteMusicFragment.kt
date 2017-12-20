@@ -84,17 +84,6 @@ class FavoriteMusicFragment : BaseMusicFragment(), FavouriteMusicController.Adap
         controller.setData(data)
     }
 
-    override fun displayLoading(isShown: Boolean) {
-        val layoutParams = favourite_music_loading.layoutParams
-
-        layoutParams.height = when {
-            isShown -> ViewGroup.LayoutParams.WRAP_CONTENT
-            else -> 0
-        }
-
-        favourite_music_loading.layoutParams = layoutParams
-    }
-
     private fun callFavouritePlaylistsService() {
         if (playlists.isEmpty()) {
             if (AppUtils.isInternetConnected(activity!!.applicationContext)) {

@@ -16,4 +16,11 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <style name="ExoMediaButton.Tracks">
+        <item name="android:src">@drawable/ic_playlist_music_black_24dp</item>
+        <item name="android:contentDescription">@string/exo_controls_show_tracks</item>
+        <item name="android:color">@color/background</item>
+    </style>
+
+    <string name="exo_controls_show_tracks">Show tracks</string>
 </resources>

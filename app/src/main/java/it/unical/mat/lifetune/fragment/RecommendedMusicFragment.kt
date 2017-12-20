@@ -9,7 +9,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import it.unical.mat.lifetune.R
@@ -45,17 +44,6 @@ class RecommendedMusicFragment : BaseMusicFragment(), RecommendationMusicControl
 
     override fun onPlaylistClicked(playlist: Playlist, position: Int) {
         callPlaylistSongsService(playlist)
-    }
-
-    override fun displayLoading(isShown: Boolean) {
-        val layoutParams = recommendation_music_loading.layoutParams
-
-        layoutParams.height = when {
-            isShown -> WRAP_CONTENT
-            else -> 0
-        }
-
-        recommendation_music_loading.layoutParams = layoutParams
     }
 
     private fun onCreateViewTasks(view: View) {
@@ -143,7 +131,7 @@ class RecommendedMusicFragment : BaseMusicFragment(), RecommendationMusicControl
             showLoading()
 
             getCompositeDisposable().add(
-                    ApiServiceFactory.createPlaylistXmlService().songs(playlist.xmlUrl)
+                    ApiServiceFactory.createPlaylistXmlService().songs(playlist.key)
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(

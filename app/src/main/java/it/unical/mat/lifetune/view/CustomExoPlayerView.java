@@ -826,6 +826,20 @@ public final class CustomExoPlayerView extends FrameLayout {
         showTrackInfo();
     }
 
+    private void updateOnPlayerStateChanged(int playbackState) {
+        switch (playbackState) {
+            case Player.STATE_READY:
+            case Player.STATE_BUFFERING:
+                showTrackInfo();
+                break;
+            case Player.STATE_IDLE:
+            case Player.STATE_ENDED:
+                setTitle(R.string.no_song_play);
+                setAvatar(null);
+                break;
+        }
+    }
+
     /**
      * Customize to update title and avatar
      */
@@ -842,8 +856,6 @@ public final class CustomExoPlayerView extends FrameLayout {
         } else {
             Track currentTrack = this.player.getTracks().get(this.player.getCurrentWindowIndex());
             String avatarUrl = currentTrack.getPlayerAvatar();
-
-            Log.d(TAG, "currentTrack#" + currentTrack.toString());
 
             setTitle(currentTrack.getCombinedTitle());
             setAvatar(avatarUrl);
@@ -948,6 +960,8 @@ public final class CustomExoPlayerView extends FrameLayout {
         @Override
         public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
             maybeShowController(false);
+
+            updateOnPlayerStateChanged(playbackState);
         }
 
         @Override
@@ -975,6 +989,10 @@ public final class CustomExoPlayerView extends FrameLayout {
             // Do nothing.
         }
 
+    }
+
+    private void setTitle(int resId) {
+        setTitle(getResources().getString(resId));
     }
 
     private void setTitle(String title) {
