@@ -38,8 +38,6 @@ abstract class FullPlaylistHeaderModel extends DataBindingEpoxyModel {
                 .error(R.drawable.no_image)
                 .into(image);
 
-        view.setOnClickListener(clickListener);
-
         return view;
     }
 }

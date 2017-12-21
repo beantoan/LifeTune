@@ -21,5 +21,9 @@
         android:layout_marginLeft="8dp"
         android:text='@{song.title}'
         android:textStyle="bold"
-        android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:onClick="@{clickListener}" />
 </layout>

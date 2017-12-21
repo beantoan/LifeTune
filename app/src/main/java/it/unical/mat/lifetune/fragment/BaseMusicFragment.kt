@@ -7,8 +7,10 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import it.unical.mat.lifetune.R
+import it.unical.mat.lifetune.controller.BaseMusicController
 import it.unical.mat.lifetune.entity.Playlist
-import it.unical.mat.lifetune.entity.PlaylistXml
+import it.unical.mat.lifetune.entity.Song
+import it.unical.mat.lifetune.entity.TrackList
 import it.unical.mat.lifetune.service.ApiServiceFactory
 import it.unical.mat.lifetune.util.AppDialog
 import it.unical.mat.lifetune.util.AppUtils
@@ -16,7 +18,7 @@ import it.unical.mat.lifetune.util.AppUtils
 /**
  * Created by beantoan on 12/14/17.
  */
-abstract class BaseMusicFragment : Fragment() {
+abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallbacks {
 
     private var mCompositeDisposable: CompositeDisposable? = null
 
@@ -32,6 +34,18 @@ abstract class BaseMusicFragment : Fragment() {
         }
 
         super.onDestroy()
+    }
+
+
+    override final fun onPlaylistClicked(playlist: Playlist) {
+        Log.d(TAG, "onPlaylistClicked#${playlist.id}-${playlist.title}")
+
+        callPlaylistSongsService(playlist)
+    }
+
+    override final fun onSongClicked(song: Song) {
+        Log.d(TAG, "onPlaylistClicked#${song.id}-${song.title}")
+
     }
 
     protected fun getCompositeDisposable(): CompositeDisposable {
@@ -61,16 +75,16 @@ abstract class BaseMusicFragment : Fragment() {
     }
 
     @UiThread
-    private fun playSongs(playlistXml: PlaylistXml?) {
+    private fun playSongs(trackList: TrackList?) {
         Log.d(TAG, "playSongs")
 
-        this.playMusicFragment?.playSongs(playlistXml)
+        this.playMusicFragment?.playSongs(trackList)
 
         hideLoading()
     }
 
-    protected fun callPlaylistSongsService(playlist: Playlist) {
-        Log.d(TAG, "callPlaylistSongsService")
+    private fun callPlaylistSongsService(playlist: Playlist) {
+        Log.d(TAG, "callPlaylistSongsService#${playlist.id}-${playlist.title}")
 
         if (AppUtils.isInternetConnected(activity!!.applicationContext)) {
             showLoading()
@@ -90,9 +104,12 @@ abstract class BaseMusicFragment : Fragment() {
     }
 
     @UiThread
-    private fun onPlaylistSongsServiceSuccess(playlist: Playlist, playlistXml: PlaylistXml) {
+    private fun onPlaylistSongsServiceSuccess(playlist: Playlist, trackList: TrackList) {
         Log.d(TAG, "onPlaylistSongsServiceSuccess")
-        playSongs(playlistXml)
+
+        trackList.tracks.forEach { it.playlist = playlist }
+
+        playSongs(trackList)
     }
 
     @UiThread

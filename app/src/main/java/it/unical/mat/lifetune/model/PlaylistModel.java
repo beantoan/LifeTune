@@ -16,6 +16,9 @@ import static com.airbnb.epoxy.EpoxyAttribute.Option.DoNotHash;
 
 @EpoxyModelClass(layout = R.layout.model_playlist)
 public abstract class PlaylistModel extends DataBindingEpoxyModel {
+
+    private static final String TAG = Playlist.class.getCanonicalName();
+
     @EpoxyAttribute(DoNotHash)
     View.OnClickListener clickListener;
 
@@ -41,8 +44,6 @@ public abstract class PlaylistModel extends DataBindingEpoxyModel {
                 .resize(imageSize, imageSize)
                 .centerCrop()
                 .into(image);
-
-        view.setOnClickListener(clickListener);
 
         return view;
     }

@@ -42,6 +42,8 @@ public class Track extends BaseObservable {
     @Element(name = "avatar", data = true, required = false)
     String avatar;
 
+    private Playlist playlist;
+
     public Track() {
     }
 
@@ -111,8 +113,22 @@ public class Track extends BaseObservable {
         this.avatar = avatar;
     }
 
+    public Playlist getPlaylist() {
+        return playlist;
+    }
+
+    public void setPlaylist(Playlist playlist) {
+        this.playlist = playlist;
+    }
+
     public String getCombinedTitle() {
-        return StringUtils.strip(getTitle()) + " - " + StringUtils.strip(getSingers());
+        String fullTitle = StringUtils.strip(getTitle()) + " >> " + StringUtils.strip(getSingers());
+
+        if (playlist != null) {
+            fullTitle = playlist.getTitle() + " >> " + fullTitle;
+        }
+
+        return fullTitle;
     }
 
     public String getPlayerAvatar() {

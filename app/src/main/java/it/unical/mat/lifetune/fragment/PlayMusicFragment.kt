@@ -21,7 +21,7 @@ import it.unical.mat.lifetune.activity.MainActivity
 import it.unical.mat.lifetune.adapter.PlayMusicPagerAdapter
 import it.unical.mat.lifetune.data.ColorSuggestion
 import it.unical.mat.lifetune.data.DataHelper
-import it.unical.mat.lifetune.entity.PlaylistXml
+import it.unical.mat.lifetune.entity.TrackList
 import kotlinx.android.synthetic.main.fragment_play_music.*
 
 /**
@@ -114,33 +114,29 @@ class PlayMusicFragment : Fragment(),
         displayMusicPlayer(false)
     }
 
-    private fun playMusic(dynamicConcatenatingMediaSource: DynamicConcatenatingMediaSource) {
-        showMusicPlayer()
-        
-        music_player.player.prepare(dynamicConcatenatingMediaSource)
-        music_player.player.playWhenReady = true
-    }
-
-    fun playSongs(playlistXml: PlaylistXml?) {
+    fun playSongs(trackList: TrackList?) {
         Log.d(TAG, "playSongs")
 
         music_player.player.stop()
 
         val dynamicConcatenatingMediaSource = DynamicConcatenatingMediaSource()
 
-        if (playlistXml == null || playlistXml.tracks.isEmpty()) {
+        if (trackList == null || trackList.tracks.isEmpty()) {
             LifeTuneApplication.musicPlayer.tracks = ArrayList()
         } else {
-            LifeTuneApplication.musicPlayer.tracks = playlistXml.tracks
+            LifeTuneApplication.musicPlayer.tracks = trackList.tracks
 
             val mediaSources = ArrayList<MediaSource>()
 
-            playlistXml.tracks.forEach { mediaSources.add(buildMediaSource(Uri.parse(it.url))) }
+            trackList.tracks.forEach { mediaSources.add(buildMediaSource(Uri.parse(it.url))) }
 
             dynamicConcatenatingMediaSource.addMediaSources(mediaSources)
         }
 
-        playMusic(dynamicConcatenatingMediaSource)
+        music_player.player.prepare(dynamicConcatenatingMediaSource)
+        music_player.player.playWhenReady = true
+
+        showMusicPlayer()
     }
 
     fun currentViewPagerItem(): Int = pager.currentItem

@@ -1,5 +1,7 @@
 package it.unical.mat.lifetune.fragment
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.DividerItemDecoration
@@ -8,6 +10,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.google.android.gms.awareness.Awareness
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import it.unical.mat.lifetune.R
@@ -15,7 +18,6 @@ import it.unical.mat.lifetune.adapter.PlayMusicPagerAdapter.Companion.RECOMMENDA
 import it.unical.mat.lifetune.controller.RecommendationMusicController
 import it.unical.mat.lifetune.decoration.RecyclerViewDividerItemDecoration
 import it.unical.mat.lifetune.entity.Category
-import it.unical.mat.lifetune.entity.Playlist
 import it.unical.mat.lifetune.service.ApiServiceFactory
 import it.unical.mat.lifetune.util.AppDialog
 import it.unical.mat.lifetune.util.AppUtils
@@ -25,7 +27,7 @@ import kotlinx.android.synthetic.main.fragment_recommended_music.*
 /**
  * Created by beantoan on 11/17/17.
  */
-class RecommendedMusicFragment : BaseMusicFragment(), RecommendationMusicController.AdapterCallbacks {
+class RecommendedMusicFragment : BaseMusicFragment() {
 
     private lateinit var controller: RecommendationMusicController
 
@@ -41,10 +43,6 @@ class RecommendedMusicFragment : BaseMusicFragment(), RecommendationMusicControl
         onCreateViewTasks(view)
     }
 
-    override fun onPlaylistClicked(playlist: Playlist, position: Int) {
-        callPlaylistSongsService(playlist)
-    }
-
     private fun onCreateViewTasks(view: View) {
         Log.d(TAG, "onCreateViewTasks")
 
@@ -53,6 +51,23 @@ class RecommendedMusicFragment : BaseMusicFragment(), RecommendationMusicControl
         setupMusicController()
 
         callRecommendationCategoriesService()
+//        callSnapshotApi()
+    }
+
+    private fun callSnapshotApi() {
+        if (ContextCompat.checkSelfPermission(activity!!, Manifest.permission.ACCESS_FINE_LOCATION) ==
+                PackageManager.PERMISSION_GRANTED) {
+
+            Awareness.getSnapshotClient(activity!!).location
+                    .addOnSuccessListener({ locationResponse ->
+                        Log.d(TAG, "Awareness.getSnapshotClient#addOnSuccessListener")
+
+                        callRecommendationCategoriesService()
+                    })
+                    .addOnFailureListener({ e ->
+                        Log.e(TAG, "Awareness.getSnapshotClient#addOnFailureListener", e)
+                    })
+        }
     }
 
     private fun setupRecyclerViewCategories() {

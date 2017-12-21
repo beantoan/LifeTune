@@ -2,6 +2,7 @@ package it.unical.mat.lifetune.activity
 
 import android.Manifest
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.NavigationView
@@ -19,6 +20,7 @@ import it.unical.mat.lifetune.fragment.MyActivitiesFragment
 import it.unical.mat.lifetune.fragment.PlayMusicFragment
 import it.unical.mat.lifetune.fragment.SchedulesFragment
 import it.unical.mat.lifetune.util.AppDialog
+import it.unical.mat.lifetune.util.AppUtils
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.nav_header_main.view.*
 import pub.devrel.easypermissions.AfterPermissionGranted
@@ -73,18 +75,23 @@ class MainActivity :
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>,
+                                            grantResults: IntArray) {
         Log.d(TAG, "onRequestPermissionsResult")
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
-        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this@MainActivity)
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults,
+                this@MainActivity)
     }
 
     override fun onPermissionsDenied(requestCode: Int, perms: MutableList<String>?) {
         Log.d(TAG, "onPermissionsDenied")
 
         AppDialog.warning(R.string.request_access_fine_location_error_title,
-                R.string.request_access_fine_location_error_message, this@MainActivity)
+                R.string.request_access_fine_location_error_message,
+                this@MainActivity, DialogInterface.OnDismissListener {
+            AppUtils.openAppSettings(this)
+        })
     }
 
     override fun onPermissionsGranted(requestCode: Int, perms: MutableList<String>?) {

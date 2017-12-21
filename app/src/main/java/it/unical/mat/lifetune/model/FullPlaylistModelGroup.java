@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import it.unical.mat.lifetune.R;
-import it.unical.mat.lifetune.controller.FavouriteMusicController;
+import it.unical.mat.lifetune.controller.BaseMusicController;
 import it.unical.mat.lifetune.entity.Playlist;
 import it.unical.mat.lifetune.entity.Song;
 import it.unical.mat.lifetune.view.FullPlaylistCarouselViewModel_;
@@ -18,25 +18,25 @@ public class FullPlaylistModelGroup extends EpoxyModelGroup {
 
     private static String TAG = FullPlaylistModelGroup.class.getCanonicalName();
 
-    public final Playlist data;
+    public static Playlist playlist;
 
-    public FullPlaylistModelGroup(Playlist _playlist, FavouriteMusicController.AdapterCallbacks callbacks) {
+    public FullPlaylistModelGroup(Playlist _playlist,
+                                  BaseMusicController.AdapterCallbacks callbacks) {
         super(R.layout.model_group_full_playlist, buildModels(_playlist, callbacks));
-        this.data = _playlist;
-        id(data.getId());
+        playlist = _playlist;
+        id(playlist.getId());
     }
 
-    private static List<EpoxyModel<?>> buildModels(Playlist playlist,
-                                                   FavouriteMusicController.AdapterCallbacks callbacks) {
-        List<Song> songs = playlist.getSongs();
+    private static List<EpoxyModel<?>> buildModels(Playlist _playlist, BaseMusicController.AdapterCallbacks callbacks) {
+        List<Song> songs = _playlist.getSongs();
         ArrayList<EpoxyModel<?>> models = new ArrayList<>();
 
         // Header for FullPlaylistCarousel
-        FullPlaylistHeaderModel_ fullPlaylistHeaderModel = new FullPlaylistHeaderModel_(playlist);
-        fullPlaylistHeaderModel.id(playlist.getId());
+        FullPlaylistHeaderModel_ fullPlaylistHeaderModel = new FullPlaylistHeaderModel_(_playlist);
+        fullPlaylistHeaderModel.id(_playlist.getId());
         fullPlaylistHeaderModel.clickListener((model, parentView, clickedView, position) -> {
-            Log.d(TAG, "FullPlaylistHeaderModel_.clickListener");
-            callbacks.onPlaylistClicked(playlist, position);
+            Log.d(TAG, "FullPlaylistHeaderModel_.clickListener position=" + position);
+            callbacks.onPlaylistClicked(model.playlist);
         });
         models.add(fullPlaylistHeaderModel);
 
@@ -44,14 +44,16 @@ public class FullPlaylistModelGroup extends EpoxyModelGroup {
         List<SongModel_> songModels = new ArrayList<>();
         for (Song song : songs) {
             songModels.add(new SongModel_(song)
-                    .id(playlist.getId(), song.getId())
-                    .clickListener((model, parentView, clickedView, position) ->
-                            callbacks.onSongClicked(song, position)
-                    ));
+                    .id(_playlist.getId(), song.getId())
+                    .clickListener((model, parentView, clickedView, position) -> {
+                        Log.d(TAG, "SongModel_.clickListener position=" + position);
+                        callbacks.onSongClicked(model.song);
+                    })
+            );
         }
 
         FullPlaylistCarouselViewModel_ fullPlaylistCarouselViewModel = new FullPlaylistCarouselViewModel_();
-        fullPlaylistCarouselViewModel.id("songs-" + String.valueOf(playlist.getId()));
+        fullPlaylistCarouselViewModel.id("songs-" + _playlist.getId());
         fullPlaylistCarouselViewModel.models(songModels);
 
         models.add(fullPlaylistCarouselViewModel);

@@ -3,6 +3,7 @@ package it.unical.mat.lifetune.util
 import android.app.Activity
 import android.app.ProgressDialog
 import android.content.Context
+import android.content.DialogInterface
 import android.util.Log
 import cn.pedant.SweetAlert.SweetAlertDialog
 import it.unical.mat.lifetune.R
@@ -28,7 +29,8 @@ object AppDialog {
         }
     }
 
-    fun showAlert(titleId: Int, messageId: Int, dialogType: Int, activity: Activity) {
+    fun showAlert(titleId: Int, messageId: Int, dialogType: Int, activity: Activity,
+                  onDismissListener: DialogInterface.OnDismissListener?) {
         AppDialog.hideAlert(activity)
 
         activity.runOnUiThread {
@@ -37,6 +39,8 @@ object AppDialog {
                         .setTitleText(activity.getString(titleId))
                         .setContentText(activity.getString(messageId))
 
+                AppDialog.alertDialog!!.setOnDismissListener(onDismissListener)
+
                 AppDialog.alertDialog!!.show()
             } catch (e: Exception) {
                 Log.e(TAG, "showAlert", e)
@@ -44,16 +48,31 @@ object AppDialog {
         }
     }
 
+    fun error(titleId: Int, messageId: Int, activity: Activity,
+              onDismissListener: DialogInterface.OnDismissListener?) {
+        AppDialog.showAlert(titleId, messageId, SweetAlertDialog.ERROR_TYPE, activity, onDismissListener)
+    }
+
     fun error(titleId: Int, messageId: Int, activity: Activity) {
-        AppDialog.showAlert(titleId, messageId, SweetAlertDialog.ERROR_TYPE, activity)
+        error(titleId, messageId, activity, null)
+    }
+
+    fun warning(titleId: Int, messageId: Int, activity: Activity,
+                onDismissListener: DialogInterface.OnDismissListener?) {
+        AppDialog.showAlert(titleId, messageId, SweetAlertDialog.WARNING_TYPE, activity, onDismissListener)
     }
 
     fun warning(titleId: Int, messageId: Int, activity: Activity) {
-        AppDialog.showAlert(titleId, messageId, SweetAlertDialog.WARNING_TYPE, activity)
+        warning(titleId, messageId, activity, null)
+    }
+
+    fun success(titleId: Int, messageId: Int, activity: Activity,
+                onDismissListener: DialogInterface.OnDismissListener?) {
+        AppDialog.showAlert(titleId, messageId, SweetAlertDialog.SUCCESS_TYPE, activity, onDismissListener)
     }
 
     fun success(titleId: Int, messageId: Int, activity: Activity) {
-        AppDialog.showAlert(titleId, messageId, SweetAlertDialog.SUCCESS_TYPE, activity)
+        success(titleId, messageId, activity, null)
     }
 
     private fun initProgressDialog(context: Context) {

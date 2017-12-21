@@ -13,16 +13,16 @@ import java.util.List;
  */
 
 @Root(name = "tracklist", strict = false)
-public class PlaylistXml extends BaseObservable {
+public class TrackList extends BaseObservable {
     @Bindable
     @ElementList(name = "track", entry = "track", inline = true, type = Track.class)
     List<Track> tracks;
 
 
-    public PlaylistXml() {
+    public TrackList() {
     }
 
-    public PlaylistXml(List<Track> tracks) {
+    public TrackList(List<Track> tracks) {
         this.tracks = tracks;
     }
 

@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import it.unical.mat.lifetune.R;
-import it.unical.mat.lifetune.controller.RecommendationMusicController;
+import it.unical.mat.lifetune.controller.BaseMusicController;
 import it.unical.mat.lifetune.entity.Category;
 import it.unical.mat.lifetune.entity.Playlist;
 import it.unical.mat.lifetune.view.CategoryCarouselViewModel_;
@@ -18,22 +18,21 @@ public class CategoryModelGroup extends EpoxyModelGroup {
 
     private static String TAG = CategoryModelGroup.class.getCanonicalName();
 
-    public final Category data;
 
-    public CategoryModelGroup(Category _category, RecommendationMusicController.AdapterCallbacks callbacks) {
+    public CategoryModelGroup(Category _category, BaseMusicController.AdapterCallbacks callbacks) {
         super(R.layout.model_group_category, buildModels(_category, callbacks));
-        this.data = _category;
-        id(data.getId());
+        id(_category.getId());
     }
 
-    private static List<EpoxyModel<?>> buildModels(Category category,
-                                                   RecommendationMusicController.AdapterCallbacks callbacks) {
-        List<Playlist> playlists = category.getPlaylists();
+    private static List<EpoxyModel<?>> buildModels(Category _category, BaseMusicController.AdapterCallbacks callbacks) {
+        Log.d(TAG, "buildModels: category.id=" + _category.getId());
+
+        List<Playlist> playlists = _category.getPlaylists();
         ArrayList<EpoxyModel<?>> models = new ArrayList<>();
 
         // Header for CategoryCarousel
-        CategoryHeaderModel_ playlistHeaderModel = new CategoryHeaderModel_(category);
-        playlistHeaderModel.id(category.getId());
+        CategoryHeaderModel_ playlistHeaderModel = new CategoryHeaderModel_(_category);
+        playlistHeaderModel.id(_category.getId());
         models.add(playlistHeaderModel);
 
         // Add a list of Playlist into CategoryCarousel
@@ -41,16 +40,16 @@ public class CategoryModelGroup extends EpoxyModelGroup {
         for (Playlist playlist : playlists) {
             playlistModels.add(
                     new PlaylistModel_(playlist)
-                    .id(playlist.getId(), category.getId())
+                            .id(playlist.getId(), _category.getId())
                     .clickListener((model, parentView, clickedView, position) -> {
-                        Log.d(TAG, "PlaylistModel_.clickListener");
-                        callbacks.onPlaylistClicked(playlist, position);
+                        Log.d(TAG, "PlaylistModel_.clickListener playlist.id=" + model.playlist.getId() + " position=" + position);
+                        callbacks.onPlaylistClicked(model.playlist);
                     })
             );
         }
 
         CategoryCarouselViewModel_ categoryCarouselViewModel = new CategoryCarouselViewModel_();
-        categoryCarouselViewModel.id("playlists-" + String.valueOf(category.getId()));
+        categoryCarouselViewModel.id("playlists-" + _category.getId());
         categoryCarouselViewModel.models(playlistModels);
 
         models.add(categoryCarouselViewModel);

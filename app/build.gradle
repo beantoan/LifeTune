@@ -74,9 +74,9 @@ dependencies {
     implementation "com.android.support:recyclerview-v7:$android_support_version"
     implementation 'pub.devrel:easypermissions:1.0.1'
     kapt 'com.android.databinding:compiler:3.0.1'
-    implementation 'com.airbnb.android:epoxy:2.7.2'
-    implementation 'com.airbnb.android:epoxy-databinding:2.7.2'
-    kapt 'com.airbnb.android:epoxy-processor:2.7.2'
+    implementation 'com.airbnb.android:epoxy:2.7.3'
+    implementation 'com.airbnb.android:epoxy-databinding:2.7.3'
+    kapt 'com.airbnb.android:epoxy-processor:2.7.3'
     implementation 'com.thedeanda:lorem:2.1'
     implementation 'com.github.arimorty:floatingsearchview:2.1.1'
     implementation 'com.google.android.exoplayer:exoplayer:r2.5.4'

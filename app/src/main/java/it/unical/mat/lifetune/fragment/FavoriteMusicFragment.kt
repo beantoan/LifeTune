@@ -15,7 +15,6 @@ import it.unical.mat.lifetune.adapter.PlayMusicPagerAdapter.Companion.FAVOURITE_
 import it.unical.mat.lifetune.controller.FavouriteMusicController
 import it.unical.mat.lifetune.decoration.RecyclerViewDividerItemDecoration
 import it.unical.mat.lifetune.entity.Playlist
-import it.unical.mat.lifetune.entity.Song
 import it.unical.mat.lifetune.service.ApiServiceFactory
 import it.unical.mat.lifetune.util.AppDialog
 import it.unical.mat.lifetune.util.AppUtils
@@ -25,7 +24,7 @@ import kotlinx.android.synthetic.main.fragment_favorite_music.*
 /**
  * Created by beantoan on 11/17/17.
  */
-class FavoriteMusicFragment : BaseMusicFragment(), FavouriteMusicController.AdapterCallbacks {
+class FavoriteMusicFragment : BaseMusicFragment() {
 
     lateinit var controller: FavouriteMusicController
 
@@ -39,14 +38,6 @@ class FavoriteMusicFragment : BaseMusicFragment(), FavouriteMusicController.Adap
         super.onViewCreated(view, savedInstanceState)
 
         onCreateViewTasks(view)
-    }
-
-    override fun onPlaylistClicked(playlist: Playlist, position: Int) {
-        callPlaylistSongsService(playlist)
-    }
-
-    override fun onSongClicked(song: Song?, position: Int) {
-
     }
 
     private fun onCreateViewTasks(view: View) {
