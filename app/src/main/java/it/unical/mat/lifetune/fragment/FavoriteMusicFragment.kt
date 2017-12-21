@@ -25,13 +25,25 @@ class FavoriteMusicFragment : BaseMusicFragment() {
     var favouritePlaylists: List<Playlist> = ArrayList()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        Log.d(TAG, "onCreateView")
+
         return inflater.inflate(R.layout.fragment_favorite_music, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        Log.d(TAG, "onViewCreated")
+
         super.onViewCreated(view, savedInstanceState)
 
         onCreateViewTasks(view)
+    }
+
+    override fun onResume() {
+        Log.d(TAG, "onResume")
+
+        super.onResume()
+
+        onResumeTasks()
     }
 
     override fun onFavouriteServiceSuccess(playlists: List<Playlist>) {
@@ -56,7 +68,9 @@ class FavoriteMusicFragment : BaseMusicFragment() {
         setupRecyclerViewPlaylists()
 
         setupMusicController()
+    }
 
+    private fun onResumeTasks() {
         callFavouritePlaylistsService()
     }
 
