@@ -188,7 +188,7 @@ class MainActivity :
         private val TAG = MainActivity::class.java.canonicalName
 
         const val ACCESS_FINE_LOCATION_REQUEST_CODE = 100
-        
+
         private val EXTRA_IDP_RESPONSE = "extra_idp_response"
 
         fun createIntent(context: Context, idpResponse: IdpResponse?): Intent {

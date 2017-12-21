@@ -8,16 +8,10 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import it.unical.mat.lifetune.R
-import it.unical.mat.lifetune.adapter.PlayMusicPagerAdapter.Companion.FAVOURITE_MUSIC_FRAGMENT
 import it.unical.mat.lifetune.controller.FavouriteMusicController
 import it.unical.mat.lifetune.decoration.RecyclerViewDividerItemDecoration
 import it.unical.mat.lifetune.entity.Playlist
-import it.unical.mat.lifetune.service.ApiServiceFactory
-import it.unical.mat.lifetune.util.AppDialog
-import it.unical.mat.lifetune.util.AppUtils
 import kotlinx.android.synthetic.main.fragment_favorite_music.*
 
 
@@ -28,7 +22,7 @@ class FavoriteMusicFragment : BaseMusicFragment() {
 
     lateinit var controller: FavouriteMusicController
 
-    private var playlists: List<Playlist> = ArrayList()
+    var favouritePlaylists: List<Playlist> = ArrayList()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_favorite_music, container, false)
@@ -40,18 +34,34 @@ class FavoriteMusicFragment : BaseMusicFragment() {
         onCreateViewTasks(view)
     }
 
+    override fun onFavouritePlaylistsServiceSuccess(playlists: List<Playlist>) {
+        super.onFavouritePlaylistsServiceSuccess(playlists)
+
+        favouritePlaylists = playlists
+
+        controller.setData(favouritePlaylists)
+    }
+
+    override fun onFavouritePlaylistsServiceFailure(error: Throwable) {
+        super.onFavouritePlaylistsServiceFailure(error)
+
+        favouritePlaylists = ArrayList()
+
+        controller.setData(favouritePlaylists)
+    }
+
     private fun onCreateViewTasks(view: View) {
         Log.d(TAG, "onCreateViewTasks")
 
-        setupRecyclerViewCategories()
+        setupRecyclerViewPlaylists()
 
         setupMusicController()
 
         callFavouritePlaylistsService()
     }
 
-    private fun setupRecyclerViewCategories() {
-        Log.d(TAG, "setupRecyclerViewCategories")
+    private fun setupRecyclerViewPlaylists() {
+        Log.d(TAG, "setupRecyclerViewPlaylists")
 
         val dividerDrawable = ContextCompat.getDrawable(activity!!.applicationContext, R.drawable.category_divider)
         val dividerItemDecoration = RecyclerViewDividerItemDecoration(activity!!.applicationContext, DividerItemDecoration.VERTICAL, dividerDrawable!!)
@@ -67,56 +77,7 @@ class FavoriteMusicFragment : BaseMusicFragment() {
         recycler_view_playlists.clear()
         recycler_view_playlists.setController(controller)
 
-        if (playlists.isNotEmpty()) {
-            updateMusicController(playlists)
-        }
-    }
-
-    private fun updateMusicController(data: List<Playlist>) {
-        controller.setData(data)
-    }
-
-    private fun callFavouritePlaylistsService() {
-        if (playlists.isEmpty()) {
-            if (AppUtils.isInternetConnected(activity!!.applicationContext)) {
-
-                if (this.playMusicFragment!!.currentViewPagerItem() == FAVOURITE_MUSIC_FRAGMENT) {
-                    showLoading()
-                }
-
-                getCompositeDisposable().add(
-                        ApiServiceFactory.createPlaylistService().favourite()
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(
-                                { playlists -> onFavouritePlaylistsServiceSuccess(playlists) },
-                                { error -> onFavouritePlaylistsServiceFailure(error) }
-                        )
-                )
-            } else {
-                AppDialog.error(R.string.no_internet_error_title, R.string.no_internet_error_message, activity!!)
-            }
-        }
-    }
-
-    private fun onFavouritePlaylistsServiceSuccess(playlists: List<Playlist>) {
-        showPlaylists(playlists)
-    }
-
-    private fun onFavouritePlaylistsServiceFailure(error: Throwable) {
-        Log.e(TAG, "onFavouritePlaylistsServiceFailure", error)
-
-        showPlaylists(ArrayList())
-
-        AppDialog.error(R.string.api_service_error_title, R.string.api_service_error_message, activity!!)
-    }
-
-    private fun showPlaylists(_playlists: List<Playlist>) {
-        playlists = _playlists
-        
-        updateMusicController(playlists)
-
-        hideLoading()
+        controller.setData(favouritePlaylists)
     }
 
     companion object {

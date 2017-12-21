@@ -19,7 +19,7 @@ public abstract class BaseMusicController<T> extends TypedEpoxyController<T> {
     }
 
 
-    public BaseMusicController(AdapterCallbacks _callbacks) {
+    BaseMusicController(AdapterCallbacks _callbacks) {
         callbacks = _callbacks;
 
         setDebugLoggingEnabled(true);

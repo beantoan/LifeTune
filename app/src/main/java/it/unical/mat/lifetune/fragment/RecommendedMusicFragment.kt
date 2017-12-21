@@ -11,16 +11,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.google.android.gms.awareness.Awareness
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import it.unical.mat.lifetune.R
-import it.unical.mat.lifetune.adapter.PlayMusicPagerAdapter.Companion.RECOMMENDATION_MUSIC_FRAGMENT
 import it.unical.mat.lifetune.controller.RecommendationMusicController
 import it.unical.mat.lifetune.decoration.RecyclerViewDividerItemDecoration
 import it.unical.mat.lifetune.entity.Category
-import it.unical.mat.lifetune.service.ApiServiceFactory
-import it.unical.mat.lifetune.util.AppDialog
-import it.unical.mat.lifetune.util.AppUtils
 import kotlinx.android.synthetic.main.fragment_recommended_music.*
 
 
@@ -31,7 +25,7 @@ class RecommendedMusicFragment : BaseMusicFragment() {
 
     private lateinit var controller: RecommendationMusicController
 
-    private var categories: List<Category> = ArrayList()
+    var recommendationCategories: List<Category> = ArrayList()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_recommended_music, container, false)
@@ -43,6 +37,22 @@ class RecommendedMusicFragment : BaseMusicFragment() {
         onCreateViewTasks(view)
     }
 
+    override fun onRecommendationCategoriesServiceSuccess(categories: List<Category>) {
+        super.onRecommendationCategoriesServiceSuccess(categories)
+
+        recommendationCategories = categories
+
+        controller.setData(recommendationCategories)
+    }
+
+    override fun onRecommendationCategoriesServiceFailure(error: Throwable) {
+        super.onRecommendationCategoriesServiceFailure(error)
+
+        recommendationCategories = ArrayList()
+
+        controller.setData(recommendationCategories)
+    }
+
     private fun onCreateViewTasks(view: View) {
         Log.d(TAG, "onCreateViewTasks")
 
@@ -51,7 +61,6 @@ class RecommendedMusicFragment : BaseMusicFragment() {
         setupMusicController()
 
         callRecommendationCategoriesService()
-//        callSnapshotApi()
     }
 
     private fun callSnapshotApi() {
@@ -82,60 +91,19 @@ class RecommendedMusicFragment : BaseMusicFragment() {
 
     private fun setupMusicController() {
         Log.d(TAG, "setupMusicController")
+
         controller = RecommendationMusicController(this)
 
         recycler_view_categories.clear()
         recycler_view_categories.setController(controller)
 
-        if (categories.isNotEmpty()) {
-            updateMusicController(categories)
-        }
+        controller.setData(recommendationCategories)
     }
 
-    private fun updateMusicController(data: List<Category>) {
-        controller.setData(data)
-    }
+    private fun showCategories() {
+        Log.d(TAG, "showCategories: " + recommendationCategories.size + " items")
 
-    private fun callRecommendationCategoriesService() {
-        if (categories.isEmpty()) {
-            if (AppUtils.isInternetConnected(activity!!.applicationContext)) {
-                if (this.playMusicFragment!!.currentViewPagerItem() == RECOMMENDATION_MUSIC_FRAGMENT) {
-                    showLoading()
-                }
-
-                getCompositeDisposable().add(
-                        ApiServiceFactory.createCategoryService().recommendation()
-                                .subscribeOn(Schedulers.io()) // "work" on io thread
-                                .observeOn(AndroidSchedulers.mainThread()) // "listen" on UIThread
-                                .subscribe(
-                                        { categories -> onRecommendationCategoriesServiceSuccess(categories) },
-                                        { error -> onRecommendationCategoriesServiceFailure(error) }
-                                )
-                )
-            } else {
-                AppDialog.error(R.string.no_internet_error_title, R.string.no_internet_error_message, activity!!)
-            }
-        }
-    }
-
-    private fun onRecommendationCategoriesServiceSuccess(categories: List<Category>) {
-        Log.d(TAG, "onRecommendationCategoriesServiceSuccess")
-
-        showCategories(categories)
-    }
-
-    private fun onRecommendationCategoriesServiceFailure(error: Throwable) {
-        Log.e(TAG, "onRecommendationCategoriesServiceFailure", error)
-
-        showCategories(ArrayList())
-
-        AppDialog.error(R.string.api_service_error_title, R.string.api_service_error_message, activity!!)
-    }
-
-    private fun showCategories(_categories: List<Category>) {
-        categories = _categories
-
-        updateMusicController(categories)
+        controller.setData(recommendationCategories)
 
         hideLoading()
     }

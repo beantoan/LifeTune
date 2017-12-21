@@ -41,10 +41,10 @@ public class CategoryModelGroup extends EpoxyModelGroup {
             playlistModels.add(
                     new PlaylistModel_(playlist)
                             .id(playlist.getId(), _category.getId())
-                    .clickListener((model, parentView, clickedView, position) -> {
-                        Log.d(TAG, "PlaylistModel_.clickListener playlist.id=" + model.playlist.getId() + " position=" + position);
-                        callbacks.onPlaylistClicked(model.playlist);
-                    })
+                            .clickListener((model, parentView, clickedView, position) -> {
+                                Log.d(TAG, "PlaylistModel_.clickListener playlist.id=" + model.playlist.getId() + " position=" + position);
+                                callbacks.onPlaylistClicked(model.playlist);
+                            })
             );
         }
 

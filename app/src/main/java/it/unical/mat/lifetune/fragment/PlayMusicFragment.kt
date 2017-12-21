@@ -60,7 +60,7 @@ class PlayMusicFragment : Fragment(),
 
     private fun onViewCreatedTasks() {
         Log.d(TAG, "onViewCreatedTasks")
-        
+
         setupViewPager()
 
         setupFloatingSearchView()
@@ -140,6 +140,10 @@ class PlayMusicFragment : Fragment(),
     }
 
     fun currentViewPagerItem(): Int = pager.currentItem
+
+    fun isCurrentRecommendationMusicFragment(): Boolean = currentViewPagerItem() == PlayMusicPagerAdapter.RECOMMENDATION_MUSIC_FRAGMENT
+
+    fun isCurrentFavouriteMusicFragment(): Boolean = currentViewPagerItem() == PlayMusicPagerAdapter.FAVOURITE_MUSIC_FRAGMENT
 
     private fun buildMediaSource(uri: Uri): ExtractorMediaSource {
         return ExtractorMediaSource(uri, DefaultHttpDataSourceFactory("ua"),

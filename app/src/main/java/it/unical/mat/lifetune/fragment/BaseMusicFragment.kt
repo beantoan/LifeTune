@@ -8,6 +8,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import it.unical.mat.lifetune.R
 import it.unical.mat.lifetune.controller.BaseMusicController
+import it.unical.mat.lifetune.entity.Category
 import it.unical.mat.lifetune.entity.Playlist
 import it.unical.mat.lifetune.entity.Song
 import it.unical.mat.lifetune.entity.TrackList
@@ -36,7 +37,6 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
         super.onDestroy()
     }
 
-
     override final fun onPlaylistClicked(playlist: Playlist) {
         Log.d(TAG, "onPlaylistClicked#${playlist.id}-${playlist.title}")
 
@@ -48,7 +48,40 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
 
     }
 
-    protected fun getCompositeDisposable(): CompositeDisposable {
+    open protected fun onRecommendationCategoriesServiceSuccess(categories: List<Category>) {
+        Log.d(TAG, "onRecommendationCategoriesServiceSuccess: categories.size=" + categories.size)
+
+        onCommonServiceSuccess()
+    }
+
+    open protected fun onRecommendationCategoriesServiceFailure(error: Throwable) {
+        Log.e(TAG, "onRecommendationCategoriesServiceFailure", error)
+
+        onCommonServiceFailure()
+    }
+
+    open protected fun onFavouritePlaylistsServiceSuccess(playlists: List<Playlist>) {
+        Log.d(TAG, "onFavouritePlaylistsServiceSuccess: playlists.size=" + playlists.size)
+
+        onCommonServiceSuccess()
+    }
+
+    open protected fun onFavouritePlaylistsServiceFailure(error: Throwable) {
+        Log.e(TAG, "onFavouritePlaylistsServiceFailure", error)
+
+        onCommonServiceFailure()
+    }
+
+    private fun onCommonServiceSuccess() {
+        hideLoading()
+    }
+
+    private fun onCommonServiceFailure() {
+        hideLoading()
+        AppDialog.error(R.string.api_service_error_title, R.string.api_service_error_message, activity!!)
+    }
+
+    private fun getCompositeDisposable(): CompositeDisposable {
         if (mCompositeDisposable == null) {
             mCompositeDisposable = CompositeDisposable()
         }
@@ -86,7 +119,7 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
     private fun callPlaylistSongsService(playlist: Playlist) {
         Log.d(TAG, "callPlaylistSongsService#${playlist.id}-${playlist.title}")
 
-        if (AppUtils.isInternetConnected(activity!!.applicationContext)) {
+        if (AppUtils.isInternetConnected(context!!)) {
             showLoading()
 
             getCompositeDisposable().add(
@@ -96,6 +129,51 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
                             .subscribe(
                                     { playlistXml -> onPlaylistSongsServiceSuccess(playlist, playlistXml) },
                                     { error -> onPlaylistSongsServiceFailure(error) }
+                            )
+            )
+        } else {
+            AppDialog.error(R.string.no_internet_error_title, R.string.no_internet_error_message, activity!!)
+        }
+    }
+
+    fun callRecommendationCategoriesService() {
+        Log.d(TAG, "callRecommendationCategoriesService")
+
+        if (AppUtils.isInternetConnected(context!!)) {
+            if (this.playMusicFragment!!.isCurrentRecommendationMusicFragment()) {
+                showLoading()
+            }
+
+            getCompositeDisposable().add(
+                    ApiServiceFactory.createCategoryService().recommendation()
+                            .subscribeOn(Schedulers.io()) // "work" on io thread
+                            .observeOn(AndroidSchedulers.mainThread()) // "listen" on UIThread
+                            .subscribe(
+                                    { categories -> onRecommendationCategoriesServiceSuccess(categories) },
+                                    { error -> onRecommendationCategoriesServiceFailure(error) }
+                            )
+            )
+        } else {
+            AppDialog.error(R.string.no_internet_error_title, R.string.no_internet_error_message, activity!!)
+        }
+    }
+
+    fun callFavouritePlaylistsService() {
+        Log.d(TAG, "callFavouritePlaylistsService")
+
+        if (AppUtils.isInternetConnected(context!!)) {
+
+            if (this.playMusicFragment!!.isCurrentFavouriteMusicFragment()) {
+                showLoading()
+            }
+
+            getCompositeDisposable().add(
+                    ApiServiceFactory.createPlaylistService().favourite()
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(
+                                    { playlists -> onFavouritePlaylistsServiceSuccess(playlists) },
+                                    { error -> onFavouritePlaylistsServiceFailure(error) }
                             )
             )
         } else {
