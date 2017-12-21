@@ -34,16 +34,16 @@ class FavoriteMusicFragment : BaseMusicFragment() {
         onCreateViewTasks(view)
     }
 
-    override fun onFavouritePlaylistsServiceSuccess(playlists: List<Playlist>) {
-        super.onFavouritePlaylistsServiceSuccess(playlists)
+    override fun onFavouriteServiceSuccess(playlists: List<Playlist>) {
+        super.onFavouriteServiceSuccess(playlists)
 
         favouritePlaylists = playlists
 
         controller.setData(favouritePlaylists)
     }
 
-    override fun onFavouritePlaylistsServiceFailure(error: Throwable) {
-        super.onFavouritePlaylistsServiceFailure(error)
+    override fun onFavouriteServiceFailure(error: Throwable) {
+        super.onFavouriteServiceFailure(error)
 
         favouritePlaylists = ArrayList()
 

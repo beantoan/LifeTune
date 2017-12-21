@@ -37,16 +37,16 @@ class RecommendedMusicFragment : BaseMusicFragment() {
         onCreateViewTasks(view)
     }
 
-    override fun onRecommendationCategoriesServiceSuccess(categories: List<Category>) {
-        super.onRecommendationCategoriesServiceSuccess(categories)
+    override fun onRecommendationServiceSuccess(categories: List<Category>) {
+        super.onRecommendationServiceSuccess(categories)
 
         recommendationCategories = categories
 
         controller.setData(recommendationCategories)
     }
 
-    override fun onRecommendationCategoriesServiceFailure(error: Throwable) {
-        super.onRecommendationCategoriesServiceFailure(error)
+    override fun onRecommendationServiceFailure(error: Throwable) {
+        super.onRecommendationServiceFailure(error)
 
         recommendationCategories = ArrayList()
 
@@ -60,7 +60,7 @@ class RecommendedMusicFragment : BaseMusicFragment() {
 
         setupMusicController()
 
-        callRecommendationCategoriesService()
+        callRecommendationService()
     }
 
     private fun callSnapshotApi() {
@@ -71,7 +71,7 @@ class RecommendedMusicFragment : BaseMusicFragment() {
                     .addOnSuccessListener({ locationResponse ->
                         Log.d(TAG, "Awareness.getSnapshotClient#addOnSuccessListener")
 
-                        callRecommendationCategoriesService()
+                        callRecommendationService()
                     })
                     .addOnFailureListener({ e ->
                         Log.e(TAG, "Awareness.getSnapshotClient#addOnFailureListener", e)

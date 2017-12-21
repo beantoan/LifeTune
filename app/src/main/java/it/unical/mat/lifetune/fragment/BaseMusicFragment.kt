@@ -40,7 +40,7 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
     override final fun onPlaylistClicked(playlist: Playlist) {
         Log.d(TAG, "onPlaylistClicked#${playlist.id}-${playlist.title}")
 
-        callPlaylistSongsService(playlist)
+        callSongsService(playlist)
     }
 
     override final fun onSongClicked(song: Song) {
@@ -48,26 +48,26 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
 
     }
 
-    open protected fun onRecommendationCategoriesServiceSuccess(categories: List<Category>) {
-        Log.d(TAG, "onRecommendationCategoriesServiceSuccess: categories.size=" + categories.size)
+    open protected fun onRecommendationServiceSuccess(categories: List<Category>) {
+        Log.d(TAG, "onRecommendationServiceSuccess: categories.size=" + categories.size)
 
         onCommonServiceSuccess()
     }
 
-    open protected fun onRecommendationCategoriesServiceFailure(error: Throwable) {
-        Log.e(TAG, "onRecommendationCategoriesServiceFailure", error)
+    open protected fun onRecommendationServiceFailure(error: Throwable) {
+        Log.e(TAG, "onRecommendationServiceFailure", error)
 
         onCommonServiceFailure()
     }
 
-    open protected fun onFavouritePlaylistsServiceSuccess(playlists: List<Playlist>) {
-        Log.d(TAG, "onFavouritePlaylistsServiceSuccess: playlists.size=" + playlists.size)
+    open protected fun onFavouriteServiceSuccess(playlists: List<Playlist>) {
+        Log.d(TAG, "onFavouriteServiceSuccess: playlists.size=" + playlists.size)
 
         onCommonServiceSuccess()
     }
 
-    open protected fun onFavouritePlaylistsServiceFailure(error: Throwable) {
-        Log.e(TAG, "onFavouritePlaylistsServiceFailure", error)
+    open protected fun onFavouriteServiceFailure(error: Throwable) {
+        Log.e(TAG, "onFavouriteServiceFailure", error)
 
         onCommonServiceFailure()
     }
@@ -116,8 +116,8 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
         hideLoading()
     }
 
-    private fun callPlaylistSongsService(playlist: Playlist) {
-        Log.d(TAG, "callPlaylistSongsService#${playlist.id}-${playlist.title}")
+    private fun callSongsService(playlist: Playlist) {
+        Log.d(TAG, "callSongsService#${playlist.id}-${playlist.title}")
 
         if (AppUtils.isInternetConnected(context!!)) {
             showLoading()
@@ -127,8 +127,8 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(
-                                    { playlistXml -> onPlaylistSongsServiceSuccess(playlist, playlistXml) },
-                                    { error -> onPlaylistSongsServiceFailure(error) }
+                                    { playlistXml -> onSongsServiceSuccess(playlist, playlistXml) },
+                                    { error -> onSongsServiceFailure(error) }
                             )
             )
         } else {
@@ -136,8 +136,8 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
         }
     }
 
-    fun callRecommendationCategoriesService() {
-        Log.d(TAG, "callRecommendationCategoriesService")
+    fun callRecommendationService() {
+        Log.d(TAG, "callRecommendationService")
 
         if (AppUtils.isInternetConnected(context!!)) {
             if (this.playMusicFragment!!.isCurrentRecommendationMusicFragment()) {
@@ -149,8 +149,8 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
                             .subscribeOn(Schedulers.io()) // "work" on io thread
                             .observeOn(AndroidSchedulers.mainThread()) // "listen" on UIThread
                             .subscribe(
-                                    { categories -> onRecommendationCategoriesServiceSuccess(categories) },
-                                    { error -> onRecommendationCategoriesServiceFailure(error) }
+                                    { categories -> onRecommendationServiceSuccess(categories) },
+                                    { error -> onRecommendationServiceFailure(error) }
                             )
             )
         } else {
@@ -172,8 +172,8 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(
-                                    { playlists -> onFavouritePlaylistsServiceSuccess(playlists) },
-                                    { error -> onFavouritePlaylistsServiceFailure(error) }
+                                    { playlists -> onFavouriteServiceSuccess(playlists) },
+                                    { error -> onFavouriteServiceFailure(error) }
                             )
             )
         } else {
@@ -182,8 +182,8 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
     }
 
     @UiThread
-    private fun onPlaylistSongsServiceSuccess(playlist: Playlist, trackList: TrackList) {
-        Log.d(TAG, "onPlaylistSongsServiceSuccess")
+    private fun onSongsServiceSuccess(playlist: Playlist, trackList: TrackList) {
+        Log.d(TAG, "onSongsServiceSuccess")
 
         trackList.tracks.forEach { it.playlist = playlist }
 
@@ -191,8 +191,8 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
     }
 
     @UiThread
-    private fun onPlaylistSongsServiceFailure(error: Throwable) {
-        Log.e(TAG, "onPlaylistSongsServiceFailure", error)
+    private fun onSongsServiceFailure(error: Throwable) {
+        Log.e(TAG, "onSongsServiceFailure", error)
 
         playSongs(null)
 
