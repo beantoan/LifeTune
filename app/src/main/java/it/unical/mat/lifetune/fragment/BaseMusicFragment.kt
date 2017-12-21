@@ -3,6 +3,7 @@ package it.unical.mat.lifetune.fragment
 import android.support.annotation.UiThread
 import android.support.v4.app.Fragment
 import android.util.Log
+import com.google.firebase.crash.FirebaseCrash
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -32,6 +33,9 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
             mCompositeDisposable?.clear()
         } catch (err: Exception) {
             Log.e(TAG, "errorOnDestroy", err)
+
+            FirebaseCrash.logcat(Log.ERROR, TAG, "errorOnDestroy" + err)
+            FirebaseCrash.report(err)
         }
 
         super.onDestroy()
@@ -55,7 +59,8 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
     }
 
     open protected fun onRecommendationServiceFailure(error: Throwable) {
-        Log.e(TAG, "onRecommendationServiceFailure", error)
+        FirebaseCrash.logcat(Log.ERROR, TAG, "onRecommendationServiceFailure:" + error)
+        FirebaseCrash.report(error)
 
         onCommonServiceFailure()
     }
@@ -67,7 +72,8 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
     }
 
     open protected fun onFavouriteServiceFailure(error: Throwable) {
-        Log.e(TAG, "onFavouriteServiceFailure", error)
+        FirebaseCrash.logcat(Log.ERROR, TAG, "onFavouriteServiceFailure:" + error)
+        FirebaseCrash.report(error)
 
         onCommonServiceFailure()
     }
@@ -192,8 +198,9 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
 
     @UiThread
     private fun onSongsServiceFailure(error: Throwable) {
-        Log.e(TAG, "onSongsServiceFailure", error)
-
+        FirebaseCrash.logcat(Log.ERROR, TAG, "onSongsServiceFailure:" + error)
+        FirebaseCrash.report(error)
+        
         playSongs(null)
 
         AppDialog.error(R.string.api_service_error_title, R.string.api_service_error_message, activity!!)
