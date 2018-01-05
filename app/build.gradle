@@ -25,6 +25,7 @@ android {
         }
         debug {
             minifyEnabled false
+            debuggable false
         }
     }
     
@@ -33,9 +34,8 @@ android {
     productFlavors {
         develop {
             dimension "mode"
-
-            applicationIdSuffix ".dev"
             versionNameSuffix ".dev"
+            applicationId 'it.unical.mat.lifetune.dev'
         }
         production {
             dimension "mode"
@@ -53,6 +53,11 @@ android {
         correctErrorTypes = true
         generateStubs = true
     }
+    dexOptions {
+        preDexLibraries = false
+        javaMaxHeapSize "4g"
+        additionalParameters = ['--core-library']
+    }
 }
 
 project.android.buildTypes.all { buildType ->
@@ -65,7 +70,9 @@ project.android.buildTypes.all { buildType ->
                     implicitlyAddAutoModels     : "true"
             ]
 }
-
+configurations.all {
+    exclude group: 'xpp3', module: 'xpp3'
+}
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
@@ -107,10 +114,10 @@ dependencies {
     implementation 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
     implementation 'com.squareup.retrofit2:converter-simplexml:2.3.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.9.1'
+    implementation 'com.squareup.retrofit2:converter-simplexml:2.3.0'
     implementation 'org.apache.commons:commons-lang3:3.7'
     implementation 'cn.pedant.sweetalert:library:1.3'
+
 }
-
-
 
 apply plugin: 'com.google.gms.google-services'
