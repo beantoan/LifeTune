@@ -61,21 +61,51 @@ class RecommendedMusicFragment : BaseMusicFragment() {
         setupMusicController()
 
         callRecommendationService()
+
+        callSnapshotApi()
     }
 
     private fun callSnapshotApi() {
         if (ContextCompat.checkSelfPermission(activity!!, Manifest.permission.ACCESS_FINE_LOCATION) ==
                 PackageManager.PERMISSION_GRANTED) {
 
-            Awareness.getSnapshotClient(activity!!).location
-                    .addOnSuccessListener({ locationResponse ->
-                        Log.d(TAG, "Awareness.getSnapshotClient#addOnSuccessListener")
+//            Awareness.getSnapshotClient(activity).location
+//                    .addOnSuccessListener({ locationResponse ->
+//                        Log.d(TAG, "Awareness.getSnapshotClient#addOnSuccessListener locationResponse: " + locationResponse.toString())
+//
+////                        callRecommendationService()
+//                    })
+//                    .addOnFailureListener({ e ->
+//                        Log.e(TAG, "Awareness.getSnapshotClient#addOnFailureListener", e)
+//                    })
 
-                        callRecommendationService()
-                    })
-                    .addOnFailureListener({ e ->
-                        Log.e(TAG, "Awareness.getSnapshotClient#addOnFailureListener", e)
-                    })
+//            Awareness.getSnapshotClient(activity).detectedActivity
+//                    .addOnSuccessListener { dar ->
+//                        val arr = dar.activityRecognitionResult
+//                        // getMostProbableActivity() is good enough for basic Activity detection.
+//                        // To work within a threshold of confidence,
+//                        // use ActivityRecognitionResult.getProbableActivities() to get a list of
+//                        // potential current activities, and check the confidence of each one.
+//                        val probableActivity = arr.mostProbableActivity
+//
+//                        val confidence = probableActivity.confidence
+//                        val activityStr = probableActivity.toString()
+//
+//                        Log.d(TAG, activityStr)
+//                    }
+//                    .addOnFailureListener { e -> Log.e(TAG, "Could not detect activity: ", e) }
+
+            Awareness.getSnapshotClient(activity).weather
+                    .addOnSuccessListener { weatherResponse ->
+                        val weather = weatherResponse.weather
+                        weather.conditions
+
+                        Log.d(TAG, "Awareness.getSnapshotClient#weather#addOnSuccessListener: " + weather)
+                    }
+                    .addOnFailureListener { e ->
+                        FirebaseCrash.logcat(Log.ERROR, TAG, "Awareness.getSnapshotClient#weather#addOnFailureListener:" + e)
+                        FirebaseCrash.report(e)
+                    }
         }
     }
 

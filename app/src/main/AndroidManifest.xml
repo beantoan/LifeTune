@@ -27,9 +27,9 @@
             android:name="com.google.android.awareness.API_KEY"
             android:value="AIzaSyBtTO8FbhHgTU3Fh3yn4gg7oPwCcOwE9HU" />
 
-        <!--<meta-data-->
-        <!--android:name="com.google.android.geo.API_KEY"-->
-        <!--android:value="AIzaSyBtTO8FbhHgTU3Fh3yn4gg7oPwCcOwE9HU" />-->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBtTO8FbhHgTU3Fh3yn4gg7oPwCcOwE9HU" />
 
         <activity
             android:name=".activity.BootActivity"
