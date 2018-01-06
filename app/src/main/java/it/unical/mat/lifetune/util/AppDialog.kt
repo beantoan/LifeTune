@@ -33,17 +33,20 @@ object AppDialog {
                   onDismissListener: DialogInterface.OnDismissListener?) {
         AppDialog.hideAlert(activity)
 
-        activity.runOnUiThread {
-            try {
-                AppDialog.alertDialog = SweetAlertDialog(activity, dialogType)
-                        .setTitleText(activity.getString(titleId))
-                        .setContentText(activity.getString(messageId))
+        if (!activity.isDestroyed) {
+            activity.runOnUiThread {
+                try {
 
-                AppDialog.alertDialog!!.setOnDismissListener(onDismissListener)
+                    AppDialog.alertDialog = SweetAlertDialog(activity, dialogType)
+                            .setTitleText(activity.getString(titleId))
+                            .setContentText(activity.getString(messageId))
 
-                AppDialog.alertDialog!!.show()
-            } catch (e: Exception) {
-                Log.e(TAG, "showAlert", e)
+                    AppDialog.alertDialog!!.setOnDismissListener(onDismissListener)
+
+                    AppDialog.alertDialog!!.show()
+                } catch (e: Exception) {
+                    Log.e(TAG, "showAlert", e)
+                }
             }
         }
     }

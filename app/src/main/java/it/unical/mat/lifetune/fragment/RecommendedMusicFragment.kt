@@ -1,7 +1,11 @@
 package it.unical.mat.lifetune.fragment
 
 import android.Manifest
+import android.app.Activity
+import android.content.DialogInterface
+import android.content.IntentSender
 import android.content.pm.PackageManager
+import android.location.Geocoder
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.DividerItemDecoration
@@ -11,10 +15,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.google.android.gms.awareness.Awareness
+import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.common.api.ResolvableApiException
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.LocationSettingsRequest
+import com.google.android.gms.location.LocationSettingsStatusCodes
+import com.google.firebase.crash.FirebaseCrash
 import it.unical.mat.lifetune.R
+import it.unical.mat.lifetune.activity.MainActivity
 import it.unical.mat.lifetune.controller.RecommendationMusicController
 import it.unical.mat.lifetune.decoration.RecyclerViewDividerItemDecoration
 import it.unical.mat.lifetune.entity.Category
+import it.unical.mat.lifetune.util.AppDialog
 import kotlinx.android.synthetic.main.fragment_recommended_music.*
 
 
@@ -60,51 +73,145 @@ class RecommendedMusicFragment : BaseMusicFragment() {
 
         setupMusicController()
 
-        callRecommendationService()
+        checkLocationSetting()
+    }
 
-        callSnapshotApi()
+    private fun checkLocationSetting() {
+        Log.d(TAG, "checkLocationSetting")
+
+        if (ContextCompat.checkSelfPermission(activity!!, Manifest.permission.ACCESS_FINE_LOCATION) ==
+                PackageManager.PERMISSION_GRANTED) {
+            val mLocationRequest = LocationRequest()
+            mLocationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+
+            val builder = LocationSettingsRequest.Builder()
+            builder.addLocationRequest(mLocationRequest)
+            val locationSettingsRequest = builder.build()
+
+            val settingsClient = LocationServices.getSettingsClient(activity!!)
+            val result = settingsClient.checkLocationSettings(locationSettingsRequest)
+
+            result.addOnCompleteListener { locationSettingsResponse ->
+                Log.d(TAG, "checkLocationSetting#addOnCompleteListener")
+
+                try {
+                    locationSettingsResponse.getResult(ApiException::class.java)
+
+                    callSnapshotApi()
+
+                } catch (exception: ApiException) {
+                    FirebaseCrash.logcat(Log.ERROR, TAG, "checkLocationSetting#addOnCompleteListener#ApiException:" + exception)
+                    FirebaseCrash.report(exception)
+
+                    when (exception.statusCode) {
+                        LocationSettingsStatusCodes.RESOLUTION_REQUIRED -> {
+                            try {
+                                val resolvable = exception as ResolvableApiException
+
+                                resolvable.startResolutionForResult(activity, MainActivity.CHECK_LOCATION_SETTINGS_REQUEST_CODE)
+
+                            } catch (e: IntentSender.SendIntentException) {
+                                FirebaseCrash.logcat(Log.ERROR, TAG, "checkLocationSetting#addOnCompleteListener#SendIntentException:" + e)
+                                FirebaseCrash.report(e)
+
+                                AppDialog.warning(R.string.error_turn_on_location_title, R.string.error_turn_on_location_message, activity!!)
+                            } catch (e: ClassCastException) {
+                                FirebaseCrash.logcat(Log.ERROR, TAG, "checkLocationSetting#addOnCompleteListener#ClassCastException:" + e)
+                                FirebaseCrash.report(e)
+
+                                AppDialog.warning(R.string.error_turn_on_location_title, R.string.error_turn_on_location_message, activity!!)
+                            }
+                        }
+                        else -> {
+                            AppDialog.warning(R.string.error_turn_on_location_title, R.string.error_turn_on_location_message, activity!!)
+                        }
+                    }
+                }
+            }
+        } else {
+            callRecommendationService()
+        }
+
     }
 
     private fun callSnapshotApi() {
+        Log.d(TAG, "callSnapshotApi")
+
+        if (ContextCompat.checkSelfPermission(activity!!, Manifest.permission.ACCESS_FINE_LOCATION) ==
+                PackageManager.PERMISSION_GRANTED) {
+            Awareness.getSnapshotClient(activity).location
+                    .addOnSuccessListener({ locationResponse ->
+                        Log.d(TAG, "Awareness.getSnapshotClient#location#addOnSuccessListener")
+
+                        val location = locationResponse.location
+                        val geocoder = Geocoder(activity)
+                        val addresses = geocoder.getFromLocation(location.latitude, location.longitude, 1)
+                        val countryCode = addresses.first().countryCode
+
+                        Log.d(TAG, "countryCode = $countryCode")
+
+                        recommendationParameter.countryCode = countryCode
+
+                        callSnapshotActivity()
+                    })
+                    .addOnFailureListener({ e ->
+                        FirebaseCrash.logcat(Log.ERROR, TAG, "Awareness.getSnapshotClient#location#addOnFailureListener:" + e)
+                        FirebaseCrash.report(e)
+
+                        recommendationParameter.countryCode = null
+
+                        callSnapshotActivity()
+                    })
+        }
+    }
+
+    private fun callSnapshotActivity() {
+        Awareness.getSnapshotClient(activity).detectedActivity
+                .addOnSuccessListener { detectedActivityResponse ->
+                    Log.d(TAG, "Awareness.getSnapshotClient#detectedActivity#addOnSuccessListener")
+
+                    val activityRecognitionResult = detectedActivityResponse.activityRecognitionResult
+                    val mostProbableActivity = activityRecognitionResult.mostProbableActivity
+
+                    Log.d(TAG, "probableActivity = ${mostProbableActivity.type}, confidence = ${mostProbableActivity.confidence}")
+
+                    recommendationParameter.activityType = mostProbableActivity.type
+
+                    callSnapshotWeather()
+                }
+                .addOnFailureListener { e ->
+                    FirebaseCrash.logcat(Log.ERROR, TAG, "Awareness.getSnapshotClient#detectedActivity#addOnFailureListener:" + e)
+                    FirebaseCrash.report(e)
+
+                    recommendationParameter.activityType = null
+
+                    callSnapshotWeather()
+                }
+    }
+
+    private fun callSnapshotWeather() {
         if (ContextCompat.checkSelfPermission(activity!!, Manifest.permission.ACCESS_FINE_LOCATION) ==
                 PackageManager.PERMISSION_GRANTED) {
 
-//            Awareness.getSnapshotClient(activity).location
-//                    .addOnSuccessListener({ locationResponse ->
-//                        Log.d(TAG, "Awareness.getSnapshotClient#addOnSuccessListener locationResponse: " + locationResponse.toString())
-//
-////                        callRecommendationService()
-//                    })
-//                    .addOnFailureListener({ e ->
-//                        Log.e(TAG, "Awareness.getSnapshotClient#addOnFailureListener", e)
-//                    })
-
-//            Awareness.getSnapshotClient(activity).detectedActivity
-//                    .addOnSuccessListener { dar ->
-//                        val arr = dar.activityRecognitionResult
-//                        // getMostProbableActivity() is good enough for basic Activity detection.
-//                        // To work within a threshold of confidence,
-//                        // use ActivityRecognitionResult.getProbableActivities() to get a list of
-//                        // potential current activities, and check the confidence of each one.
-//                        val probableActivity = arr.mostProbableActivity
-//
-//                        val confidence = probableActivity.confidence
-//                        val activityStr = probableActivity.toString()
-//
-//                        Log.d(TAG, activityStr)
-//                    }
-//                    .addOnFailureListener { e -> Log.e(TAG, "Could not detect activity: ", e) }
-
             Awareness.getSnapshotClient(activity).weather
                     .addOnSuccessListener { weatherResponse ->
-                        val weather = weatherResponse.weather
-                        weather.conditions
+                        Log.d(TAG, "Awareness.getSnapshotClient#weather#addOnSuccessListener")
 
-                        Log.d(TAG, "Awareness.getSnapshotClient#weather#addOnSuccessListener: " + weather)
+                        val temp = weatherResponse.weather.getFeelsLikeTemperature(2)
+
+                        Log.d(TAG, "temp = $temp")
+
+                        recommendationParameter.temp = temp
+
+                        callRecommendationService()
                     }
                     .addOnFailureListener { e ->
                         FirebaseCrash.logcat(Log.ERROR, TAG, "Awareness.getSnapshotClient#weather#addOnFailureListener:" + e)
                         FirebaseCrash.report(e)
+
+                        recommendationParameter.temp = null
+
+                        callRecommendationService()
                     }
         }
     }
@@ -136,6 +243,22 @@ class RecommendedMusicFragment : BaseMusicFragment() {
         controller.setData(recommendationCategories)
 
         hideLoading()
+    }
+
+    fun onCheckLocationSettingResult(resultCode: Int) {
+        Log.d(TAG, "onCheckLocationSettingResult: resultCode = $resultCode")
+
+        when (resultCode) {
+            Activity.RESULT_OK -> {
+                callSnapshotApi()
+            }
+            else -> {
+                AppDialog.warning(R.string.error_turn_on_location_title, R.string.error_turn_on_location_message, activity!!,
+                        DialogInterface.OnDismissListener {
+                            callRecommendationService()
+                        })
+            }
+        }
     }
 
     companion object {

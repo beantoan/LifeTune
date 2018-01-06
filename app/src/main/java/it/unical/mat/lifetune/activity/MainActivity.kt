@@ -75,6 +75,15 @@ class MainActivity :
         }
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, dataResult: Intent) {
+        when (requestCode) {
+            CHECK_LOCATION_SETTINGS_REQUEST_CODE -> {
+                playMusicFragment!!.onCheckLocationSettingResult(resultCode)
+            }
+
+        }
+    }
+
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>,
                                             grantResults: IntArray) {
         Log.d(TAG, "onRequestPermissionsResult")
@@ -188,6 +197,7 @@ class MainActivity :
         private val TAG = MainActivity::class.java.canonicalName
 
         const val ACCESS_FINE_LOCATION_REQUEST_CODE = 100
+        const val CHECK_LOCATION_SETTINGS_REQUEST_CODE = 101
 
         private val EXTRA_IDP_RESPONSE = "extra_idp_response"
 

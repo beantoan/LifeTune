@@ -9,10 +9,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import it.unical.mat.lifetune.R
 import it.unical.mat.lifetune.controller.BaseMusicController
-import it.unical.mat.lifetune.entity.Category
-import it.unical.mat.lifetune.entity.Playlist
-import it.unical.mat.lifetune.entity.Song
-import it.unical.mat.lifetune.entity.TrackList
+import it.unical.mat.lifetune.entity.*
 import it.unical.mat.lifetune.service.ApiServiceFactory
 import it.unical.mat.lifetune.util.AppDialog
 import it.unical.mat.lifetune.util.AppUtils
@@ -25,6 +22,9 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
     private var mCompositeDisposable: CompositeDisposable? = null
 
     protected var playMusicFragment: PlayMusicFragment? = null
+
+    protected val recommendationParameter: RecommendationParameter = RecommendationParameter()
+
 
     override fun onDestroy() {
         Log.d(TAG, "onDestroy")
@@ -146,6 +146,7 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
         Log.d(TAG, "callRecommendationService")
 
         if (AppUtils.isInternetConnected(context!!)) {
+
             if (this.playMusicFragment!!.isCurrentRecommendationMusicFragment()) {
                 showLoading()
             }

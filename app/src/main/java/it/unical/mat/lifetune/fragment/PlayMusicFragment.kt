@@ -145,6 +145,12 @@ class PlayMusicFragment : Fragment(),
 
     fun isCurrentFavouriteMusicFragment(): Boolean = currentViewPagerItem() == PlayMusicPagerAdapter.FAVOURITE_MUSIC_FRAGMENT
 
+    fun onCheckLocationSettingResult(resultCode: Int) {
+        Log.d(TAG, "onCheckLocationSettingResult: resultCode = $resultCode")
+
+        mPlayMusicPagerAdapter.recommendationMusicFragment.onCheckLocationSettingResult(resultCode)
+    }
+
     private fun buildMediaSource(uri: Uri): ExtractorMediaSource {
         return ExtractorMediaSource(uri, DefaultHttpDataSourceFactory("ua"),
                 DefaultExtractorsFactory(), null, null)

@@ -13,8 +13,8 @@ import it.unical.mat.lifetune.fragment.RecommendedMusicFragment
 class PlayMusicPagerAdapter(playMusicFragment: PlayMusicFragment, fragmentManager: FragmentManager) :
         FragmentPagerAdapter(fragmentManager) {
 
-    private val recommendationMusicFragment = RecommendedMusicFragment.newInstance(playMusicFragment)
-    private val favoriteMusicFragment = FavoriteMusicFragment.newInstance(playMusicFragment)
+    val recommendationMusicFragment = RecommendedMusicFragment.newInstance(playMusicFragment)
+    val favoriteMusicFragment = FavoriteMusicFragment.newInstance(playMusicFragment)
 
     override fun getItem(i: Int): Fragment = when (i) {
         RECOMMENDATION_MUSIC_FRAGMENT -> recommendationMusicFragment
