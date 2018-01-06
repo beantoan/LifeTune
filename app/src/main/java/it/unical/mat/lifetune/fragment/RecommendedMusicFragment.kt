@@ -15,6 +15,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.google.android.gms.awareness.Awareness
+import com.google.android.gms.awareness.state.Weather
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.LocationRequest
@@ -223,7 +224,7 @@ class RecommendedMusicFragment : BaseMusicFragment() {
                     .addOnSuccessListener { weatherResponse ->
                         Log.d(TAG, "Awareness.getSnapshotClient#weather#addOnSuccessListener")
 
-                        val temp = weatherResponse.weather.getFeelsLikeTemperature(2)
+                        val temp = weatherResponse.weather.getFeelsLikeTemperature(Weather.CELSIUS)
 
                         Log.d(TAG, "temp = $temp")
 
