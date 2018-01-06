@@ -24,6 +24,7 @@ import it.unical.mat.lifetune.data.DataHelper
 import it.unical.mat.lifetune.entity.TrackList
 import kotlinx.android.synthetic.main.fragment_play_music.*
 
+
 /**
  * Created by beantoan on 12/12/17.
  */
@@ -144,12 +145,6 @@ class PlayMusicFragment : Fragment(),
     fun isCurrentRecommendationMusicFragment(): Boolean = currentViewPagerItem() == PlayMusicPagerAdapter.RECOMMENDATION_MUSIC_FRAGMENT
 
     fun isCurrentFavouriteMusicFragment(): Boolean = currentViewPagerItem() == PlayMusicPagerAdapter.FAVOURITE_MUSIC_FRAGMENT
-
-    fun onCheckLocationSettingResult(resultCode: Int) {
-        Log.d(TAG, "onCheckLocationSettingResult: resultCode = $resultCode")
-
-        mPlayMusicPagerAdapter.recommendationMusicFragment.onCheckLocationSettingResult(resultCode)
-    }
 
     private fun buildMediaSource(uri: Uri): ExtractorMediaSource {
         return ExtractorMediaSource(uri, DefaultHttpDataSourceFactory("ua"),

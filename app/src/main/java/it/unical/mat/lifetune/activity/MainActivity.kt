@@ -16,6 +16,7 @@ import com.beantoan.smsbackup.util.ActivityUtils
 import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
 import it.unical.mat.lifetune.R
+import it.unical.mat.lifetune.entity.ActivityResultEvent
 import it.unical.mat.lifetune.fragment.MyActivitiesFragment
 import it.unical.mat.lifetune.fragment.PlayMusicFragment
 import it.unical.mat.lifetune.fragment.SchedulesFragment
@@ -23,8 +24,10 @@ import it.unical.mat.lifetune.util.AppDialog
 import it.unical.mat.lifetune.util.AppUtils
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.nav_header_main.view.*
+import org.greenrobot.eventbus.EventBus
 import pub.devrel.easypermissions.AfterPermissionGranted
 import pub.devrel.easypermissions.EasyPermissions
+
 
 class MainActivity :
         AppCompatActivity(),
@@ -75,13 +78,12 @@ class MainActivity :
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, dataResult: Intent) {
-        when (requestCode) {
-            CHECK_LOCATION_SETTINGS_REQUEST_CODE -> {
-                playMusicFragment!!.onCheckLocationSettingResult(resultCode)
-            }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        Log.d(TAG, "onActivityResult")
 
-        }
+        super.onActivityResult(requestCode, resultCode, data)
+
+        EventBus.getDefault().post(ActivityResultEvent(requestCode, resultCode, data))
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>,

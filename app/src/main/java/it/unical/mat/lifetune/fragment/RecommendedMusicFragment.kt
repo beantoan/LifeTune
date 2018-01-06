@@ -23,12 +23,14 @@ import com.google.android.gms.location.LocationSettingsRequest
 import com.google.android.gms.location.LocationSettingsStatusCodes
 import com.google.firebase.crash.FirebaseCrash
 import it.unical.mat.lifetune.R
-import it.unical.mat.lifetune.activity.MainActivity
 import it.unical.mat.lifetune.controller.RecommendationMusicController
 import it.unical.mat.lifetune.decoration.RecyclerViewDividerItemDecoration
+import it.unical.mat.lifetune.entity.ActivityResultEvent
 import it.unical.mat.lifetune.entity.Category
 import it.unical.mat.lifetune.util.AppDialog
 import kotlinx.android.synthetic.main.fragment_recommended_music.*
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
 
 
 /**
@@ -50,6 +52,12 @@ class RecommendedMusicFragment : BaseMusicFragment() {
         onCreateViewTasks(view)
     }
 
+    override fun onStop() {
+        onStopTasks()
+
+        super.onStop()
+    }
+
     override fun onRecommendationServiceSuccess(categories: List<Category>) {
         super.onRecommendationServiceSuccess(categories)
 
@@ -66,14 +74,32 @@ class RecommendedMusicFragment : BaseMusicFragment() {
         controller.setData(recommendationCategories)
     }
 
+    @Subscribe
+    fun onActivityResultEvent(event: ActivityResultEvent) {
+        Log.d(TAG, "onActivityResultEvent: requestCode=${event.requestCode}, resultCode=${event.resultCode}")
+
+        when (event.requestCode) {
+            CHECK_LOCATION_SETTINGS_REQUEST_CODE -> {
+                onCheckLocationSettingResult(event.resultCode)
+            }
+
+        }
+    }
+
     private fun onCreateViewTasks(view: View) {
         Log.d(TAG, "onCreateViewTasks")
+
+        EventBus.getDefault().register(this)
 
         setupRecyclerViewCategories()
 
         setupMusicController()
 
         checkLocationSetting()
+    }
+
+    private fun onStopTasks() {
+        EventBus.getDefault().unregister(this)
     }
 
     private fun checkLocationSetting() {
@@ -108,7 +134,7 @@ class RecommendedMusicFragment : BaseMusicFragment() {
                             try {
                                 val resolvable = exception as ResolvableApiException
 
-                                resolvable.startResolutionForResult(activity, MainActivity.CHECK_LOCATION_SETTINGS_REQUEST_CODE)
+                                resolvable.startResolutionForResult(activity, CHECK_LOCATION_SETTINGS_REQUEST_CODE)
 
                             } catch (e: IntentSender.SendIntentException) {
                                 FirebaseCrash.logcat(Log.ERROR, TAG, "checkLocationSetting#addOnCompleteListener#SendIntentException:" + e)
@@ -263,6 +289,7 @@ class RecommendedMusicFragment : BaseMusicFragment() {
 
     companion object {
         private val TAG = RecommendedMusicFragment::class.java.canonicalName
+        const val CHECK_LOCATION_SETTINGS_REQUEST_CODE = 101
 
         fun newInstance(playMusicFragment: PlayMusicFragment): RecommendedMusicFragment {
             val fragment = RecommendedMusicFragment()
