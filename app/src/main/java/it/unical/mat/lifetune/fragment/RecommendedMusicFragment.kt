@@ -58,16 +58,16 @@ class RecommendedMusicFragment : BaseMusicFragment() {
         super.onStop()
     }
 
-    override fun onRecommendationServiceSuccess(categories: List<Category>) {
-        super.onRecommendationServiceSuccess(categories)
+    override fun onRecommendationApiSuccess(categories: List<Category>) {
+        super.onRecommendationApiSuccess(categories)
 
         recommendationCategories = categories
 
         controller.setData(recommendationCategories)
     }
 
-    override fun onRecommendationServiceFailure(error: Throwable) {
-        super.onRecommendationServiceFailure(error)
+    override fun onRecommendationApiFailure(error: Throwable) {
+        super.onRecommendationApiFailure(error)
 
         recommendationCategories = ArrayList()
 
@@ -155,7 +155,7 @@ class RecommendedMusicFragment : BaseMusicFragment() {
                 }
             }
         } else {
-            callRecommendationService()
+            callRecommendationApi()
         }
 
     }
@@ -229,7 +229,7 @@ class RecommendedMusicFragment : BaseMusicFragment() {
 
                         recommendationParameter.temp = temp
 
-                        callRecommendationService()
+                        callRecommendationApi()
                     }
                     .addOnFailureListener { e ->
                         FirebaseCrash.logcat(Log.ERROR, TAG, "Awareness.getSnapshotClient#weather#addOnFailureListener:" + e)
@@ -237,7 +237,7 @@ class RecommendedMusicFragment : BaseMusicFragment() {
 
                         recommendationParameter.temp = null
 
-                        callRecommendationService()
+                        callRecommendationApi()
                     }
         }
     }
@@ -281,7 +281,7 @@ class RecommendedMusicFragment : BaseMusicFragment() {
             else -> {
                 AppDialog.warning(R.string.error_turn_on_location_title, R.string.error_turn_on_location_message, activity!!,
                         DialogInterface.OnDismissListener {
-                            callRecommendationService()
+                            callRecommendationApi()
                         })
             }
         }

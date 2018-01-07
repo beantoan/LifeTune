@@ -46,16 +46,16 @@ class FavoriteMusicFragment : BaseMusicFragment() {
         onResumeTasks()
     }
 
-    override fun onFavouriteServiceSuccess(playlists: List<Playlist>) {
-        super.onFavouriteServiceSuccess(playlists)
+    override fun onFavouriteApiSuccess(playlists: List<Playlist>) {
+        super.onFavouriteApiSuccess(playlists)
 
         favouritePlaylists = playlists
 
         controller.setData(favouritePlaylists)
     }
 
-    override fun onFavouriteServiceFailure(error: Throwable) {
-        super.onFavouriteServiceFailure(error)
+    override fun onFavouriteApiFailure(error: Throwable) {
+        super.onFavouriteApiFailure(error)
 
         favouritePlaylists = ArrayList()
 
@@ -71,7 +71,7 @@ class FavoriteMusicFragment : BaseMusicFragment() {
     }
 
     private fun onResumeTasks() {
-        callFavouritePlaylistsService()
+        callFavouritePlaylistsApi()
     }
 
     private fun setupRecyclerViewPlaylists() {
