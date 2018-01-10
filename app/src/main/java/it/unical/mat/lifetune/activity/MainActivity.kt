@@ -221,7 +221,10 @@ class MainActivity :
                 .addDataType(DataType.TYPE_ACTIVITY_SEGMENT)
                 .addDataType(DataType.AGGREGATE_ACTIVITY_SUMMARY)
                 .addDataType(DataType.AGGREGATE_STEP_COUNT_DELTA)
-                .addDataType(DataType.TYPE_ACTIVITY_SAMPLES)
+                .addDataType(DataType.AGGREGATE_CALORIES_EXPENDED)
+                .addDataType(DataType.AGGREGATE_DISTANCE_DELTA)
+                .addDataType(DataType.TYPE_DISTANCE_DELTA)
+                .addDataType(DataType.TYPE_CALORIES_EXPENDED)
                 .build()
 
         if (!GoogleSignIn.hasPermissions(GoogleSignIn.getLastSignedInAccount(this), fitnessOptions)) {
@@ -263,7 +266,18 @@ class MainActivity :
                 }
 
         Fitness.getRecordingClient(this, account)
-                .subscribe(DataType.TYPE_ACTIVITY_SAMPLES)
+                .subscribe(DataType.TYPE_DISTANCE_DELTA)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Log.d(TAG, "Fitness.getRecordingClient#addOnCompleteListener: Successfully subscribed!")
+                    } else {
+                        FirebaseCrash.logcat(Log.ERROR, TAG, "Fitness.getRecordingClient#addOnCompleteListener:" + task.exception!!)
+                        FirebaseCrash.report(task.exception)
+                    }
+                }
+
+        Fitness.getRecordingClient(this, account)
+                .subscribe(DataType.TYPE_CALORIES_EXPENDED)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         Log.d(TAG, "Fitness.getRecordingClient#addOnCompleteListener: Successfully subscribed!")

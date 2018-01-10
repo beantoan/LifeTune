@@ -32,6 +32,10 @@
     <string name="request_access_fine_location_error_message">Please turn on location permission in app setting to use the features</string>
     <string name="error_turn_on_location_title">Cannot turn on location</string>
     <string name="error_turn_on_location_message">Please turn on location to receive the best recommendation</string>
+    <string name="count_steps_chart_title">Count Steps</string>
+    <string name="calculate_distances_chart_title">Calculate Distances</string>
+    <string name="calculate_calories_chart_title">Calculate Calories</string>
+    <string name="my_activities_summary_title">Summary</string>
 
 
 </resources>
