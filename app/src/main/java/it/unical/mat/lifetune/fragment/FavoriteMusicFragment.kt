@@ -95,7 +95,7 @@ class FavoriteMusicFragment : BaseMusicFragment() {
     }
 
     companion object {
-        private val TAG = FavoriteMusicFragment::class.java.canonicalName
+        private val TAG = FavoriteMusicFragment::class.java.simpleName
 
         fun newInstance(playMusicFragment: PlayMusicFragment): FavoriteMusicFragment {
             val fragment = FavoriteMusicFragment()

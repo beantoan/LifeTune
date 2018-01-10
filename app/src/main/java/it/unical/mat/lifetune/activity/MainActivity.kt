@@ -1,6 +1,7 @@
 package it.unical.mat.lifetune.activity
 
 import android.Manifest
+import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -14,7 +15,12 @@ import android.util.Log
 import android.view.MenuItem
 import com.beantoan.smsbackup.util.ActivityUtils
 import com.firebase.ui.auth.IdpResponse
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.fitness.Fitness
+import com.google.android.gms.fitness.FitnessOptions
+import com.google.android.gms.fitness.data.DataType
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.crash.FirebaseCrash
 import it.unical.mat.lifetune.R
 import it.unical.mat.lifetune.entity.ActivityResultEvent
 import it.unical.mat.lifetune.fragment.MyActivitiesFragment
@@ -84,6 +90,12 @@ class MainActivity :
         super.onActivityResult(requestCode, resultCode, data)
 
         EventBus.getDefault().post(ActivityResultEvent(requestCode, resultCode, data))
+
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == FITNESS_OAUTH_REQUEST_CODE) {
+                subscribeFitness()
+            }
+        }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>,
@@ -129,6 +141,8 @@ class MainActivity :
         setupNavigationDrawer()
 
         checkFineLocationPermission()
+
+        checkFitnessPermissions()
     }
 
     private fun setupNavigationDrawer() {
@@ -141,8 +155,11 @@ class MainActivity :
 
         nav_view.setNavigationItemSelectedListener(this)
 
-        nav_view.setCheckedItem(R.id.nav_play_music)
-        nav_view.menu.performIdentifierAction(R.id.nav_play_music, 0)
+//        nav_view.setCheckedItem(R.id.nav_play_music)
+//        nav_view.menu.performIdentifierAction(R.id.nav_play_music, 0)
+
+        nav_view.setCheckedItem(R.id.nav_my_activities)
+        nav_view.menu.performIdentifierAction(R.id.nav_my_activities, 0)
     }
 
     private fun showUserInfo() {
@@ -194,12 +211,75 @@ class MainActivity :
 
     }
 
+    private fun checkFitnessPermissions() {
+        Log.d(TAG, "checkFitnessPermissions")
+
+        val fitnessOptions = FitnessOptions.builder()
+                .addDataType(DataType.TYPE_STEP_COUNT_CUMULATIVE)
+                .addDataType(DataType.TYPE_STEP_COUNT_DELTA)
+                .addDataType(DataType.TYPE_STEP_COUNT_CADENCE)
+                .addDataType(DataType.TYPE_ACTIVITY_SEGMENT)
+                .addDataType(DataType.AGGREGATE_ACTIVITY_SUMMARY)
+                .addDataType(DataType.AGGREGATE_STEP_COUNT_DELTA)
+                .addDataType(DataType.TYPE_ACTIVITY_SAMPLES)
+                .build()
+
+        if (!GoogleSignIn.hasPermissions(GoogleSignIn.getLastSignedInAccount(this), fitnessOptions)) {
+            GoogleSignIn.requestPermissions(
+                    this,
+                    FITNESS_OAUTH_REQUEST_CODE,
+                    GoogleSignIn.getLastSignedInAccount(this),
+                    fitnessOptions);
+        } else {
+            subscribeFitness()
+        }
+    }
+
+    private fun subscribeFitness() {
+        Log.d(TAG, "subscribeFitness")
+
+        val account = GoogleSignIn.getLastSignedInAccount(this)
+
+        Fitness.getRecordingClient(this, account)
+                .subscribe(DataType.TYPE_STEP_COUNT_CUMULATIVE)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Log.d(TAG, "Fitness.getRecordingClient#addOnCompleteListener: Successfully subscribed!")
+                    } else {
+                        FirebaseCrash.logcat(Log.ERROR, TAG, "Fitness.getRecordingClient#addOnCompleteListener:" + task.exception!!)
+                        FirebaseCrash.report(task.exception)
+                    }
+                }
+
+        Fitness.getRecordingClient(this, account)
+                .subscribe(DataType.TYPE_STEP_COUNT_DELTA)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Log.d(TAG, "Fitness.getRecordingClient#addOnCompleteListener: Successfully subscribed!")
+                    } else {
+                        FirebaseCrash.logcat(Log.ERROR, TAG, "Fitness.getRecordingClient#addOnCompleteListener:" + task.exception!!)
+                        FirebaseCrash.report(task.exception)
+                    }
+                }
+
+        Fitness.getRecordingClient(this, account)
+                .subscribe(DataType.TYPE_ACTIVITY_SAMPLES)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Log.d(TAG, "Fitness.getRecordingClient#addOnCompleteListener: Successfully subscribed!")
+                    } else {
+                        FirebaseCrash.logcat(Log.ERROR, TAG, "Fitness.getRecordingClient#addOnCompleteListener:" + task.exception!!)
+                        FirebaseCrash.report(task.exception)
+                    }
+                }
+    }
+
     companion object {
 
-        private val TAG = MainActivity::class.java.canonicalName
+        private val TAG = MainActivity::class.java.simpleName
 
         const val ACCESS_FINE_LOCATION_REQUEST_CODE = 100
-        const val CHECK_LOCATION_SETTINGS_REQUEST_CODE = 101
+        const val FITNESS_OAUTH_REQUEST_CODE = 102
 
         private val EXTRA_IDP_RESPONSE = "extra_idp_response"
 

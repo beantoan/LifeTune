@@ -209,7 +209,7 @@ class PlayMusicFragment : Fragment(),
     }
 
     companion object {
-        val TAG = PlayMusicFragment::class.java.canonicalName
+        val TAG = PlayMusicFragment::class.java.simpleName
 
         private val FIND_SUGGESTION_SIMULATED_DELAY = 250L
     }

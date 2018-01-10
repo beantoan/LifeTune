@@ -24,6 +24,6 @@ class SchedulesFragment : Fragment() {
     }
 
     companion object {
-        val TAG = SchedulesFragment::class.java.canonicalName
+        val TAG = SchedulesFragment::class.java.simpleName
     }
 }

@@ -28,6 +28,7 @@ import it.unical.mat.lifetune.decoration.RecyclerViewDividerItemDecoration
 import it.unical.mat.lifetune.entity.ActivityResultEvent
 import it.unical.mat.lifetune.entity.Category
 import it.unical.mat.lifetune.util.AppDialog
+import it.unical.mat.lifetune.util.AppUtils
 import kotlinx.android.synthetic.main.fragment_recommended_music.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -165,80 +166,100 @@ class RecommendedMusicFragment : BaseMusicFragment() {
 
         if (ContextCompat.checkSelfPermission(activity!!, Manifest.permission.ACCESS_FINE_LOCATION) ==
                 PackageManager.PERMISSION_GRANTED) {
-            Awareness.getSnapshotClient(activity).location
-                    .addOnSuccessListener({ locationResponse ->
-                        Log.d(TAG, "Awareness.getSnapshotClient#location#addOnSuccessListener")
 
-                        val location = locationResponse.location
-                        val geocoder = Geocoder(activity)
-                        val addresses = geocoder.getFromLocation(location.latitude, location.longitude, 1)
-                        val countryCode = addresses.first().countryCode
+            if (AppUtils.isInternetConnected(context!!)) {
+                Awareness.getSnapshotClient(activity).location
+                        .addOnSuccessListener({ locationResponse ->
+                            Log.d(TAG, "Awareness.getSnapshotClient#location#addOnSuccessListener")
 
-                        Log.d(TAG, "countryCode = $countryCode")
+                            val location = locationResponse.location
+                            val geocoder = Geocoder(activity)
 
-                        recommendationParameter.countryCode = countryCode
+                            try {
+                                val addresses = geocoder.getFromLocation(location.latitude, location.longitude, 1)
+                                val countryCode = addresses.first().countryCode
 
-                        callSnapshotActivity()
-                    })
-                    .addOnFailureListener({ e ->
-                        FirebaseCrash.logcat(Log.ERROR, TAG, "Awareness.getSnapshotClient#location#addOnFailureListener:" + e)
-                        FirebaseCrash.report(e)
+                                Log.d(TAG, "countryCode = $countryCode")
 
-                        recommendationParameter.countryCode = null
+                                recommendationParameter.countryCode = countryCode
+                            } catch (e: Exception) {
+                                FirebaseCrash.logcat(Log.ERROR, TAG, "Awareness.getSnapshotClient#location#addOnSuccessListener:" + e)
+                                FirebaseCrash.report(e)
+                            }
 
-                        callSnapshotActivity()
-                    })
+                            callSnapshotActivity()
+                        })
+                        .addOnFailureListener({ e ->
+                            FirebaseCrash.logcat(Log.ERROR, TAG, "Awareness.getSnapshotClient#location#addOnFailureListener:" + e)
+                            FirebaseCrash.report(e)
+
+                            recommendationParameter.countryCode = null
+
+                            callSnapshotActivity()
+                        })
+            } else {
+                AppDialog.error(R.string.no_internet_error_title, R.string.no_internet_error_message, activity!!)
+            }
         }
     }
 
     private fun callSnapshotActivity() {
-        Awareness.getSnapshotClient(activity).detectedActivity
-                .addOnSuccessListener { detectedActivityResponse ->
-                    Log.d(TAG, "Awareness.getSnapshotClient#detectedActivity#addOnSuccessListener")
 
-                    val activityRecognitionResult = detectedActivityResponse.activityRecognitionResult
-                    val mostProbableActivity = activityRecognitionResult.mostProbableActivity
+        if (AppUtils.isInternetConnected(context!!)) {
+            Awareness.getSnapshotClient(activity).detectedActivity
+                    .addOnSuccessListener { detectedActivityResponse ->
+                        Log.d(TAG, "Awareness.getSnapshotClient#detectedActivity#addOnSuccessListener")
 
-                    Log.d(TAG, "probableActivity = ${mostProbableActivity.type}, confidence = ${mostProbableActivity.confidence}")
+                        val activityRecognitionResult = detectedActivityResponse.activityRecognitionResult
+                        val mostProbableActivity = activityRecognitionResult.mostProbableActivity
 
-                    recommendationParameter.activityType = mostProbableActivity.type
+                        Log.d(TAG, "probableActivity = ${mostProbableActivity.type}, confidence = ${mostProbableActivity.confidence}")
 
-                    callSnapshotWeather()
-                }
-                .addOnFailureListener { e ->
-                    FirebaseCrash.logcat(Log.ERROR, TAG, "Awareness.getSnapshotClient#detectedActivity#addOnFailureListener:" + e)
-                    FirebaseCrash.report(e)
+                        recommendationParameter.activityType = mostProbableActivity.type
 
-                    recommendationParameter.activityType = null
+                        callSnapshotWeather()
+                    }
+                    .addOnFailureListener { e ->
+                        FirebaseCrash.logcat(Log.ERROR, TAG, "Awareness.getSnapshotClient#detectedActivity#addOnFailureListener:" + e)
+                        FirebaseCrash.report(e)
 
-                    callSnapshotWeather()
-                }
+                        recommendationParameter.activityType = null
+
+                        callSnapshotWeather()
+                    }
+        } else {
+            AppDialog.error(R.string.no_internet_error_title, R.string.no_internet_error_message, activity!!)
+        }
     }
 
     private fun callSnapshotWeather() {
         if (ContextCompat.checkSelfPermission(activity!!, Manifest.permission.ACCESS_FINE_LOCATION) ==
                 PackageManager.PERMISSION_GRANTED) {
 
-            Awareness.getSnapshotClient(activity).weather
-                    .addOnSuccessListener { weatherResponse ->
-                        Log.d(TAG, "Awareness.getSnapshotClient#weather#addOnSuccessListener")
+            if (AppUtils.isInternetConnected(context!!)) {
+                Awareness.getSnapshotClient(activity).weather
+                        .addOnSuccessListener { weatherResponse ->
+                            Log.d(TAG, "Awareness.getSnapshotClient#weather#addOnSuccessListener")
 
-                        val temp = weatherResponse.weather.getFeelsLikeTemperature(2)
+                            val temp = weatherResponse.weather.getFeelsLikeTemperature(2)
 
-                        Log.d(TAG, "temp = $temp")
+                            Log.d(TAG, "temp = $temp")
 
-                        recommendationParameter.temp = temp
+                            recommendationParameter.temp = temp
 
-                        callRecommendationApi()
-                    }
-                    .addOnFailureListener { e ->
-                        FirebaseCrash.logcat(Log.ERROR, TAG, "Awareness.getSnapshotClient#weather#addOnFailureListener:" + e)
-                        FirebaseCrash.report(e)
+                            callRecommendationApi()
+                        }
+                        .addOnFailureListener { e ->
+                            FirebaseCrash.logcat(Log.ERROR, TAG, "Awareness.getSnapshotClient#weather#addOnFailureListener:" + e)
+                            FirebaseCrash.report(e)
 
-                        recommendationParameter.temp = null
+                            recommendationParameter.temp = null
 
-                        callRecommendationApi()
-                    }
+                            callRecommendationApi()
+                        }
+            } else {
+                AppDialog.error(R.string.no_internet_error_title, R.string.no_internet_error_message, activity!!)
+            }
         }
     }
 
@@ -288,7 +309,7 @@ class RecommendedMusicFragment : BaseMusicFragment() {
     }
 
     companion object {
-        private val TAG = RecommendedMusicFragment::class.java.canonicalName
+        private val TAG = RecommendedMusicFragment::class.java.simpleName
         const val CHECK_LOCATION_SETTINGS_REQUEST_CODE = 101
 
         fun newInstance(playMusicFragment: PlayMusicFragment): RecommendedMusicFragment {

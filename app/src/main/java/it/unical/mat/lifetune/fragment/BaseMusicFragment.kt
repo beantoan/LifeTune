@@ -209,6 +209,6 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
 
 
     companion object {
-        private val TAG = BaseMusicFragment::class.java.canonicalName
+        private val TAG = BaseMusicFragment::class.java.simpleName
     }
 }
