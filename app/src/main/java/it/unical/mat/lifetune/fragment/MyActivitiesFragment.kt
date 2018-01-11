@@ -228,13 +228,13 @@ class MyActivitiesFragment : Fragment() {
             val start = dateTimeFormat.format(startMs)
             val end = dateTimeFormat.format(endMs)
 
-            totalActiveTime += endMs - startMs
-
             val hour = hourFormat.format(startMs).toFloat()
 
             Log.d(TAG, "-- activity=${bucket.activity}")
 
             if (bucket.activity in ACCEPTED_FITNESS_ACTIVITIES) {
+
+                totalActiveTime += endMs - startMs
 
                 if (!fitnessHours.contains(hour)) {
                     fitnessHours.add(hour)
@@ -320,8 +320,12 @@ class MyActivitiesFragment : Fragment() {
     private fun updateSummaryInfo(_totalActiveTime: Float, _totalSteps: Float,
                                   _totalDistance: Float, _totalCalories: Float) {
         val activeTimeLong = _totalActiveTime.toLong()
-        val activeTimeMinutes = TimeUnit.MILLISECONDS.toMinutes(activeTimeLong)
-        val activeTimeSeconds = TimeUnit.MILLISECONDS.toSeconds(activeTimeLong) - TimeUnit.MINUTES.toSeconds(activeTimeMinutes)
+        val activeTimeHours = TimeUnit.MILLISECONDS.toHours(activeTimeLong)
+        val activeTimeMinutes = TimeUnit.MILLISECONDS.toMinutes(activeTimeLong) - TimeUnit.HOURS.toMinutes(activeTimeHours)
+
+        val activeTimeHoursStr = if (activeTimeHours > 0) "${activeTimeHours}h" else ""
+        val activeTimeMinutesStr = if (activeTimeMinutes > 0) "${activeTimeMinutes}m" else ""
+        val activeTimeSpace = if (activeTimeHoursStr == "" || activeTimeMinutesStr == "") "" else " "
 
         val numberFormat = NumberFormat.getNumberInstance(Locale.getDefault())
 
@@ -330,11 +334,11 @@ class MyActivitiesFragment : Fragment() {
 
         val distanceKmStr = if (distanceKm > 0) "${distanceKm}km" else ""
         val distanceMStr = if (distanceM > 0) "${distanceM}m" else ""
+        val distanceSpace = if (distanceKmStr == "" || distanceMStr == "") "" else " "
 
-        total_active_time.text = String.format("%dmin %dsec", activeTimeSeconds, activeTimeSeconds)
-
+        total_active_time.text = "$activeTimeHoursStr$activeTimeSpace$activeTimeMinutesStr"
         total_steps.text = numberFormat.format(_totalSteps.toInt())
-        total_distance.text = "$distanceKmStr $distanceMStr"
+        total_distance.text = "$distanceKmStr$distanceSpace$distanceMStr"
         total_calories.text = Math.round(_totalCalories).toString()
     }
 
@@ -375,7 +379,7 @@ class MyActivitiesFragment : Fragment() {
 
         // https://github.com/PhilJay/MPAndroidChart/blob/master/MPChartExample/src/com/xxmassdeveloper/mpchartexample/BarChartActivityMultiDataset.java#L180
         // (barWith + barSpace) * numberOfBars + groupSpace = 1
-        val groupSpace = 0.03f
+        val groupSpace = 0.04f
         val barSpace = 0.01f
         val barWidth = 0.31f
 
@@ -423,7 +427,7 @@ class MyActivitiesFragment : Fragment() {
         val CHART_SERIES_TITLE_WALKING = "Walking"
         val CHART_SERIES_TITLE_BIKING = "Biking"
 
-        val CHART_SERIES_COLOR_RUNNING = Color.parseColor("#3572b0")
+        val CHART_SERIES_COLOR_RUNNING = Color.parseColor("#f6c342")
         val CHART_SERIES_COLOR_WALKING = Color.parseColor("#14892c")
         val CHART_SERIES_COLOR_BIKING = Color.parseColor("#d04437")
 
