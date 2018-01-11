@@ -20,7 +20,6 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:layout_scrollFlags="scroll|enterAlways|snap"
             app:popupTheme="@style/ThemeOverlay.AppCompat.ActionBar" />
 
     </android.support.design.widget.AppBarLayout>
@@ -78,14 +77,15 @@
                         android:layout_weight="1"
                         android:layout_gravity="center"
                         android:layout_marginStart="10dp"
-                        android:text="Active time" />
+                        android:text="@string/summary_active_time_title" />
 
                     <TextView
+                        android:id="@+id/total_active_time"
                         style="@style/TextAppearance.AppCompat.Subhead"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:text="15m" />
+                        android:text="0" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -107,14 +107,15 @@
                         android:layout_weight="1"
                         android:layout_gravity="center"
                         android:layout_marginStart="10dp"
-                        android:text="Steps" />
+                        android:text="@string/summary_steps_title" />
 
                     <TextView
+                        android:id="@+id/total_steps"
                         style="@style/TextAppearance.AppCompat.Subhead"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:text="1,500" />
+                        android:text="0" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -136,14 +137,15 @@
                         android:layout_weight="1"
                         android:layout_gravity="center"
                         android:layout_marginStart="10dp"
-                        android:text="Distance" />
+                        android:text="@string/summary_distance_title" />
 
                     <TextView
+                        android:id="@+id/total_distance"
                         style="@style/TextAppearance.AppCompat.Subhead"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:text="1 km" />
+                        android:text="0" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -165,14 +167,15 @@
                         android:layout_weight="1"
                         android:layout_gravity="center"
                         android:layout_marginStart="10dp"
-                        android:text="Calories" />
+                        android:text="@string/summary_calories_title" />
 
                     <TextView
+                        android:id="@+id/total_calories"
                         style="@style/TextAppearance.AppCompat.Subhead"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:text="56 cal" />
+                        android:text="0" />
                 </LinearLayout>
 
             </LinearLayout>
@@ -262,24 +265,16 @@
         android:id="@+id/bottom_sheet"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:background="@color/colorAccent"
+        android:background="@color/colorPrimary"
         android:orientation="vertical"
         app:behavior_hideable="false"
         app:layout_behavior="@string/bottom_sheet_behavior">
 
-        <TextView
+        <EditText
+            android:id="@+id/fitness_date"
+            android:textColor="@color/active_mode_text_color"
             android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:background="@color/colorAccent"
-            android:gravity="center"
-            android:textColor="@android:color/white" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:textColor="@android:color/white" />
-
+            android:layout_height="wrap_content" />
     </LinearLayout>
 
 

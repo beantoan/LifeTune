@@ -4,6 +4,7 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.text.InputType
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -13,6 +14,7 @@ import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.formatter.IAxisValueFormatter
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.fitness.Fitness
 import com.google.android.gms.fitness.data.Bucket
@@ -20,13 +22,14 @@ import com.google.android.gms.fitness.data.DataSource
 import com.google.android.gms.fitness.data.DataType
 import com.google.android.gms.fitness.data.Field
 import com.google.android.gms.fitness.request.DataReadRequest
-import it.unical.mat.lifetune.BuildConfig
 import it.unical.mat.lifetune.R
 import it.unical.mat.lifetune.activity.MainActivity
 import it.unical.mat.lifetune.entity.FitnessActivity
 import it.unical.mat.lifetune.entity.FitnessChartEntry
+import it.unical.mat.lifetune.util.AppDialog
 import kotlinx.android.synthetic.main.fragment_my_activities.*
 import java.text.DateFormat
+import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -41,9 +44,19 @@ class MyActivitiesFragment : Fragment() {
     private var runningData: ArrayList<FitnessChartEntry> = ArrayList()
     private var onBicycleData: ArrayList<FitnessChartEntry> = ArrayList()
     private var walkingData: ArrayList<FitnessChartEntry> = ArrayList()
+
+    private var totalActiveTime = 0f
+    private var totalSteps = 0f
+    private var totalDistance = 0f
+    private var totalCalories = 0f
+
+    private val fitnessCalendar = Calendar.getInstance()
+
     private var fitnessHours: ArrayList<Float> = ArrayList()
 
     private var mainActivity: MainActivity? = null
+
+    private var isLoadingFitnessData = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -71,8 +84,9 @@ class MyActivitiesFragment : Fragment() {
         mainActivity = activity as MainActivity
 
         mainActivity!!.setupToggleDrawer(toolbar)
-    }
 
+        setupFitnessDateInput()
+    }
 
     private fun onResumeTasks() {
         Log.d(TAG, "onResumeTasks")
@@ -80,24 +94,48 @@ class MyActivitiesFragment : Fragment() {
         readFitnessData()
     }
 
+    private fun setupFitnessDateInput() {
+        fitness_date.inputType = InputType.TYPE_NULL
+
+        fitness_date.setOnClickListener {
+            AppDialog.showDatePickerDialog(mainActivity!!, fitness_date,
+                    fitnessCalendar.get(Calendar.YEAR), fitnessCalendar.get(Calendar.MONTH), fitnessCalendar.get(Calendar.DAY_OF_MONTH),
+                    false, object : AppDialog.DateSetListener {
+                override fun onSetListener(_year: Int, _month: Int, _day: Int) {
+
+                    fitnessCalendar.set(_year, _month, _day)
+
+                    readFitnessData()
+                }
+            })
+        }
+
+        val dateFormat = DateFormat.getDateInstance(DateFormat.LONG)
+
+        fitness_date.setText(dateFormat.format(fitnessCalendar.timeInMillis))
+    }
+
     private fun readFitnessData() {
+
+        if (isLoadingFitnessData) {
+            return
+        }
+
+        isLoadingFitnessData = true
+
+        resetFitnessData()
 
         val dateTimeFormat = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.MEDIUM)
 
-        val cal = Calendar.getInstance()
-        cal.set(Calendar.YEAR, 2018)
-        cal.set(Calendar.MONTH, Calendar.JANUARY)
-        cal.set(Calendar.DAY_OF_MONTH, 10)
+        fitnessCalendar.set(Calendar.HOUR_OF_DAY, 0)
+        fitnessCalendar.set(Calendar.MINUTE, 0)
+        fitnessCalendar.set(Calendar.SECOND, 0)
+        val startTime = fitnessCalendar.timeInMillis
 
-        cal.set(Calendar.HOUR_OF_DAY, 0)
-        cal.set(Calendar.MINUTE, 0)
-        cal.set(Calendar.SECOND, 0)
-        val startTime = cal.timeInMillis
-
-        cal.set(Calendar.HOUR_OF_DAY, 23)
-        cal.set(Calendar.MINUTE, 59)
-        cal.set(Calendar.SECOND, 59)
-        val endTime = cal.timeInMillis
+        fitnessCalendar.set(Calendar.HOUR_OF_DAY, 23)
+        fitnessCalendar.set(Calendar.MINUTE, 59)
+        fitnessCalendar.set(Calendar.SECOND, 59)
+        val endTime = fitnessCalendar.timeInMillis
 
         Log.d(TAG, "Start time: " + dateTimeFormat.format(startTime))
         Log.d(TAG, "End time: " + dateTimeFormat.format(endTime))
@@ -124,6 +162,8 @@ class MyActivitiesFragment : Fragment() {
 
         val account = GoogleSignIn.getLastSignedInAccount(activity)
 
+        AppDialog.showProgress(R.string.progress_dialog_waiting_message, context!!)
+
         Fitness.getHistoryClient(activity!!, account)
                 .readData(readRequest)
                 .addOnCompleteListener({ dataReadResponse ->
@@ -134,39 +174,67 @@ class MyActivitiesFragment : Fragment() {
                 .addOnSuccessListener({
                     Log.d(TAG, "Fitness.getHistoryClient#addOnSuccessListener")
 
+                    isLoadingFitnessData = false
+
+                    AppDialog.hideProgress(context!!)
+
+                    fitnessHours.sortBy { it }
+
                     addLackedHoursToEntries(fitnessHours, runningData)
                     addLackedHoursToEntries(fitnessHours, walkingData)
                     addLackedHoursToEntries(fitnessHours, onBicycleData)
 
-                    updateFitnessChart(steps_chart, FitnessChartEntry.TYPE_STEPS)
-                    updateFitnessChart(distance_chart, FitnessChartEntry.TYPE_DISTANCE)
-                    updateFitnessChart(calories_chart, FitnessChartEntry.TYPE_CALORIES)
+                    updateSummaryInfo(totalActiveTime, totalSteps, totalDistance, totalCalories)
+
+                    updateFitnessChart(steps_chart, FitnessChartEntry.TYPE_STEPS,
+                            runningData, walkingData, onBicycleData, fitnessHours)
+
+                    updateFitnessChart(distance_chart, FitnessChartEntry.TYPE_DISTANCE,
+                            runningData, walkingData, onBicycleData, fitnessHours)
+
+                    updateFitnessChart(calories_chart, FitnessChartEntry.TYPE_CALORIES,
+                            runningData, walkingData, onBicycleData, fitnessHours)
                 })
                 .addOnFailureListener({
                     Log.d(TAG, "Fitness.getHistoryClient#addOnFailureListener")
+
+                    isLoadingFitnessData = false
+
+                    AppDialog.error(R.string.fitness_read_history_error_title, R.string.fitness_read_history_error_message, activity!!)
                 })
     }
 
-    private fun convertBucketsToBarChartData(buckets: List<Bucket>) {
+    private fun resetFitnessData() {
+        fitnessHours.clear()
+
         runningData.clear()
         walkingData.clear()
         onBicycleData.clear()
 
-        val acceptedActivities = arrayOf(FitnessActivity.RUNNING, FitnessActivity.ON_BICYCLE, FitnessActivity.WALKING)
+        totalActiveTime = 0f
+        totalSteps = 0f
+        totalDistance = 0f
+        totalCalories = 0f
+    }
+
+    private fun convertBucketsToBarChartData(buckets: List<Bucket>) {
 
         val dateTimeFormat = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.MEDIUM)
         val hourFormat = SimpleDateFormat("k")
 
         buckets.forEach { bucket ->
-            val start = dateTimeFormat.format(bucket.getStartTime(TimeUnit.MILLISECONDS))
-            val end = dateTimeFormat.format(bucket.getEndTime(TimeUnit.MILLISECONDS))
+            val startMs = bucket.getStartTime(TimeUnit.MILLISECONDS)
+            val endMs = bucket.getEndTime(TimeUnit.MILLISECONDS)
+            val start = dateTimeFormat.format(startMs)
+            val end = dateTimeFormat.format(endMs)
 
-            val hour = hourFormat.format(bucket.getStartTime(TimeUnit.MILLISECONDS)).toFloat()
+            totalActiveTime += endMs - startMs
 
+            val hour = hourFormat.format(startMs).toFloat()
 
             Log.d(TAG, "-- activity=${bucket.activity}")
 
-            if (bucket.activity in acceptedActivities) {
+            if (bucket.activity in ACCEPTED_FITNESS_ACTIVITIES) {
 
                 if (!fitnessHours.contains(hour)) {
                     fitnessHours.add(hour)
@@ -180,6 +248,10 @@ class MyActivitiesFragment : Fragment() {
                         val steps = if (fields.contains(Field.FIELD_STEPS)) dataPoint.getValue(Field.FIELD_STEPS).toString().toFloat() else 0f
                         val distance = if (fields.contains(Field.FIELD_DISTANCE)) dataPoint.getValue(Field.FIELD_DISTANCE).toString().toFloat() else 0f
                         val calories = if (fields.contains(Field.FIELD_CALORIES)) dataPoint.getValue(Field.FIELD_CALORIES).toString().toFloat() else 0f
+
+                        totalSteps += steps
+                        totalDistance += distance
+                        totalCalories += calories
 
                         var existedHour = false
 
@@ -226,7 +298,6 @@ class MyActivitiesFragment : Fragment() {
                             }
                         }
 
-
                         Log.d(TAG, "-- activity=${bucket.activity} - steps=$steps - calories=$calories - distance=$distance - start=$start - end=$end - hour=$hour")
                     }
                 }
@@ -242,18 +313,54 @@ class MyActivitiesFragment : Fragment() {
                 entries.add(fitnessChartEntry)
             }
         }
+
+        entries.sortBy { it.hour }
     }
 
-    private fun updateFitnessChart(chart: BarChart, type: Int) {
-        val runningEntries = runningData.map { BarEntry(it.hour, it.getValueByType(type)) }
-        val walkingEntries = walkingData.map { BarEntry(it.hour, it.getValueByType(type)) }
-        val onBicycleEntries = onBicycleData.map { BarEntry(it.hour, it.getValueByType(type)) }
-        
-        Log.d(TAG, "runningEntries.size=${runningEntries.size}")
-        Log.d(TAG, "walkingEntries.size=${onBicycleEntries.size}")
-        Log.d(TAG, "walkingEntries.size=${walkingEntries.size}")
+    private fun updateSummaryInfo(_totalActiveTime: Float, _totalSteps: Float,
+                                  _totalDistance: Float, _totalCalories: Float) {
+        val activeTimeLong = _totalActiveTime.toLong()
+        val activeTimeMinutes = TimeUnit.MILLISECONDS.toMinutes(activeTimeLong)
+        val activeTimeSeconds = TimeUnit.MILLISECONDS.toSeconds(activeTimeLong) - TimeUnit.MINUTES.toSeconds(activeTimeMinutes)
 
-        val groupBarSize = fitnessHours.size
+        val numberFormat = NumberFormat.getNumberInstance(Locale.getDefault())
+
+        val distanceKm = Math.round(_totalDistance / 1000)
+        val distanceM = (_totalDistance - distanceKm * 1000).toInt()
+
+        val distanceKmStr = if (distanceKm > 0) "${distanceKm}km" else ""
+        val distanceMStr = if (distanceM > 0) "${distanceM}m" else ""
+
+        total_active_time.text = String.format("%dmin %dsec", activeTimeSeconds, activeTimeSeconds)
+
+        total_steps.text = numberFormat.format(_totalSteps.toInt())
+        total_distance.text = "$distanceKmStr $distanceMStr"
+        total_calories.text = Math.round(_totalCalories).toString()
+    }
+
+    private fun getHoursAxisValueFormatter(_fitnessHours: List<Float>): IAxisValueFormatter {
+
+        return IAxisValueFormatter { value, axis ->
+            val valInt = value.toInt()
+            val size = _fitnessHours.count()
+
+            if (valInt in 0..(size - 1)) _fitnessHours[valInt].toInt().toString() + "h" else ""
+        }
+    }
+
+    private fun updateFitnessChart(chart: BarChart, type: Int,
+                                   _runningData: List<FitnessChartEntry>, _walkingData: List<FitnessChartEntry>,
+                                   _onBicycleData: List<FitnessChartEntry>, _fitnessHours: List<Float>) {
+
+        val runningEntries = _runningData.map { BarEntry(it.hour, it.getValueByType(type)) }
+        val walkingEntries = _walkingData.map { BarEntry(it.hour, it.getValueByType(type)) }
+        val onBicycleEntries = _onBicycleData.map { BarEntry(it.hour, it.getValueByType(type)) }
+
+        val groupBarSize = _fitnessHours.size
+
+        Log.d(TAG, "runningEntries.size=${runningEntries.size}, walkingEntries.size=${onBicycleEntries.size}, walkingEntries.size=${walkingEntries.size}")
+
+        Log.d(TAG, "updateFitnessChart: groupBarSize=$groupBarSize, fitnessHours=$_fitnessHours")
 
         val runningDataSet = BarDataSet(runningEntries, CHART_SERIES_TITLE_RUNNING)
         runningDataSet.color = CHART_SERIES_COLOR_RUNNING
@@ -268,7 +375,7 @@ class MyActivitiesFragment : Fragment() {
 
         // https://github.com/PhilJay/MPAndroidChart/blob/master/MPChartExample/src/com/xxmassdeveloper/mpchartexample/BarChartActivityMultiDataset.java#L180
         // (barWith + barSpace) * numberOfBars + groupSpace = 1
-        val groupSpace = 0.02f
+        val groupSpace = 0.03f
         val barSpace = 0.01f
         val barWidth = 0.31f
 
@@ -304,13 +411,7 @@ class MyActivitiesFragment : Fragment() {
 
         chart.legend.setDrawInside(false)
 
-        chart.xAxis.setValueFormatter { value, axis ->
-            if (value >= 0 && value < groupBarSize) {
-                fitnessHours[value.toInt()].toInt().toString() + "h"
-            } else {
-                ""
-            }
-        }
+        chart.xAxis.valueFormatter = getHoursAxisValueFormatter(_fitnessHours)
 
         chart.invalidate()
     }
@@ -326,8 +427,7 @@ class MyActivitiesFragment : Fragment() {
         val CHART_SERIES_COLOR_WALKING = Color.parseColor("#14892c")
         val CHART_SERIES_COLOR_BIKING = Color.parseColor("#d04437")
 
-        val FENCE_KEY = "MY_ACTIVITIES_FENCE_KEY"
-        val FENCE_RECEIVER_ACTION = BuildConfig.APPLICATION_ID + ".FENCE_RECEIVER_ACTION"
+        val ACCEPTED_FITNESS_ACTIVITIES = arrayOf(FitnessActivity.RUNNING, FitnessActivity.ON_BICYCLE, FitnessActivity.WALKING)
 
         fun newInstance(): MyActivitiesFragment {
             val fragment = MyActivitiesFragment()
