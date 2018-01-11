@@ -7,26 +7,23 @@ import android.support.v4.app.Fragment
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.INVISIBLE
-import android.view.View.VISIBLE
 import android.view.ViewGroup
 import com.arlib.floatingsearchview.FloatingSearchView
 import com.arlib.floatingsearchview.suggestions.model.SearchSuggestion
-import com.google.android.exoplayer2.DefaultLoadControl
-import com.google.android.exoplayer2.DefaultRenderersFactory
-import com.google.android.exoplayer2.ExoPlayerFactory
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory
 import com.google.android.exoplayer2.source.DynamicConcatenatingMediaSource
 import com.google.android.exoplayer2.source.ExtractorMediaSource
 import com.google.android.exoplayer2.source.MediaSource
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
+import it.unical.mat.lifetune.LifeTuneApplication
 import it.unical.mat.lifetune.R
 import it.unical.mat.lifetune.activity.MainActivity
 import it.unical.mat.lifetune.adapter.PlayMusicPagerAdapter
 import it.unical.mat.lifetune.data.ColorSuggestion
 import it.unical.mat.lifetune.data.DataHelper
+import it.unical.mat.lifetune.entity.TrackList
 import kotlinx.android.synthetic.main.fragment_play_music.*
+
 
 /**
  * Created by beantoan on 12/12/17.
@@ -39,16 +36,20 @@ class PlayMusicFragment : Fragment(),
     private var mLastQuery = ""
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        Log.d(TAG, "onCreateView")
         return inflater.inflate(R.layout.fragment_play_music, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        Log.d(TAG, "onViewCreated")
         super.onViewCreated(view, savedInstanceState)
 
         onViewCreatedTasks()
     }
 
     override fun onDestroy() {
+        Log.d(TAG, "onDestroy")
+
         super.onDestroy()
 
         onDestroyTasks()
@@ -59,53 +60,49 @@ class PlayMusicFragment : Fragment(),
     }
 
     private fun onViewCreatedTasks() {
-        setupViewPager()
+        Log.d(TAG, "onViewCreatedTasks")
 
-        setupMusicPlayer()
+        setupViewPager()
 
         setupFloatingSearchView()
 
         app_bar_layout.addOnOffsetChangedListener(this)
 
-        floating_search_view.attachNavigationDrawerToMenuButton((activity as MainActivity).getDrawerLayout()!!)
+        setupMusicPlayer()
     }
 
     private fun onDestroyTasks() {
-        music_player.player.release()
+        Log.d(TAG, "onDestroyTasks")
     }
 
     private fun setupViewPager() {
-        // Create the adapter that will return a fragment for each of the three primary sections
-        // of the app.
+        Log.d(TAG, "setupViewPager")
+
         mPlayMusicPagerAdapter = PlayMusicPagerAdapter(this, activity!!.supportFragmentManager)
 
-        // Set up the ViewPager, attaching the adapter and setting up a listener for when the
-        // user swipes between sections.
         pager.adapter = mPlayMusicPagerAdapter
 
         tabs.setupWithViewPager(pager)
     }
 
     private fun setupMusicPlayer() {
-        music_player.player = ExoPlayerFactory.newSimpleInstance(
-                DefaultRenderersFactory(activity),
-                DefaultTrackSelector(),
-                DefaultLoadControl()
-        )
+        Log.d(TAG, "setupMusicPlayer")
 
-        hideMusicPlayer()
+        music_player.player = LifeTuneApplication.musicPlayer
+        music_player.requestFocus()
+        music_player.controllerAutoShow = true
+        music_player.showController()
 
-        playMusic(dummyMediaSources())
+        if (LifeTuneApplication.musicPlayer.tracks.isEmpty()) {
+            hideMusicPlayer()
+        }
     }
 
-    private fun playMusic(dynamicConcatenatingMediaSource: DynamicConcatenatingMediaSource) {
-        music_player.player.prepare(dynamicConcatenatingMediaSource)
-        music_player.player.playWhenReady = true
-    }
-
-    private fun displayMusicPlayer(isShown: Boolean) = when {
-        isShown -> music_player.visibility = VISIBLE
-        else -> music_player.visibility = INVISIBLE
+    private fun displayMusicPlayer(isShown: Boolean) {
+        music_player.layoutParams.height = when {
+            isShown -> resources.getDimension(R.dimen.music_player_height).toInt()
+            else -> 0
+        }
     }
 
     fun showMusicPlayer() {
@@ -116,23 +113,36 @@ class PlayMusicFragment : Fragment(),
         displayMusicPlayer(false)
     }
 
-    // TODO need to add real data source
-    private fun dummyMediaSources(): DynamicConcatenatingMediaSource {
+    fun playSongs(trackList: TrackList?) {
+        Log.d(TAG, "playSongs")
+
+        music_player.player.stop()
+
         val dynamicConcatenatingMediaSource = DynamicConcatenatingMediaSource()
-        val mediaSources = ArrayList<MediaSource>()
 
-        val songUrls = arrayListOf(
-                "https://r1---eu.nixcdn.com/NhacCuaTui955/NguoiTinhMuaDong-HaVan-5308927.mp3?st=091TkbAG1BmP1qV1DdY3dw&e=1513246936&t=1513160536589",
-                "https://r1---eu.nixcdn.com/NhacCuaTui955/NguoiTinhMuaDong-HaVan-5308927.mp3?st=091TkbAG1BmP1qV1DdY3dw&e=1513246936&t=1513160536589",
-                "https://r1---eu.nixcdn.com/NhacCuaTui955/NguoiTinhMuaDong-HaVan-5308927.mp3?st=091TkbAG1BmP1qV1DdY3dw&e=1513246936&t=1513160536589"
-        )
+        if (trackList == null || trackList.tracks.isEmpty()) {
+            LifeTuneApplication.musicPlayer.tracks = ArrayList()
+        } else {
+            LifeTuneApplication.musicPlayer.tracks = trackList.tracks
 
-        songUrls.forEach { mediaSources.add(buildMediaSource(Uri.parse(it))) }
+            val mediaSources = ArrayList<MediaSource>()
 
-        dynamicConcatenatingMediaSource.addMediaSources(mediaSources)
+            trackList.tracks.forEach { mediaSources.add(buildMediaSource(Uri.parse(it.url))) }
 
-        return dynamicConcatenatingMediaSource
+            dynamicConcatenatingMediaSource.addMediaSources(mediaSources)
+        }
+
+        music_player.player.prepare(dynamicConcatenatingMediaSource)
+        music_player.player.playWhenReady = true
+
+        showMusicPlayer()
     }
+
+    fun currentViewPagerItem(): Int = pager.currentItem
+
+    fun isCurrentRecommendationMusicFragment(): Boolean = currentViewPagerItem() == PlayMusicPagerAdapter.RECOMMENDATION_MUSIC_FRAGMENT
+
+    fun isCurrentFavouriteMusicFragment(): Boolean = currentViewPagerItem() == PlayMusicPagerAdapter.FAVOURITE_MUSIC_FRAGMENT
 
     private fun buildMediaSource(uri: Uri): ExtractorMediaSource {
         return ExtractorMediaSource(uri, DefaultHttpDataSourceFactory("ua"),
@@ -140,29 +150,24 @@ class PlayMusicFragment : Fragment(),
     }
 
     private fun setupFloatingSearchView() {
+        Log.d(TAG, "setupFloatingSearchView")
+
+        val drawerLayout = (activity as MainActivity).getDrawerLayout()!!
+
+        floating_search_view.attachNavigationDrawerToMenuButton(drawerLayout)
+
         floating_search_view.setOnQueryChangeListener { oldQuery, newQuery ->
             if (oldQuery.isNotBlank() && newQuery.isBlank()) {
                 floating_search_view.clearSuggestions()
             } else {
-
-                //this shows the top left circular progress
-                //you can call it where ever you want, but
-                //it makes sense to do it when loading something in
-                //the background.
                 floating_search_view.showProgress()
 
-                //simulates a query call to a data source
-                //with a new query.
                 DataHelper.findSuggestions(activity, newQuery, 5,
                         PlayMusicFragment.FIND_SUGGESTION_SIMULATED_DELAY) { results ->
                     Log.d(PlayMusicFragment.TAG, "setupFloatingSearchView#setOnQueryChangeListener")
 
-                    //this will swap the data and
-                    //render the collapse/expand animations as necessary
                     floating_search_view.swapSuggestions(results)
 
-                    //let the users know that the background
-                    //process has completed
                     floating_search_view.hideProgress()
                 }
             }
@@ -196,21 +201,18 @@ class PlayMusicFragment : Fragment(),
         floating_search_view.setOnFocusChangeListener(object : FloatingSearchView.OnFocusChangeListener {
             override fun onFocus() {
 
-                //show suggestions when search bar gains focus (typically history suggestions)
                 floating_search_view.swapSuggestions(DataHelper.getHistory(activity, 3))
             }
 
             override fun onFocusCleared() {
-                //set the title of the bar so that when focus is returned a new query begins
                 floating_search_view.setSearchBarTitle(mLastQuery)
             }
         })
     }
 
     companion object {
-        val TAG = PlayMusicFragment::class.java.canonicalName
+        val TAG = PlayMusicFragment::class.java.simpleName
 
         private val FIND_SUGGESTION_SIMULATED_DELAY = 250L
     }
-
 }

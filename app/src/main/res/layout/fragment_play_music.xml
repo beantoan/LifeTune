@@ -6,13 +6,11 @@
     android:id="@+id/parent_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
     tools:context="it.unical.mat.lifetune.activity.MainActivity">
 
     <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fitsSystemWindows="true"
         tools:context="it.unical.mat.lifetune.activity.MainActivity">
 
         <android.support.design.widget.AppBarLayout
@@ -21,39 +19,34 @@
             android:layout_height="wrap_content"
             tools:context="it.unical.mat.lifetune.activity.MainActivity">
 
-            <android.support.design.widget.CollapsingToolbarLayout
+            <View
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_scrollFlags="scroll|enterAlways|snap"
-                app:titleEnabled="false">
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/float_search_view_placeholder_height"
-                    app:popupTheme="@style/AppTheme.PopupOverlay" />
-
-            </android.support.design.widget.CollapsingToolbarLayout>
+                android:layout_height="@dimen/float_search_view_placeholder_height"
+                app:popupTheme="@style/AppTheme.PopupOverlay"
+                app:layout_scrollFlags="scroll|enterAlways|snap" />
 
             <android.support.design.widget.TabLayout
                 android:id="@+id/tabs"
                 android:layout_width="match_parent"
-                android:layout_height="50sp"
+                android:layout_height="50dp"
                 app:tabTextColor="@color/lightGray"
                 app:tabSelectedTextColor="@color/lightGray"
                 app:tabIndicatorColor="@color/lightGray"
                 app:layout_collapseMode="pin"
-                app:tabIndicatorHeight="4sp" />
+                app:tabIndicatorHeight="4dp" />
 
         </android.support.design.widget.AppBarLayout>
 
         <LinearLayout
             android:id="@+id/main_content"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             app:layout_anchor="@id/app_bar_layout"
+
             android:layout_gravity="fill"
             app:layout_anchorGravity="fill"
+
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
             <android.support.v4.view.ViewPager
@@ -64,20 +57,37 @@
 
         </LinearLayout>
 
-        <com.google.android.exoplayer2.ui.SimpleExoPlayerView
-            android:id="@+id/music_player"
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/music_player_container"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/music_player_height"
-            tools:context="it.unical.mat.lifetune.activity.MainActivity"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+
+            android:background="@color/colorPrimary"
 
             app:layout_anchor="@id/main_content"
             android:layout_gravity="bottom"
             app:layout_anchorGravity="bottom"
+            app:cardElevation="4dp"
+            app:cardCornerRadius="0dp">
 
-            app:use_artwork="false"
-            app:hide_on_touch="false"
-            app:show_timeout="0"
-            app:resize_mode="fit" />
+            <it.unical.mat.lifetune.view.CustomExoPlayerView
+                android:id="@+id/music_player"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/music_player_height"
+                tools:context="it.unical.mat.lifetune.activity.MainActivity"
+
+                app:player_layout_id="@layout/custom_exo_simple_player_view"
+                app:controller_layout_id="@layout/custom_exo_playback_control_view"
+
+                app:use_controller="true"
+                app:hide_on_touch="false"
+                app:use_artwork="false"
+                app:show_timeout="0"
+                app:resize_mode="fit" />
+
+        </android.support.v7.widget.CardView>
 
     </android.support.design.widget.CoordinatorLayout>
 
@@ -85,14 +95,14 @@
         android:id="@+id/floating_search_view"
         tools:context="it.unical.mat.lifetune.activity.MainActivity"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="150dp"
         app:floatingSearch_close_search_on_keyboard_dismiss="false"
         app:floatingSearch_dimBackground="true"
         app:floatingSearch_dismissOnOutsideTouch="true"
         app:floatingSearch_leftActionMode="showHamburger"
-        app:floatingSearch_searchBarMarginLeft="8sp"
-        app:floatingSearch_searchBarMarginTop="8sp"
-        app:floatingSearch_searchBarMarginRight="8sp"
+        app:floatingSearch_searchBarMarginLeft="8dp"
+        app:floatingSearch_searchBarMarginTop="8dp"
+        app:floatingSearch_searchBarMarginRight="8dp"
         app:floatingSearch_searchHint="@string/search_music_title"
         app:floatingSearch_showSearchKey="true"
         app:floatingSearch_suggestionsListAnimDuration="250" />

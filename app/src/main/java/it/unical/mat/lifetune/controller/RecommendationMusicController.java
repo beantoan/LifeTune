@@ -2,26 +2,19 @@ package it.unical.mat.lifetune.controller;
 
 import android.util.Log;
 
-import com.airbnb.epoxy.TypedEpoxyController;
+import com.google.firebase.crash.FirebaseCrash;
 
 import java.util.List;
 
 import it.unical.mat.lifetune.entity.Category;
-import it.unical.mat.lifetune.entity.Playlist;
 import it.unical.mat.lifetune.model.CategoryModelGroup;
 
-public class RecommendationMusicController extends TypedEpoxyController<List<Category>> {
+public class RecommendationMusicController extends BaseMusicController<List<Category>> {
+
     private static final String TAG = RecommendationMusicController.class.getCanonicalName();
 
-    public interface AdapterCallbacks {
-        void onPlaylistClicked(Playlist playlist, int position);
-    }
-
-    private final AdapterCallbacks callbacks;
-
     public RecommendationMusicController(AdapterCallbacks _callbacks) {
-        this.callbacks = _callbacks;
-        setDebugLoggingEnabled(true);
+        super(_callbacks);
     }
 
     @Override
@@ -33,8 +26,9 @@ public class RecommendationMusicController extends TypedEpoxyController<List<Cat
 
     @Override
     protected void onExceptionSwallowed(RuntimeException exception) {
-        Log.e(TAG, "onExceptionSwallowed", exception);
-        
+        FirebaseCrash.logcat(Log.ERROR, TAG, "onExceptionSwallowed:" + exception);
+        FirebaseCrash.report(exception);
+
         // Best practice is to throw in debug so you are aware of any issues that Epoxy notices.
         // Otherwise Epoxy does its best to swallow these exceptions and continue gracefully
         throw exception;

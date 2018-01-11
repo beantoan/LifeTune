@@ -1,10 +1,17 @@
 package it.unical.mat.lifetune.util
 
 import android.app.Activity
+import android.app.DatePickerDialog
 import android.app.ProgressDialog
+import android.content.Context
+import android.content.DialogInterface
 import android.util.Log
+import android.widget.EditText
 import cn.pedant.SweetAlert.SweetAlertDialog
 import it.unical.mat.lifetune.R
+import java.text.DateFormat
+import java.util.*
+
 
 /**
  * Created by beantoan on 8/27/16.
@@ -27,72 +34,118 @@ object AppDialog {
         }
     }
 
-    fun showAlert(titleId: Int, messageId: Int, dialogType: Int, activity: Activity) {
+    fun showAlert(titleId: Int, messageId: Int, dialogType: Int, activity: Activity,
+                  onDismissListener: DialogInterface.OnDismissListener?) {
         AppDialog.hideAlert(activity)
 
-        activity.runOnUiThread {
-            try {
-                AppDialog.alertDialog = SweetAlertDialog(activity, dialogType)
-                        .setTitleText(activity.getString(titleId))
-                        .setContentText(activity.getString(messageId))
+        if (!activity.isDestroyed) {
+            activity.runOnUiThread {
+                try {
 
-                AppDialog.alertDialog!!.show()
-            } catch (e: Exception) {
-                Log.e(TAG, "showAlert", e)
+                    AppDialog.alertDialog = SweetAlertDialog(activity, dialogType)
+                            .setTitleText(activity.getString(titleId))
+                            .setContentText(activity.getString(messageId))
+
+                    AppDialog.alertDialog!!.setOnDismissListener(onDismissListener)
+
+                    AppDialog.alertDialog!!.show()
+                } catch (e: Exception) {
+                    Log.e(TAG, "showAlert", e)
+                }
             }
         }
+    }
+
+    fun error(titleId: Int, messageId: Int, activity: Activity,
+              onDismissListener: DialogInterface.OnDismissListener?) {
+        AppDialog.showAlert(titleId, messageId, SweetAlertDialog.ERROR_TYPE, activity, onDismissListener)
     }
 
     fun error(titleId: Int, messageId: Int, activity: Activity) {
-        AppDialog.showAlert(titleId, messageId, SweetAlertDialog.ERROR_TYPE, activity)
+        error(titleId, messageId, activity, null)
+    }
+
+    fun warning(titleId: Int, messageId: Int, activity: Activity,
+                onDismissListener: DialogInterface.OnDismissListener?) {
+        AppDialog.showAlert(titleId, messageId, SweetAlertDialog.WARNING_TYPE, activity, onDismissListener)
     }
 
     fun warning(titleId: Int, messageId: Int, activity: Activity) {
-        AppDialog.showAlert(titleId, messageId, SweetAlertDialog.WARNING_TYPE, activity)
+        warning(titleId, messageId, activity, null)
+    }
+
+    fun success(titleId: Int, messageId: Int, activity: Activity,
+                onDismissListener: DialogInterface.OnDismissListener?) {
+        AppDialog.showAlert(titleId, messageId, SweetAlertDialog.SUCCESS_TYPE, activity, onDismissListener)
     }
 
     fun success(titleId: Int, messageId: Int, activity: Activity) {
-        AppDialog.showAlert(titleId, messageId, SweetAlertDialog.SUCCESS_TYPE, activity)
+        success(titleId, messageId, activity, null)
     }
 
-    private fun initProgressDialog(activity: Activity) {
-        AppDialog.progressDialog = ProgressDialog(activity)
-        AppDialog.progressDialog!!.setCancelable(false)
-        AppDialog.progressDialog!!.setCanceledOnTouchOutside(false)
-        AppDialog.progressDialog!!.setMessage(activity.getString(R.string.progress_dialog_waiting_message))
+    private fun initProgressDialog(context: Context) {
+        AppDialog.progressDialog = ProgressDialog(context)
+        AppDialog.progressDialog!!.setCancelable(true)
+        AppDialog.progressDialog!!.setCanceledOnTouchOutside(true)
+        AppDialog.progressDialog!!.setMessage(context.getString(R.string.progress_dialog_waiting_message))
     }
 
-    fun hideProgress(activity: Activity) {
+    fun hideProgress(context: Context) {
         if (AppDialog.progressDialog != null) {
-            activity.runOnUiThread {
-                try {
-                    AppDialog.progressDialog!!.dismiss()
+            try {
+                AppDialog.progressDialog!!.dismiss()
 
-                } catch (e: Exception) {
-                    Log.e(TAG, "hideProgress", e)
-                }
+            } catch (e: Exception) {
+                Log.e(TAG, "hideProgress", e)
             }
         }
     }
 
-    fun showProgress(messageId: Int?, activity: Activity) {
-        AppDialog.initProgressDialog(activity)
+    fun showProgress(messageId: Int?, context: Context) {
+        AppDialog.initProgressDialog(context)
 
-        AppDialog.hideProgress(activity)
+        AppDialog.hideProgress(context)
 
         if (AppDialog.progressDialog != null) {
             if (messageId != null) {
-                AppDialog.progressDialog!!.setMessage(activity.getString(messageId))
+                AppDialog.progressDialog!!.setMessage(context.getString(messageId))
             }
 
-            activity.runOnUiThread {
-                try {
-                    AppDialog.progressDialog!!.show()
+            try {
+                AppDialog.progressDialog!!.show()
 
-                } catch (e: Exception) {
-                    Log.e(TAG, "showProgress", e)
-                }
+            } catch (e: Exception) {
+                Log.e(TAG, "showProgress", e)
             }
         }
+    }
+
+    fun showDatePickerDialog(activity: Activity, mDate: EditText,
+                             _year: Int, _month: Int, _day: Int,
+                             isCancelable: Boolean = false, onDateSetListener: DateSetListener? = null) {
+        val datePickerDialog = DatePickerDialog(activity, DatePickerDialog.OnDateSetListener { view, year, monthOfYear, dayOfMonth ->
+            val cal = Calendar.getInstance()
+            val dateFormat = DateFormat.getDateInstance(DateFormat.LONG)
+
+            cal.set(year, monthOfYear, dayOfMonth)
+
+            val date = dateFormat.format(cal.timeInMillis)
+
+            mDate.setText(date)
+
+            onDateSetListener?.onSetListener(year, monthOfYear, dayOfMonth)
+        }, _year, _month, _day)
+
+        datePickerDialog.setOnCancelListener {
+            if (isCancelable) {
+                mDate.text = null
+            }
+        }
+
+        datePickerDialog.show()
+    }
+
+    interface DateSetListener {
+        fun onSetListener(_year: Int, _month: Int, _day: Int)
     }
 }

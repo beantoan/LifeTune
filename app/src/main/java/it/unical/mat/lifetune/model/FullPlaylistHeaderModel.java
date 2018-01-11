@@ -16,6 +16,8 @@ import static com.airbnb.epoxy.EpoxyAttribute.Option.DoNotHash;
 
 @EpoxyModelClass(layout = R.layout.model_full_playlist_header)
 abstract class FullPlaylistHeaderModel extends DataBindingEpoxyModel {
+    @EpoxyAttribute(DoNotHash)
+    View.OnClickListener clickListener;
 
     @EpoxyAttribute(DoNotHash)
     Playlist playlist;

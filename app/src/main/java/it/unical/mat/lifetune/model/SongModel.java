@@ -19,7 +19,7 @@ public abstract class SongModel extends DataBindingEpoxyModel {
     @EpoxyAttribute(DoNotHash)
     Song song;
 
-    public SongModel(Song _song) {
+    SongModel(Song _song) {
         song = _song;
     }
 }

@@ -8,59 +8,74 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import it.unical.mat.lifetune.R
 import it.unical.mat.lifetune.controller.FavouriteMusicController
 import it.unical.mat.lifetune.decoration.RecyclerViewDividerItemDecoration
 import it.unical.mat.lifetune.entity.Playlist
-import it.unical.mat.lifetune.entity.Song
-import it.unical.mat.lifetune.service.ApiServiceFactory
-import it.unical.mat.lifetune.service.PlaylistServiceInterface
-import it.unical.mat.lifetune.util.AppDialog
-import it.unical.mat.lifetune.util.AppUtils
 import kotlinx.android.synthetic.main.fragment_favorite_music.*
 
 
 /**
  * Created by beantoan on 11/17/17.
  */
-class FavoriteMusicFragment : BaseMusicFragment(), FavouriteMusicController.AdapterCallbacks {
+class FavoriteMusicFragment : BaseMusicFragment() {
 
     lateinit var controller: FavouriteMusicController
 
-    private var playlists: List<Playlist> = ArrayList()
+    var favouritePlaylists: List<Playlist> = ArrayList()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        Log.d(TAG, "onCreateView")
+
         return inflater.inflate(R.layout.fragment_favorite_music, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        Log.d(TAG, "onViewCreated")
+
         super.onViewCreated(view, savedInstanceState)
 
         onCreateViewTasks(view)
     }
 
-    override fun onPlaylistClicked(playlist: Playlist, position: Int) {
+    override fun onResume() {
+        Log.d(TAG, "onResume")
 
+        super.onResume()
+
+        onResumeTasks()
     }
 
-    override fun onSongClicked(song: Song?, position: Int) {
+    override fun onFavouriteApiSuccess(playlists: List<Playlist>) {
+        super.onFavouriteApiSuccess(playlists)
 
+        favouritePlaylists = playlists
+
+        controller.setData(favouritePlaylists)
+    }
+
+    override fun onFavouriteApiFailure(error: Throwable) {
+        super.onFavouriteApiFailure(error)
+
+        favouritePlaylists = ArrayList()
+
+        controller.setData(favouritePlaylists)
     }
 
     private fun onCreateViewTasks(view: View) {
         Log.d(TAG, "onCreateViewTasks")
 
-        setupRecyclerViewCategories()
+        setupRecyclerViewPlaylists()
 
         setupMusicController()
-
-        callFavouritePlaylistsService()
     }
 
-    private fun setupRecyclerViewCategories() {
-        Log.d(TAG, "setupRecyclerViewCategories")
+    private fun onResumeTasks() {
+        callFavouritePlaylistsApi()
+    }
+
+    private fun setupRecyclerViewPlaylists() {
+        Log.d(TAG, "setupRecyclerViewPlaylists")
 
         val dividerDrawable = ContextCompat.getDrawable(activity!!.applicationContext, R.drawable.category_divider)
         val dividerItemDecoration = RecyclerViewDividerItemDecoration(activity!!.applicationContext, DividerItemDecoration.VERTICAL, dividerDrawable!!)
@@ -75,52 +90,12 @@ class FavoriteMusicFragment : BaseMusicFragment(), FavouriteMusicController.Adap
 
         recycler_view_playlists.clear()
         recycler_view_playlists.setController(controller)
+
+        controller.setData(favouritePlaylists)
     }
-
-    private fun updateMusicController(data: List<Playlist>) {
-        controller.setData(data)
-    }
-
-    private fun callFavouritePlaylistsService() {
-        if (AppUtils.isInternetConnected(activity!!.applicationContext) && playlists.isEmpty()) {
-            AppDialog.showProgress(R.string.progress_dialog_waiting_message, activity!!)
-
-            val playlistService = ApiServiceFactory.create(PlaylistServiceInterface::class.java)
-
-            getCompositeDisposable().add(playlistService.favourite()
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                            { playlists -> showPlaylists(playlists) },
-                            { error ->
-                                Log.e(TAG, "callFavouritePlaylistsService", error)
-
-                                showPlaylists(ArrayList())
-
-                                AppDialog.error(R.string.api_service_error_title, R.string.api_service_error_message, activity!!)
-                            }
-                    )
-            )
-        }
-    }
-
-    private fun showPlaylists(_playlists: List<Playlist>) {
-        playlists = _playlists
-        
-        updateMusicController(playlists)
-
-        if (playlists.isEmpty()) {
-            this.playMusicFragment.hideMusicPlayer()
-        } else {
-            this.playMusicFragment.showMusicPlayer()
-        }
-
-        AppDialog.hideProgress(activity!!)
-    }
-
 
     companion object {
-        private val TAG = FavoriteMusicFragment::class.java.canonicalName
+        private val TAG = FavoriteMusicFragment::class.java.simpleName
 
         fun newInstance(playMusicFragment: PlayMusicFragment): FavoriteMusicFragment {
             val fragment = FavoriteMusicFragment()
