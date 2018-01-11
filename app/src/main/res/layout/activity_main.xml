@@ -8,10 +8,11 @@
     android:fitsSystemWindows="true"
     tools:openDrawer="start">
 
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/content_main_placeholder"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="vertical"
         android:padding="0dp" />
 
     <android.support.design.widget.NavigationView

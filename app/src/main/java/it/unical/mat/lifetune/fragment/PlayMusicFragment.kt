@@ -68,8 +68,6 @@ class PlayMusicFragment : Fragment(),
 
         app_bar_layout.addOnOffsetChangedListener(this)
 
-        floating_search_view.attachNavigationDrawerToMenuButton((activity as MainActivity).getDrawerLayout()!!)
-
         setupMusicPlayer()
     }
 
@@ -153,6 +151,10 @@ class PlayMusicFragment : Fragment(),
 
     private fun setupFloatingSearchView() {
         Log.d(TAG, "setupFloatingSearchView")
+
+        val drawerLayout = (activity as MainActivity).getDrawerLayout()!!
+
+        floating_search_view.attachNavigationDrawerToMenuButton(drawerLayout)
 
         floating_search_view.setOnQueryChangeListener { oldQuery, newQuery ->
             if (oldQuery.isNotBlank() && newQuery.isBlank()) {

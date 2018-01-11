@@ -43,6 +43,8 @@ class MyActivitiesFragment : Fragment() {
     private var walkingData: ArrayList<FitnessChartEntry> = ArrayList()
     private var fitnessHours: ArrayList<Float> = ArrayList()
 
+    private var mainActivity: MainActivity? = null
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
 
@@ -54,14 +56,21 @@ class MyActivitiesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        (activity as MainActivity).setSupportActionBar(toolbar)
-
+        onViewCreatedTasks()
     }
 
     override fun onResume() {
         super.onResume()
 
         onResumeTasks()
+    }
+
+    private fun onViewCreatedTasks() {
+        Log.d(TAG, "onViewCreatedTasks")
+
+        mainActivity = activity as MainActivity
+
+        mainActivity!!.setupToggleDrawer(toolbar)
     }
 
 

@@ -11,6 +11,7 @@ import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.MenuItem
 import com.beantoan.smsbackup.util.ActivityUtils
@@ -138,6 +139,8 @@ class MainActivity :
 
         showUserInfo()
 
+        setupToggleDrawer()
+        
         setupNavigationDrawer()
 
         checkFineLocationPermission()
@@ -147,11 +150,6 @@ class MainActivity :
 
     private fun setupNavigationDrawer() {
         Log.d(TAG, "setupNavigationDrawer")
-
-        val toggle = ActionBarDrawerToggle(
-                this, drawer_layout, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
-        drawer_layout.addDrawerListener(toggle)
-        toggle.syncState()
 
         nav_view.setNavigationItemSelectedListener(this)
 
@@ -232,7 +230,7 @@ class MainActivity :
                     this,
                     FITNESS_OAUTH_REQUEST_CODE,
                     GoogleSignIn.getLastSignedInAccount(this),
-                    fitnessOptions);
+                    fitnessOptions)
         } else {
             subscribeFitness()
         }
@@ -286,6 +284,24 @@ class MainActivity :
                         FirebaseCrash.report(task.exception)
                     }
                 }
+    }
+
+    fun setupToggleDrawer(toolbar: Toolbar? = null) {
+        Log.d(TAG, "setupToggleDrawer")
+
+        if (toolbar != null) {
+            setSupportActionBar(toolbar)
+
+            val mDrawerToggle = ActionBarDrawerToggle(
+                    this@MainActivity, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
+
+            mDrawerToggle.isDrawerIndicatorEnabled = true
+
+            drawer_layout.removeDrawerListener(mDrawerToggle)
+            drawer_layout.addDrawerListener(mDrawerToggle)
+
+            mDrawerToggle.syncState()
+        }
     }
 
     companion object {
