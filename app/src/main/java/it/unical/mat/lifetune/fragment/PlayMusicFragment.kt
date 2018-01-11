@@ -24,6 +24,7 @@ import it.unical.mat.lifetune.data.DataHelper
 import it.unical.mat.lifetune.entity.TrackList
 import kotlinx.android.synthetic.main.fragment_play_music.*
 
+
 /**
  * Created by beantoan on 12/12/17.
  */
@@ -66,8 +67,6 @@ class PlayMusicFragment : Fragment(),
         setupFloatingSearchView()
 
         app_bar_layout.addOnOffsetChangedListener(this)
-
-        floating_search_view.attachNavigationDrawerToMenuButton((activity as MainActivity).getDrawerLayout()!!)
 
         setupMusicPlayer()
     }
@@ -153,6 +152,10 @@ class PlayMusicFragment : Fragment(),
     private fun setupFloatingSearchView() {
         Log.d(TAG, "setupFloatingSearchView")
 
+        val drawerLayout = (activity as MainActivity).getDrawerLayout()!!
+
+        floating_search_view.attachNavigationDrawerToMenuButton(drawerLayout)
+
         floating_search_view.setOnQueryChangeListener { oldQuery, newQuery ->
             if (oldQuery.isNotBlank() && newQuery.isBlank()) {
                 floating_search_view.clearSuggestions()
@@ -208,7 +211,7 @@ class PlayMusicFragment : Fragment(),
     }
 
     companion object {
-        val TAG = PlayMusicFragment::class.java.canonicalName
+        val TAG = PlayMusicFragment::class.java.simpleName
 
         private val FIND_SUGGESTION_SIMULATED_DELAY = 250L
     }

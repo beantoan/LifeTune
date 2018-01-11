@@ -3,16 +3,14 @@ package it.unical.mat.lifetune.fragment
 import android.support.annotation.UiThread
 import android.support.v4.app.Fragment
 import android.util.Log
+import com.google.firebase.crash.FirebaseCrash
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import it.unical.mat.lifetune.R
+import it.unical.mat.lifetune.api.ApiServiceFactory
 import it.unical.mat.lifetune.controller.BaseMusicController
-import it.unical.mat.lifetune.entity.Category
-import it.unical.mat.lifetune.entity.Playlist
-import it.unical.mat.lifetune.entity.Song
-import it.unical.mat.lifetune.entity.TrackList
-import it.unical.mat.lifetune.service.ApiServiceFactory
+import it.unical.mat.lifetune.entity.*
 import it.unical.mat.lifetune.util.AppDialog
 import it.unical.mat.lifetune.util.AppUtils
 
@@ -25,6 +23,9 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
 
     protected var playMusicFragment: PlayMusicFragment? = null
 
+    protected val recommendationParameter: RecommendationParameter = RecommendationParameter()
+
+
     override fun onDestroy() {
         Log.d(TAG, "onDestroy")
 
@@ -32,6 +33,9 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
             mCompositeDisposable?.clear()
         } catch (err: Exception) {
             Log.e(TAG, "errorOnDestroy", err)
+
+            FirebaseCrash.logcat(Log.ERROR, TAG, "errorOnDestroy" + err)
+            FirebaseCrash.report(err)
         }
 
         super.onDestroy()
@@ -40,7 +44,7 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
     override final fun onPlaylistClicked(playlist: Playlist) {
         Log.d(TAG, "onPlaylistClicked#${playlist.id}-${playlist.title}")
 
-        callSongsService(playlist)
+        callSongsApi(playlist)
     }
 
     override final fun onSongClicked(song: Song) {
@@ -48,35 +52,37 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
 
     }
 
-    open protected fun onRecommendationServiceSuccess(categories: List<Category>) {
-        Log.d(TAG, "onRecommendationServiceSuccess: categories.size=" + categories.size)
+    open protected fun onRecommendationApiSuccess(categories: List<Category>) {
+        Log.d(TAG, "onRecommendationApiSuccess: categories.size=" + categories.size)
 
-        onCommonServiceSuccess()
+        onCommonApiSuccess()
     }
 
-    open protected fun onRecommendationServiceFailure(error: Throwable) {
-        Log.e(TAG, "onRecommendationServiceFailure", error)
+    open protected fun onRecommendationApiFailure(error: Throwable) {
+        FirebaseCrash.logcat(Log.ERROR, TAG, "onRecommendationApiFailure:" + error)
+        FirebaseCrash.report(error)
 
-        onCommonServiceFailure()
+        onCommonApiFailure()
     }
 
-    open protected fun onFavouriteServiceSuccess(playlists: List<Playlist>) {
-        Log.d(TAG, "onFavouriteServiceSuccess: playlists.size=" + playlists.size)
+    open protected fun onFavouriteApiSuccess(playlists: List<Playlist>) {
+        Log.d(TAG, "onFavouriteApiSuccess: playlists.size=" + playlists.size)
 
-        onCommonServiceSuccess()
+        onCommonApiSuccess()
     }
 
-    open protected fun onFavouriteServiceFailure(error: Throwable) {
-        Log.e(TAG, "onFavouriteServiceFailure", error)
+    open protected fun onFavouriteApiFailure(error: Throwable) {
+        FirebaseCrash.logcat(Log.ERROR, TAG, "onFavouriteApiFailure:" + error)
+        FirebaseCrash.report(error)
 
-        onCommonServiceFailure()
+        onCommonApiFailure()
     }
 
-    private fun onCommonServiceSuccess() {
+    private fun onCommonApiSuccess() {
         hideLoading()
     }
 
-    private fun onCommonServiceFailure() {
+    private fun onCommonApiFailure() {
         hideLoading()
         AppDialog.error(R.string.api_service_error_title, R.string.api_service_error_message, activity!!)
     }
@@ -116,19 +122,19 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
         hideLoading()
     }
 
-    private fun callSongsService(playlist: Playlist) {
-        Log.d(TAG, "callSongsService#${playlist.id}-${playlist.title}")
+    private fun callSongsApi(playlist: Playlist) {
+        Log.d(TAG, "callSongsApi#${playlist.id}-${playlist.title}")
 
         if (AppUtils.isInternetConnected(context!!)) {
             showLoading()
 
             getCompositeDisposable().add(
-                    ApiServiceFactory.createPlaylistXmlService().songs(playlist.key)
+                    ApiServiceFactory.createPlaylistXmlApi().songs(playlist.key)
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(
-                                    { playlistXml -> onSongsServiceSuccess(playlist, playlistXml) },
-                                    { error -> onSongsServiceFailure(error) }
+                                    { playlistXml -> onSongsApiSuccess(playlist, playlistXml) },
+                                    { error -> onSongsApiFailure(error) }
                             )
             )
         } else {
@@ -136,21 +142,22 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
         }
     }
 
-    fun callRecommendationService() {
-        Log.d(TAG, "callRecommendationService")
+    fun callRecommendationApi() {
+        Log.d(TAG, "callRecommendationApi")
 
         if (AppUtils.isInternetConnected(context!!)) {
+
             if (this.playMusicFragment!!.isCurrentRecommendationMusicFragment()) {
                 showLoading()
             }
 
             getCompositeDisposable().add(
-                    ApiServiceFactory.createCategoryService().recommendation()
+                    ApiServiceFactory.createCategoryApi().recommendation()
                             .subscribeOn(Schedulers.io()) // "work" on io thread
                             .observeOn(AndroidSchedulers.mainThread()) // "listen" on UIThread
                             .subscribe(
-                                    { categories -> onRecommendationServiceSuccess(categories) },
-                                    { error -> onRecommendationServiceFailure(error) }
+                                    { categories -> onRecommendationApiSuccess(categories) },
+                                    { error -> onRecommendationApiFailure(error) }
                             )
             )
         } else {
@@ -158,8 +165,8 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
         }
     }
 
-    fun callFavouritePlaylistsService() {
-        Log.d(TAG, "callFavouritePlaylistsService")
+    fun callFavouritePlaylistsApi() {
+        Log.d(TAG, "callFavouritePlaylistsApi")
 
         if (AppUtils.isInternetConnected(context!!)) {
 
@@ -168,12 +175,12 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
             }
 
             getCompositeDisposable().add(
-                    ApiServiceFactory.createPlaylistService().favourite()
+                    ApiServiceFactory.createPlaylistApi().favourite()
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(
-                                    { playlists -> onFavouriteServiceSuccess(playlists) },
-                                    { error -> onFavouriteServiceFailure(error) }
+                                    { playlists -> onFavouriteApiSuccess(playlists) },
+                                    { error -> onFavouriteApiFailure(error) }
                             )
             )
         } else {
@@ -182,8 +189,8 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
     }
 
     @UiThread
-    private fun onSongsServiceSuccess(playlist: Playlist, trackList: TrackList) {
-        Log.d(TAG, "onSongsServiceSuccess")
+    private fun onSongsApiSuccess(playlist: Playlist, trackList: TrackList) {
+        Log.d(TAG, "onSongsApiSuccess")
 
         trackList.tracks.forEach { it.playlist = playlist }
 
@@ -191,9 +198,10 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
     }
 
     @UiThread
-    private fun onSongsServiceFailure(error: Throwable) {
-        Log.e(TAG, "onSongsServiceFailure", error)
-
+    private fun onSongsApiFailure(error: Throwable) {
+        FirebaseCrash.logcat(Log.ERROR, TAG, "onSongsApiFailure:" + error)
+        FirebaseCrash.report(error)
+        
         playSongs(null)
 
         AppDialog.error(R.string.api_service_error_title, R.string.api_service_error_message, activity!!)
@@ -201,6 +209,6 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
 
 
     companion object {
-        private val TAG = BaseMusicFragment::class.java.canonicalName
+        private val TAG = BaseMusicFragment::class.java.simpleName
     }
 }

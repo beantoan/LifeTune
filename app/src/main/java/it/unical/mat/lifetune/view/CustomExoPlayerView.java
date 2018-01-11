@@ -850,11 +850,13 @@ public final class CustomExoPlayerView extends FrameLayout {
             return;
         }
 
-        if (this.player.getTracks().isEmpty()) {
+        List<Track> tracks = this.player.getTracks();
+
+        if (this.player.getTracks().isEmpty() || this.player.getCurrentWindowIndex() > tracks.size() - 1) {
             setTitle(null);
             setAvatar(null);
         } else {
-            Track currentTrack = this.player.getTracks().get(this.player.getCurrentWindowIndex());
+            Track currentTrack = tracks.get(this.player.getCurrentWindowIndex());
             String avatarUrl = currentTrack.getPlayerAvatar();
 
             setTitle(currentTrack.getCombinedTitle());

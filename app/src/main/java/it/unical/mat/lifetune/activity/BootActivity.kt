@@ -133,7 +133,7 @@ class BootActivity : AppCompatActivity() {
     }
 
     companion object {
-        private val TAG = BootActivity::class.java.canonicalName
+        private val TAG = BootActivity::class.java.simpleName
 
         private val GOOGLE_TOS_URL = "https://www.google.com/policies/terms/"
         private val GOOGLE_PRIVACY_POLICY_URL = "https://www.google.com/policies/privacy/"
