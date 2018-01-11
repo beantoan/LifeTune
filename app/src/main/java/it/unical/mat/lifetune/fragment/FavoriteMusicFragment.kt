@@ -25,37 +25,25 @@ class FavoriteMusicFragment : BaseMusicFragment() {
     var favouritePlaylists: List<Playlist> = ArrayList()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        Log.d(TAG, "onCreateView")
-
         return inflater.inflate(R.layout.fragment_favorite_music, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        Log.d(TAG, "onViewCreated")
-
         super.onViewCreated(view, savedInstanceState)
 
         onCreateViewTasks(view)
     }
 
-    override fun onResume() {
-        Log.d(TAG, "onResume")
-
-        super.onResume()
-
-        onResumeTasks()
-    }
-
-    override fun onFavouriteApiSuccess(playlists: List<Playlist>) {
-        super.onFavouriteApiSuccess(playlists)
+    override fun onFavouriteServiceSuccess(playlists: List<Playlist>) {
+        super.onFavouriteServiceSuccess(playlists)
 
         favouritePlaylists = playlists
 
         controller.setData(favouritePlaylists)
     }
 
-    override fun onFavouriteApiFailure(error: Throwable) {
-        super.onFavouriteApiFailure(error)
+    override fun onFavouriteServiceFailure(error: Throwable) {
+        super.onFavouriteServiceFailure(error)
 
         favouritePlaylists = ArrayList()
 
@@ -68,10 +56,8 @@ class FavoriteMusicFragment : BaseMusicFragment() {
         setupRecyclerViewPlaylists()
 
         setupMusicController()
-    }
 
-    private fun onResumeTasks() {
-        callFavouritePlaylistsApi()
+        callFavouritePlaylistsService()
     }
 
     private fun setupRecyclerViewPlaylists() {
@@ -95,7 +81,7 @@ class FavoriteMusicFragment : BaseMusicFragment() {
     }
 
     companion object {
-        private val TAG = FavoriteMusicFragment::class.java.simpleName
+        private val TAG = FavoriteMusicFragment::class.java.canonicalName
 
         fun newInstance(playMusicFragment: PlayMusicFragment): FavoriteMusicFragment {
             val fragment = FavoriteMusicFragment()
