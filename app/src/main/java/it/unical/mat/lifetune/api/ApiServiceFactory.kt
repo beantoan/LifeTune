@@ -1,4 +1,4 @@
-package it.unical.mat.lifetune.service
+package it.unical.mat.lifetune.api
 
 
 import it.unical.mat.lifetune.EnvConstants
@@ -74,12 +74,12 @@ object ApiServiceFactory {
         return ApiServiceFactory.getRetrofitXml(baseUrl).create(service)
     }
 
-    fun createCategoryService(): CategoryServiceInterface =
-            ApiServiceFactory.create(CategoryServiceInterface::class.java)
+    fun createCategoryApi(): CategoryApiInterface =
+            ApiServiceFactory.create(CategoryApiInterface::class.java)
 
-    fun createPlaylistService(): PlaylistServiceInterface =
-            ApiServiceFactory.create(PlaylistServiceInterface::class.java)
+    fun createPlaylistApi(): PlaylistApiInterface =
+            ApiServiceFactory.create(PlaylistApiInterface::class.java)
 
-    fun createPlaylistXmlService(): TrackListServiceInterface =
-            ApiServiceFactory.createXml(TrackListServiceInterface::class.java, EnvConstants.NCT_BASE_URL)
+    fun createPlaylistXmlApi(): TrackListApiInterface =
+            ApiServiceFactory.createXml(TrackListApiInterface::class.java, EnvConstants.NCT_BASE_URL)
 }

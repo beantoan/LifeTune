@@ -1,12 +1,17 @@
 package it.unical.mat.lifetune.util
 
 import android.app.Activity
+import android.app.DatePickerDialog
 import android.app.ProgressDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.util.Log
+import android.widget.EditText
 import cn.pedant.SweetAlert.SweetAlertDialog
 import it.unical.mat.lifetune.R
+import java.text.DateFormat
+import java.util.*
+
 
 /**
  * Created by beantoan on 8/27/16.
@@ -113,5 +118,34 @@ object AppDialog {
                 Log.e(TAG, "showProgress", e)
             }
         }
+    }
+
+    fun showDatePickerDialog(activity: Activity, mDate: EditText,
+                             _year: Int, _month: Int, _day: Int,
+                             isCancelable: Boolean = false, onDateSetListener: DateSetListener? = null) {
+        val datePickerDialog = DatePickerDialog(activity, DatePickerDialog.OnDateSetListener { view, year, monthOfYear, dayOfMonth ->
+            val cal = Calendar.getInstance()
+            val dateFormat = DateFormat.getDateInstance(DateFormat.LONG)
+
+            cal.set(year, monthOfYear, dayOfMonth)
+
+            val date = dateFormat.format(cal.timeInMillis)
+
+            mDate.setText(date)
+
+            onDateSetListener?.onSetListener(year, monthOfYear, dayOfMonth)
+        }, _year, _month, _day)
+
+        datePickerDialog.setOnCancelListener {
+            if (isCancelable) {
+                mDate.text = null
+            }
+        }
+
+        datePickerDialog.show()
+    }
+
+    interface DateSetListener {
+        fun onSetListener(_year: Int, _month: Int, _day: Int)
     }
 }

@@ -1,4 +1,4 @@
-package it.unical.mat.lifetune.service
+package it.unical.mat.lifetune.api
 
 import io.reactivex.Flowable
 import it.unical.mat.lifetune.entity.Playlist
@@ -9,7 +9,7 @@ import retrofit2.http.Path
 /**
  * Created by beantoan on 5/14/16.
  */
-interface PlaylistServiceInterface {
+interface PlaylistApiInterface {
     @GET("playlists/favourite.json")
     fun favourite(): Flowable<List<Playlist>>
 

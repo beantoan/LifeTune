@@ -29,7 +29,7 @@ class PlayMusicPagerAdapter(playMusicFragment: PlayMusicFragment, fragmentManage
     }
 
     companion object {
-        val TAG = PlayMusicPagerAdapter::class.java.canonicalName
+        val TAG = PlayMusicPagerAdapter::class.java.simpleName
         private val TAB_COUNT = 2
 
         val RECOMMENDATION_MUSIC_FRAGMENT = 0

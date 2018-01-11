@@ -1,4 +1,4 @@
-package it.unical.mat.lifetune.service
+package it.unical.mat.lifetune.api
 
 import io.reactivex.Flowable
 import it.unical.mat.lifetune.entity.TrackList
@@ -8,7 +8,7 @@ import retrofit2.http.Query
 /**
  * Created by beantoan on 5/14/16.
  */
-interface TrackListServiceInterface {
+interface TrackListApiInterface {
     @GET("flash/xml")
     fun songs(@Query("key2") key: String): Flowable<TrackList>
 }
