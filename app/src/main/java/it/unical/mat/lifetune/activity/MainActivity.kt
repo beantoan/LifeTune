@@ -25,6 +25,7 @@ import com.google.firebase.crash.FirebaseCrash
 import it.unical.mat.lifetune.R
 import it.unical.mat.lifetune.entity.ActivityResultEvent
 import it.unical.mat.lifetune.fragment.MyActivitiesFragment
+import it.unical.mat.lifetune.fragment.NearbyPlacesFragment
 import it.unical.mat.lifetune.fragment.PlayMusicFragment
 import it.unical.mat.lifetune.fragment.SchedulesFragment
 import it.unical.mat.lifetune.util.AppDialog
@@ -47,6 +48,8 @@ class MainActivity :
 
     private var schedulesFragment: SchedulesFragment? = null
 
+    private var nearbyPlacesFragment: NearbyPlacesFragment? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG, "onCreate")
 
@@ -59,15 +62,10 @@ class MainActivity :
         Log.d(TAG, "onNavigationItemSelected")
 
         when (item.itemId) {
-            R.id.nav_play_music -> {
-                showPlayMusicFragment()
-            }
-            R.id.nav_my_activities -> {
-                showMyActivitiesFragment()
-            }
-            R.id.nav_schedules -> {
-                showSchedulesFragment()
-            }
+            R.id.nav_play_music -> showPlayMusicFragment()
+            R.id.nav_my_activities -> showMyActivitiesFragment()
+            R.id.nav_nearby_places -> showNearbyPlacesFragment()
+            R.id.nav_schedules -> showSchedulesFragment()
         }
 
         drawer_layout.closeDrawer(GravityCompat.START)
@@ -195,6 +193,18 @@ class MainActivity :
 
         ActivityUtils.addOrAttachFragment(supportFragmentManager,
                 myActivitiesFragment!!, R.id.content_main_placeholder, MyActivitiesFragment.TAG)
+    }
+
+    private fun showNearbyPlacesFragment() {
+        Log.d(TAG, "showNearbyPlacesFragment")
+
+        if (nearbyPlacesFragment == null) {
+            nearbyPlacesFragment = NearbyPlacesFragment()
+        }
+
+        ActivityUtils.addOrAttachFragment(supportFragmentManager,
+                nearbyPlacesFragment!!, R.id.content_main_placeholder, NearbyPlacesFragment.TAG)
+
     }
 
     private fun showSchedulesFragment() {
