@@ -50,9 +50,9 @@ class MyActivitiesFragment : Fragment() {
     private var totalDistance = 0f
     private var totalCalories = 0f
 
-    private val fitnessCalendar = Calendar.getInstance()
-
     private var fitnessHours: ArrayList<Float> = ArrayList()
+
+    private val fitnessCalendar = Calendar.getInstance()
 
     private var mainActivity: MainActivity? = null
 
@@ -228,13 +228,13 @@ class MyActivitiesFragment : Fragment() {
             val start = dateTimeFormat.format(startMs)
             val end = dateTimeFormat.format(endMs)
 
-            totalActiveTime += endMs - startMs
-
             val hour = hourFormat.format(startMs).toFloat()
 
             Log.d(TAG, "-- activity=${bucket.activity}")
 
             if (bucket.activity in ACCEPTED_FITNESS_ACTIVITIES) {
+
+                totalActiveTime += endMs - startMs
 
                 if (!fitnessHours.contains(hour)) {
                     fitnessHours.add(hour)
@@ -306,6 +306,10 @@ class MyActivitiesFragment : Fragment() {
     }
 
     private fun addLackedHoursToEntries(hours: List<Float>, entries: ArrayList<FitnessChartEntry>) {
+        if (entries.isEmpty()) {
+            return
+        }
+
         hours.forEach { hour ->
             val fitnessChartEntry = FitnessChartEntry(hour)
 
@@ -317,72 +321,129 @@ class MyActivitiesFragment : Fragment() {
         entries.sortBy { it.hour }
     }
 
-    private fun updateSummaryInfo(_totalActiveTime: Float, _totalSteps: Float,
-                                  _totalDistance: Float, _totalCalories: Float) {
-        val activeTimeLong = _totalActiveTime.toLong()
-        val activeTimeMinutes = TimeUnit.MILLISECONDS.toMinutes(activeTimeLong)
-        val activeTimeSeconds = TimeUnit.MILLISECONDS.toSeconds(activeTimeLong) - TimeUnit.MINUTES.toSeconds(activeTimeMinutes)
+    private fun convertMilliSecondsToHuman(time: Float): String {
+        val timeLong = time.toLong()
+        val timeHours = TimeUnit.MILLISECONDS.toHours(timeLong)
+        val timeMinutes = TimeUnit.MILLISECONDS.toMinutes(timeLong) - TimeUnit.HOURS.toMinutes(timeHours)
 
-        val numberFormat = NumberFormat.getNumberInstance(Locale.getDefault())
+        val timeHoursStr = if (timeHours > 0) "${timeHours}h" else ""
+        val timeMinutesStr = if (timeMinutes > 0) "${timeMinutes}m" else ""
+        val timeSpace = if (timeHoursStr == "" || timeMinutesStr == "") "" else " "
 
-        val distanceKm = Math.round(_totalDistance / 1000)
-        val distanceM = (_totalDistance - distanceKm * 1000).toInt()
+        return "$timeHoursStr$timeSpace$timeMinutesStr"
+    }
+
+    private fun convertDistanceToHuman(distance: Float): String {
+        val distanceKm = Math.round(distance / 1000)
+        val distanceM = (distance - distanceKm * 1000).toInt()
 
         val distanceKmStr = if (distanceKm > 0) "${distanceKm}km" else ""
         val distanceMStr = if (distanceM > 0) "${distanceM}m" else ""
+        val distanceSpace = if (distanceKmStr == "" || distanceMStr == "") "" else " "
 
-        total_active_time.text = String.format("%dmin %dsec", activeTimeSeconds, activeTimeSeconds)
+        return "$distanceKmStr$distanceSpace$distanceMStr"
+    }
 
+    private fun updateSummaryInfo(_totalActiveTime: Float, _totalSteps: Float,
+                                  _totalDistance: Float, _totalCalories: Float) {
+
+        val numberFormat = NumberFormat.getNumberInstance(Locale.getDefault())
+
+        total_active_time.text = convertMilliSecondsToHuman(_totalActiveTime)
         total_steps.text = numberFormat.format(_totalSteps.toInt())
-        total_distance.text = "$distanceKmStr $distanceMStr"
+        total_distance.text = convertDistanceToHuman(_totalDistance)
         total_calories.text = Math.round(_totalCalories).toString()
     }
 
     private fun getHoursAxisValueFormatter(_fitnessHours: List<Float>): IAxisValueFormatter {
-
         return IAxisValueFormatter { value, axis ->
             val valInt = value.toInt()
             val size = _fitnessHours.count()
 
-            if (valInt in 0..(size - 1)) _fitnessHours[valInt].toInt().toString() + "h" else ""
+            if (valInt in 0..(size - 1)) _fitnessHours[valInt].toInt().toString() else ""
         }
+    }
+
+    private fun getDefaultAxisValueFormatter(): IAxisValueFormatter {
+        return IAxisValueFormatter { value, axis ->
+            value.toInt().toString()
+        }
+    }
+
+    /**
+     * https://github.com/PhilJay/MPAndroidChart/blob/master/MPChartExample/src/com/xxmassdeveloper/mpchartexample/BarChartActivityMultiDataset.java#L180
+     * (barWith + barSpace) * numberOfBars + groupSpace = 1
+     *
+     * return List (groupSpace, barSpace, barWidth)
+     */
+    private fun getGroupedBarChartParams(numberOfBarInGroup: Int): List<Float> {
+        return when (numberOfBarInGroup) {
+            3 -> {
+                listOf(0.04f, 0.01f, 0.31f)
+            }
+            2 -> {
+                listOf(0.04f, 0.01f, 0.47f)
+            }
+            else -> {
+                listOf(0f, 0f, 0.8f)
+            }
+        }
+    }
+
+    private fun generateBarDataSet(chartData: BarData, type: Int, rawData: List<FitnessChartEntry>,
+                                   chartTitle: String, chartColor: Int): Int {
+        if (rawData.isEmpty()) {
+            return 0
+        }
+
+        val entries = rawData.map { BarEntry(it.hour, it.getValueByType(type)) }
+
+        val dataSet = BarDataSet(entries, chartTitle)
+        dataSet.color = chartColor
+
+        chartData.addDataSet(dataSet)
+
+        return 1
+    }
+
+    private fun generateChartData(type: Int,
+                                  _runningData: List<FitnessChartEntry>,
+                                  _walkingData: List<FitnessChartEntry>,
+                                  _onBicycleData: List<FitnessChartEntry>): Pair<Int, BarData> {
+
+        val chartData = BarData()
+
+        var numberOfBarInGroup = 0
+
+        numberOfBarInGroup += generateBarDataSet(chartData, type, _walkingData,
+                CHART_SERIES_TITLE_WALKING, CHART_SERIES_COLOR_WALKING)
+
+        numberOfBarInGroup += generateBarDataSet(chartData, type, _runningData,
+                CHART_SERIES_TITLE_RUNNING, CHART_SERIES_COLOR_RUNNING)
+
+        numberOfBarInGroup += generateBarDataSet(chartData, type, _onBicycleData,
+                CHART_SERIES_TITLE_BIKING, CHART_SERIES_COLOR_BIKING)
+
+        return Pair(numberOfBarInGroup, chartData)
     }
 
     private fun updateFitnessChart(chart: BarChart, type: Int,
                                    _runningData: List<FitnessChartEntry>, _walkingData: List<FitnessChartEntry>,
                                    _onBicycleData: List<FitnessChartEntry>, _fitnessHours: List<Float>) {
 
-        val runningEntries = _runningData.map { BarEntry(it.hour, it.getValueByType(type)) }
-        val walkingEntries = _walkingData.map { BarEntry(it.hour, it.getValueByType(type)) }
-        val onBicycleEntries = _onBicycleData.map { BarEntry(it.hour, it.getValueByType(type)) }
+        val (numberOfBarInGroup, chartData) = generateChartData(type, _runningData, _walkingData, _onBicycleData)
 
-        val groupBarSize = _fitnessHours.size
+        val (groupSpace, barSpace, barWidth) = getGroupedBarChartParams(numberOfBarInGroup)
 
-        Log.d(TAG, "runningEntries.size=${runningEntries.size}, walkingEntries.size=${onBicycleEntries.size}, walkingEntries.size=${walkingEntries.size}")
-
-        Log.d(TAG, "updateFitnessChart: groupBarSize=$groupBarSize, fitnessHours=$_fitnessHours")
-
-        val runningDataSet = BarDataSet(runningEntries, CHART_SERIES_TITLE_RUNNING)
-        runningDataSet.color = CHART_SERIES_COLOR_RUNNING
-
-        val onBicycleDataSet = BarDataSet(onBicycleEntries, CHART_SERIES_TITLE_BIKING)
-        onBicycleDataSet.color = CHART_SERIES_COLOR_BIKING
-
-        val walkingDataSet = BarDataSet(walkingEntries, CHART_SERIES_TITLE_WALKING)
-        walkingDataSet.color = CHART_SERIES_COLOR_WALKING
-
-        val chartData = BarData(walkingDataSet, runningDataSet, onBicycleDataSet)
-
-        // https://github.com/PhilJay/MPAndroidChart/blob/master/MPChartExample/src/com/xxmassdeveloper/mpchartexample/BarChartActivityMultiDataset.java#L180
-        // (barWith + barSpace) * numberOfBars + groupSpace = 1
-        val groupSpace = 0.03f
-        val barSpace = 0.01f
-        val barWidth = 0.31f
+        Log.d(TAG, "updateFitnessChart: _walkingData.size=${_walkingData.size}, _runningData.size=${_runningData.size}, _onBicycleData.size=${_onBicycleData.size}")
+        Log.d(TAG, "updateFitnessChart: fitnessHours=$_fitnessHours")
+        Log.d(TAG, "updateFitnessChart: numberOfBarInGroup=$numberOfBarInGroup, groupSpace=$groupSpace, barSpace=$barSpace, barWidth=$barWidth")
 
         chartData.setDrawValues(true)
         chartData.barWidth = barWidth
 
         chart.clear()
+
         chart.data = chartData
 
         chart.setDrawValueAboveBar(true)
@@ -397,21 +458,37 @@ class MyActivitiesFragment : Fragment() {
         chart.axisRight.isEnabled = false
 
         chart.xAxis.position = XAxis.XAxisPosition.BOTTOM
-        chart.xAxis.labelCount = groupBarSize
-        chart.xAxis.setCenterAxisLabels(true)
-        chart.xAxis.setDrawGridLines(true)
         chart.xAxis.granularity = 1f
         chart.xAxis.isGranularityEnabled = true
-        chart.xAxis.axisMinimum = 0f
-        chart.xAxis.axisMaximum = chart.barData.getGroupWidth(groupSpace, barSpace) * groupBarSize
+        chart.xAxis.setDrawGridLines(true)
 
         chart.rendererXAxis.paintAxisLabels.textAlign = Paint.Align.CENTER
 
-        chart.groupBars(0f, groupSpace, barSpace)
-
         chart.legend.setDrawInside(false)
 
-        chart.xAxis.valueFormatter = getHoursAxisValueFormatter(_fitnessHours)
+        if (numberOfBarInGroup < 2) {
+            val maxHour = _fitnessHours.max()?.toInt() ?: -1
+            val minHour = (_fitnessHours.min() ?: 0.5f) - 0.5f
+
+            chart.xAxis.axisMinimum = minHour
+            chart.xAxis.axisMaximum = maxHour + 1f
+
+            chart.xAxis.labelCount = maxHour
+            chart.xAxis.valueFormatter = getDefaultAxisValueFormatter()
+            chart.xAxis.setCenterAxisLabels(false)
+        } else {
+            val groupBarSize = _fitnessHours.size
+
+            chart.xAxis.labelCount = groupBarSize
+            chart.xAxis.axisMinimum = 0f
+            chart.xAxis.axisMaximum = chart.barData.getGroupWidth(groupSpace, barSpace) * groupBarSize
+            chart.xAxis.valueFormatter = getHoursAxisValueFormatter(_fitnessHours)
+            chart.xAxis.setCenterAxisLabels(true)
+
+            chart.groupBars(0f, groupSpace, barSpace)
+        }
+
+        chart.notifyDataSetChanged()
 
         chart.invalidate()
     }
@@ -423,7 +500,7 @@ class MyActivitiesFragment : Fragment() {
         val CHART_SERIES_TITLE_WALKING = "Walking"
         val CHART_SERIES_TITLE_BIKING = "Biking"
 
-        val CHART_SERIES_COLOR_RUNNING = Color.parseColor("#3572b0")
+        val CHART_SERIES_COLOR_RUNNING = Color.parseColor("#f6c342")
         val CHART_SERIES_COLOR_WALKING = Color.parseColor("#14892c")
         val CHART_SERIES_COLOR_BIKING = Color.parseColor("#d04437")
 
