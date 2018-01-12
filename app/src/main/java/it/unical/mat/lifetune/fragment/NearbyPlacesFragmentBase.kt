@@ -221,7 +221,7 @@ class NearbyPlacesFragmentBase : BaseLocationFragment(),
     private fun zoomToCurrentAddressOnMap() {
         if (googleMap != null && currentAddress != null) {
             val latLng = LatLng(currentAddress!!.latitude, currentAddress!!.longitude)
-            googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 14f))
+            googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, GOOGLE_MAP_ZOOM_LEVEL))
         }
     }
 
@@ -295,12 +295,11 @@ class NearbyPlacesFragmentBase : BaseLocationFragment(),
             googleMap?.clear()
 
             nearbyPlaces.forEach { place ->
-                val title = "${place.name}\n${place.address}"
 
                 val markerOptions = MarkerOptions()
-                markerOptions.title(title)
+                markerOptions.title(place.name)
                 markerOptions.position(place.latLng)
-                markerOptions.snippet(title)
+                markerOptions.snippet(place.address)
 
                 googleMap?.addMarker(markerOptions)
             }
@@ -309,5 +308,6 @@ class NearbyPlacesFragmentBase : BaseLocationFragment(),
 
     companion object {
         val TAG = NearbyPlacesFragmentBase::class.java.simpleName
+        val GOOGLE_MAP_ZOOM_LEVEL = 15f
     }
 }
