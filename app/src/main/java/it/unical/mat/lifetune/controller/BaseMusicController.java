@@ -8,7 +8,7 @@ import it.unical.mat.lifetune.entity.Song;
 
 public abstract class BaseMusicController<T> extends TypedEpoxyController<T> {
 
-    private static final String TAG = BaseMusicController.class.getCanonicalName();
+    private static final String TAG = BaseMusicController.class.getSimpleName();
 
     final AdapterCallbacks callbacks;
 

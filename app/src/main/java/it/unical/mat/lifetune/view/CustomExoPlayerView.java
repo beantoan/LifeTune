@@ -211,7 +211,7 @@ import it.unical.mat.lifetune.util.CustomExoPlayer;
 @TargetApi(16)
 public final class CustomExoPlayerView extends FrameLayout {
 
-    private static final String TAG = CustomExoPlayerView.class.getCanonicalName();
+    private static final String TAG = CustomExoPlayerView.class.getSimpleName();
 
     private static final int SURFACE_TYPE_NONE = 0;
     private static final int SURFACE_TYPE_SURFACE_VIEW = 1;

@@ -17,6 +17,7 @@ import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.formatter.IAxisValueFormatter
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.fitness.Fitness
+import com.google.android.gms.fitness.FitnessOptions
 import com.google.android.gms.fitness.data.Bucket
 import com.google.android.gms.fitness.data.DataSource
 import com.google.android.gms.fitness.data.DataType
@@ -117,6 +118,23 @@ class MyActivitiesFragment : Fragment() {
 
     private fun readFitnessData() {
 
+        val fitnessOptions = FitnessOptions.builder()
+                .addDataType(DataType.TYPE_STEP_COUNT_CUMULATIVE)
+                .addDataType(DataType.TYPE_STEP_COUNT_DELTA)
+                .addDataType(DataType.TYPE_STEP_COUNT_CADENCE)
+                .addDataType(DataType.TYPE_ACTIVITY_SEGMENT)
+                .addDataType(DataType.AGGREGATE_ACTIVITY_SUMMARY)
+                .addDataType(DataType.AGGREGATE_STEP_COUNT_DELTA)
+                .addDataType(DataType.AGGREGATE_CALORIES_EXPENDED)
+                .addDataType(DataType.AGGREGATE_DISTANCE_DELTA)
+                .addDataType(DataType.TYPE_DISTANCE_DELTA)
+                .addDataType(DataType.TYPE_CALORIES_EXPENDED)
+                .build()
+
+        if (!GoogleSignIn.hasPermissions(GoogleSignIn.getLastSignedInAccount(context), fitnessOptions)) {
+            return
+        }
+
         if (isLoadingFitnessData) {
             return
         }
@@ -166,12 +184,12 @@ class MyActivitiesFragment : Fragment() {
 
         Fitness.getHistoryClient(activity!!, account)
                 .readData(readRequest)
-                .addOnCompleteListener({ dataReadResponse ->
+                .addOnCompleteListener(activity!!, { dataReadResponse ->
                     Log.d(TAG, "Fitness.getHistoryClient#addOnCompleteListener: buckets.size=${dataReadResponse.result.buckets.size}")
 
                     convertBucketsToBarChartData(dataReadResponse.result.buckets)
                 })
-                .addOnSuccessListener({
+                .addOnSuccessListener(activity!!, {
                     Log.d(TAG, "Fitness.getHistoryClient#addOnSuccessListener")
 
                     isLoadingFitnessData = false
@@ -195,10 +213,12 @@ class MyActivitiesFragment : Fragment() {
                     updateFitnessChart(calories_chart, FitnessChartEntry.TYPE_CALORIES,
                             runningData, walkingData, onBicycleData, fitnessHours)
                 })
-                .addOnFailureListener({
+                .addOnFailureListener(activity!!, {
                     Log.d(TAG, "Fitness.getHistoryClient#addOnFailureListener")
 
                     isLoadingFitnessData = false
+
+                    AppDialog.hideProgress(context!!)
 
                     AppDialog.error(R.string.fitness_read_history_error_title, R.string.fitness_read_history_error_message, activity!!)
                 })

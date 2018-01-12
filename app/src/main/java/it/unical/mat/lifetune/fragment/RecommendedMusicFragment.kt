@@ -124,7 +124,7 @@ class RecommendedMusicFragment : BaseMusicFragment() {
                 try {
                     locationSettingsResponse.getResult(ApiException::class.java)
 
-                    callSnapshotApi()
+                    callSnapshotLocationApi()
 
                 } catch (exception: ApiException) {
                     FirebaseCrash.logcat(Log.ERROR, TAG, "checkLocationSetting#addOnCompleteListener#ApiException:" + exception)
@@ -161,15 +161,15 @@ class RecommendedMusicFragment : BaseMusicFragment() {
 
     }
 
-    private fun callSnapshotApi() {
-        Log.d(TAG, "callSnapshotApi")
+    private fun callSnapshotLocationApi() {
+        Log.d(TAG, "callSnapshotLocationApi")
 
         if (ContextCompat.checkSelfPermission(activity!!, Manifest.permission.ACCESS_FINE_LOCATION) ==
                 PackageManager.PERMISSION_GRANTED) {
 
             if (AppUtils.isInternetConnected(context!!)) {
                 Awareness.getSnapshotClient(activity).location
-                        .addOnSuccessListener({ locationResponse ->
+                        .addOnSuccessListener(activity!!, { locationResponse ->
                             Log.d(TAG, "Awareness.getSnapshotClient#location#addOnSuccessListener")
 
                             val location = locationResponse.location
@@ -189,7 +189,7 @@ class RecommendedMusicFragment : BaseMusicFragment() {
 
                             callSnapshotActivity()
                         })
-                        .addOnFailureListener({ e ->
+                        .addOnFailureListener(activity!!, { e ->
                             FirebaseCrash.logcat(Log.ERROR, TAG, "Awareness.getSnapshotClient#location#addOnFailureListener:" + e)
                             FirebaseCrash.report(e)
 
@@ -207,7 +207,7 @@ class RecommendedMusicFragment : BaseMusicFragment() {
 
         if (AppUtils.isInternetConnected(context!!)) {
             Awareness.getSnapshotClient(activity).detectedActivity
-                    .addOnSuccessListener { detectedActivityResponse ->
+                    .addOnSuccessListener(activity!!, { detectedActivityResponse ->
                         Log.d(TAG, "Awareness.getSnapshotClient#detectedActivity#addOnSuccessListener")
 
                         val activityRecognitionResult = detectedActivityResponse.activityRecognitionResult
@@ -218,15 +218,15 @@ class RecommendedMusicFragment : BaseMusicFragment() {
                         recommendationParameter.activityType = mostProbableActivity.type
 
                         callSnapshotWeather()
-                    }
-                    .addOnFailureListener { e ->
+                    })
+                    .addOnFailureListener(activity!!, { e ->
                         FirebaseCrash.logcat(Log.ERROR, TAG, "Awareness.getSnapshotClient#detectedActivity#addOnFailureListener:" + e)
                         FirebaseCrash.report(e)
 
                         recommendationParameter.activityType = null
 
                         callSnapshotWeather()
-                    }
+                    })
         } else {
             AppDialog.error(R.string.no_internet_error_title, R.string.no_internet_error_message, activity!!)
         }
@@ -238,7 +238,7 @@ class RecommendedMusicFragment : BaseMusicFragment() {
 
             if (AppUtils.isInternetConnected(context!!)) {
                 Awareness.getSnapshotClient(activity).weather
-                        .addOnSuccessListener { weatherResponse ->
+                        .addOnSuccessListener(activity!!, { weatherResponse ->
                             Log.d(TAG, "Awareness.getSnapshotClient#weather#addOnSuccessListener")
 
                             val temp = weatherResponse.weather.getFeelsLikeTemperature(2)
@@ -248,15 +248,15 @@ class RecommendedMusicFragment : BaseMusicFragment() {
                             recommendationParameter.temp = temp
 
                             callRecommendationApi()
-                        }
-                        .addOnFailureListener { e ->
+                        })
+                        .addOnFailureListener(activity!!, { e ->
                             FirebaseCrash.logcat(Log.ERROR, TAG, "Awareness.getSnapshotClient#weather#addOnFailureListener:" + e)
                             FirebaseCrash.report(e)
 
                             recommendationParameter.temp = null
 
                             callRecommendationApi()
-                        }
+                        })
             } else {
                 AppDialog.error(R.string.no_internet_error_title, R.string.no_internet_error_message, activity!!)
             }
@@ -297,7 +297,7 @@ class RecommendedMusicFragment : BaseMusicFragment() {
 
         when (resultCode) {
             Activity.RESULT_OK -> {
-                callSnapshotApi()
+                callSnapshotLocationApi()
             }
             else -> {
                 AppDialog.warning(R.string.error_turn_on_location_title, R.string.error_turn_on_location_message, activity!!,

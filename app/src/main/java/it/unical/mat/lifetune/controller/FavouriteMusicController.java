@@ -10,7 +10,7 @@ import it.unical.mat.lifetune.entity.Playlist;
 import it.unical.mat.lifetune.model.FullPlaylistModelGroup;
 
 public class FavouriteMusicController extends BaseMusicController<List<Playlist>> {
-    private static final String TAG = FavouriteMusicController.class.getCanonicalName();
+    private static final String TAG = FavouriteMusicController.class.getSimpleName();
 
     public FavouriteMusicController(AdapterCallbacks _callbacks) {
         super(_callbacks);

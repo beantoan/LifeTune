@@ -16,7 +16,7 @@ import it.unical.mat.lifetune.view.CategoryCarouselViewModel_;
 
 public class CategoryModelGroup extends EpoxyModelGroup {
 
-    private static String TAG = CategoryModelGroup.class.getCanonicalName();
+    private static String TAG = CategoryModelGroup.class.getSimpleName();
 
 
     public CategoryModelGroup(Category _category, BaseMusicController.AdapterCallbacks callbacks) {

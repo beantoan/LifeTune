@@ -16,7 +16,7 @@ import it.unical.mat.lifetune.view.FullPlaylistCarouselViewModel_;
 
 public class FullPlaylistModelGroup extends EpoxyModelGroup {
 
-    private static String TAG = FullPlaylistModelGroup.class.getCanonicalName();
+    private static String TAG = FullPlaylistModelGroup.class.getSimpleName();
 
     public static Playlist playlist;
 

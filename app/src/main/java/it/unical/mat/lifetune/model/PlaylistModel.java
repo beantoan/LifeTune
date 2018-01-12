@@ -17,7 +17,7 @@ import static com.airbnb.epoxy.EpoxyAttribute.Option.DoNotHash;
 @EpoxyModelClass(layout = R.layout.model_playlist)
 public abstract class PlaylistModel extends DataBindingEpoxyModel {
 
-    private static final String TAG = Playlist.class.getCanonicalName();
+    private static final String TAG = Playlist.class.getSimpleName();
 
     @EpoxyAttribute(DoNotHash)
     View.OnClickListener clickListener;

@@ -37,7 +37,9 @@
     <string name="calculate_calories_chart_title">Calculate Calories</string>
     <string name="my_activities_summary_title">Summary</string>
     <string name="fitness_read_history_error_title">Sorry! I\'m Wrong</string>
-    <string name="fitness_read_history_error_message">There are some problems occurred while reading your data. We are fixing as fast as possible. Please contact me at beantoan@gmail.com for more helps.</string>
+    <string name="fitness_read_history_error_message">There are some problems occurred while retrieving fitness data. We are fixing as fast as possible. Please contact me at beantoan@gmail.com for more helps.</string>
+    <string name="get_nearby_places_error_title">Sorry! I\'m Wrong</string>
+    <string name="get_nearby_places_error_message">There are some problems occurred while retrieving nearby places. We are fixing as fast as possible. Please contact me at beantoan@gmail.com for more helps.</string>
     <string name="summary_active_time_title">Active time</string>
     <string name="summary_steps_title">Steps</string>
     <string name="summary_distance_title">Distance</string>
@@ -49,5 +51,9 @@
     <string name="nav_settings_title">Settings</string>
     <string name="nav_my_profile_title">My Profile</string>
     <string name="nav_logout_title">Logout</string>
+    <string name="button_show_map_title">Show map</string>
+    <string name="get_current_location_error_message">Cannot locate your location</string>
+    <string name="button_hide_map_title">Hide map</string>
+    <string name="locating_location_title">Locating your location ...</string>
 
 </resources>

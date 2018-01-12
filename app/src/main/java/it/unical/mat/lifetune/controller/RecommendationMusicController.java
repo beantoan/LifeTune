@@ -11,7 +11,7 @@ import it.unical.mat.lifetune.model.CategoryModelGroup;
 
 public class RecommendationMusicController extends BaseMusicController<List<Category>> {
 
-    private static final String TAG = RecommendationMusicController.class.getCanonicalName();
+    private static final String TAG = RecommendationMusicController.class.getSimpleName();
 
     public RecommendationMusicController(AdapterCallbacks _callbacks) {
         super(_callbacks);
