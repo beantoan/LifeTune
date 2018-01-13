@@ -128,7 +128,7 @@ class NearbyPlacesFragmentBase : BaseLocationFragment(),
     private fun setupRecyclerViewNearbyPlaces() {
         Log.d(TAG, "setupRecyclerViewNearbyPlaces")
 
-        val dividerDrawable = ContextCompat.getDrawable(activity!!.applicationContext, R.drawable.category_divider)
+        val dividerDrawable = ContextCompat.getDrawable(activity!!.applicationContext, R.drawable.place_divider)
         val dividerItemDecoration = RecyclerViewDividerItemDecoration(activity!!.applicationContext, DividerItemDecoration.VERTICAL, dividerDrawable!!)
 
         recycler_view_nearby_places.layoutManager = LinearLayoutManager(activity!!.applicationContext)
