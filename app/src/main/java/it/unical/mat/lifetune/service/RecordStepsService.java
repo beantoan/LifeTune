@@ -15,7 +15,7 @@ import com.google.firebase.crash.FirebaseCrash;
  */
 
 public class RecordStepsService extends IntentService {
-    private static final String TAG = RecordStepsService.class.getCanonicalName();
+    private static final String TAG = RecordStepsService.class.getSimpleName();
 
     public RecordStepsService() {
         super(TAG);

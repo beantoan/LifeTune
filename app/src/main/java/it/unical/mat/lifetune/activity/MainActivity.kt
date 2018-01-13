@@ -25,6 +25,7 @@ import com.google.firebase.crash.FirebaseCrash
 import it.unical.mat.lifetune.R
 import it.unical.mat.lifetune.entity.ActivityResultEvent
 import it.unical.mat.lifetune.fragment.MyActivitiesFragment
+import it.unical.mat.lifetune.fragment.NearbyPlacesFragmentBase
 import it.unical.mat.lifetune.fragment.PlayMusicFragment
 import it.unical.mat.lifetune.fragment.SchedulesFragment
 import it.unical.mat.lifetune.util.AppDialog
@@ -47,6 +48,8 @@ class MainActivity :
 
     private var schedulesFragment: SchedulesFragment? = null
 
+    private var nearbyPlacesFragment: NearbyPlacesFragmentBase? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG, "onCreate")
 
@@ -59,15 +62,10 @@ class MainActivity :
         Log.d(TAG, "onNavigationItemSelected")
 
         when (item.itemId) {
-            R.id.nav_play_music -> {
-                showPlayMusicFragment()
-            }
-            R.id.nav_my_activities -> {
-                showMyActivitiesFragment()
-            }
-            R.id.nav_schedules -> {
-                showSchedulesFragment()
-            }
+            R.id.nav_play_music -> showPlayMusicFragment()
+            R.id.nav_my_activities -> showMyActivitiesFragment()
+            R.id.nav_nearby_places -> showNearbyPlacesFragment()
+            R.id.nav_schedules -> showSchedulesFragment()
         }
 
         drawer_layout.closeDrawer(GravityCompat.START)
@@ -156,8 +154,8 @@ class MainActivity :
 //        nav_view.setCheckedItem(R.id.nav_play_music)
 //        nav_view.menu.performIdentifierAction(R.id.nav_play_music, 0)
 
-        nav_view.setCheckedItem(R.id.nav_my_activities)
-        nav_view.menu.performIdentifierAction(R.id.nav_my_activities, 0)
+        nav_view.setCheckedItem(R.id.nav_nearby_places)
+        nav_view.menu.performIdentifierAction(R.id.nav_nearby_places, 0)
     }
 
     private fun showUserInfo() {
@@ -195,6 +193,18 @@ class MainActivity :
 
         ActivityUtils.addOrAttachFragment(supportFragmentManager,
                 myActivitiesFragment!!, R.id.content_main_placeholder, MyActivitiesFragment.TAG)
+    }
+
+    private fun showNearbyPlacesFragment() {
+        Log.d(TAG, "showNearbyPlacesFragment")
+
+        if (nearbyPlacesFragment == null) {
+            nearbyPlacesFragment = NearbyPlacesFragmentBase()
+        }
+
+        ActivityUtils.addOrAttachFragment(supportFragmentManager,
+                nearbyPlacesFragment!!, R.id.content_main_placeholder, NearbyPlacesFragmentBase.TAG)
+
     }
 
     private fun showSchedulesFragment() {
@@ -243,47 +253,47 @@ class MainActivity :
 
         Fitness.getRecordingClient(this, account)
                 .subscribe(DataType.TYPE_STEP_COUNT_CUMULATIVE)
-                .addOnCompleteListener { task ->
+                .addOnCompleteListener(this@MainActivity, { task ->
                     if (task.isSuccessful) {
                         Log.d(TAG, "Fitness.getRecordingClient#addOnCompleteListener: Successfully subscribed!")
                     } else {
                         FirebaseCrash.logcat(Log.ERROR, TAG, "Fitness.getRecordingClient#addOnCompleteListener:" + task.exception!!)
                         FirebaseCrash.report(task.exception)
                     }
-                }
+                })
 
         Fitness.getRecordingClient(this, account)
                 .subscribe(DataType.TYPE_STEP_COUNT_DELTA)
-                .addOnCompleteListener { task ->
+                .addOnCompleteListener(this@MainActivity, { task ->
                     if (task.isSuccessful) {
                         Log.d(TAG, "Fitness.getRecordingClient#addOnCompleteListener: Successfully subscribed!")
                     } else {
                         FirebaseCrash.logcat(Log.ERROR, TAG, "Fitness.getRecordingClient#addOnCompleteListener:" + task.exception!!)
                         FirebaseCrash.report(task.exception)
                     }
-                }
+                })
 
         Fitness.getRecordingClient(this, account)
                 .subscribe(DataType.TYPE_DISTANCE_DELTA)
-                .addOnCompleteListener { task ->
+                .addOnCompleteListener(this@MainActivity, { task ->
                     if (task.isSuccessful) {
                         Log.d(TAG, "Fitness.getRecordingClient#addOnCompleteListener: Successfully subscribed!")
                     } else {
                         FirebaseCrash.logcat(Log.ERROR, TAG, "Fitness.getRecordingClient#addOnCompleteListener:" + task.exception!!)
                         FirebaseCrash.report(task.exception)
                     }
-                }
+                })
 
         Fitness.getRecordingClient(this, account)
                 .subscribe(DataType.TYPE_CALORIES_EXPENDED)
-                .addOnCompleteListener { task ->
+                .addOnCompleteListener(this@MainActivity, { task ->
                     if (task.isSuccessful) {
                         Log.d(TAG, "Fitness.getRecordingClient#addOnCompleteListener: Successfully subscribed!")
                     } else {
                         FirebaseCrash.logcat(Log.ERROR, TAG, "Fitness.getRecordingClient#addOnCompleteListener:" + task.exception!!)
                         FirebaseCrash.report(task.exception)
                     }
-                }
+                })
     }
 
     fun setupToggleDrawer(toolbar: Toolbar? = null) {
