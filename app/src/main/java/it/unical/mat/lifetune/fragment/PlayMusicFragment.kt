@@ -3,6 +3,7 @@ package it.unical.mat.lifetune.fragment
 import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.AppBarLayout
+import android.support.design.widget.BottomSheetBehavior
 import android.support.v4.app.Fragment
 import android.util.Log
 import android.view.LayoutInflater
@@ -35,6 +36,8 @@ class PlayMusicFragment : Fragment(),
 
     private var mLastQuery = ""
 
+    private var floatingSearchViewTranslationY = 0f
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         Log.d(TAG, "onCreateView")
         return inflater.inflate(R.layout.fragment_play_music, container, false)
@@ -56,6 +59,7 @@ class PlayMusicFragment : Fragment(),
     }
 
     override fun onOffsetChanged(appBarLayout: AppBarLayout?, verticalOffset: Int) {
+        floatingSearchViewTranslationY = verticalOffset.toFloat()
         floating_search_view.translationY = verticalOffset.toFloat()
     }
 
@@ -69,6 +73,8 @@ class PlayMusicFragment : Fragment(),
         app_bar_layout.addOnOffsetChangedListener(this)
 
         setupMusicPlayer()
+
+        setupBottomSheet()
     }
 
     private fun onDestroyTasks() {
@@ -206,6 +212,24 @@ class PlayMusicFragment : Fragment(),
 
             override fun onFocusCleared() {
                 floating_search_view.setSearchBarTitle(mLastQuery)
+            }
+        })
+    }
+
+    private fun setupBottomSheet() {
+        val bottomSheetBehavior = BottomSheetBehavior.from(bottom_sheet_music_player)
+
+        bottomSheetBehavior.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+
+            }
+
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                when (newState) {
+                    BottomSheetBehavior.STATE_EXPANDED -> {
+                        app_bar_layout.setExpanded(true, true)
+                    }
+                }
             }
         })
     }

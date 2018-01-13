@@ -151,11 +151,8 @@ class MainActivity :
 
         nav_view.setNavigationItemSelectedListener(this)
 
-//        nav_view.setCheckedItem(R.id.nav_play_music)
-//        nav_view.menu.performIdentifierAction(R.id.nav_play_music, 0)
-
-        nav_view.setCheckedItem(R.id.nav_nearby_places)
-        nav_view.menu.performIdentifierAction(R.id.nav_nearby_places, 0)
+        nav_view.setCheckedItem(R.id.nav_play_music)
+        nav_view.menu.performIdentifierAction(R.id.nav_play_music, 0)
     }
 
     private fun showUserInfo() {

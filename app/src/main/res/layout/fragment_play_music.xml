@@ -20,8 +20,10 @@
             tools:context="it.unical.mat.lifetune.activity.MainActivity">
 
             <View
+                android:id="@+id/floating_search_view_placeholder"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/float_search_view_placeholder_height"
+                android:animateLayoutChanges="true"
                 app:popupTheme="@style/AppTheme.PopupOverlay"
                 app:layout_scrollFlags="scroll|enterAlways|snap" />
 
@@ -42,10 +44,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            app:layout_anchor="@id/app_bar_layout"
-
-            android:layout_gravity="fill"
-            app:layout_anchorGravity="fill"
 
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
@@ -57,38 +55,50 @@
 
         </LinearLayout>
 
-
-        <android.support.v7.widget.CardView
-            android:id="@+id/music_player_container"
+        <android.support.design.widget.CoordinatorLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
+            android:layout_height="match_parent"
+            android:elevation="@dimen/design_appbar_elevation"
+            android:layout_marginTop="70dp">
 
-            android:background="@color/colorPrimary"
-
-            app:layout_anchor="@id/main_content"
-            android:layout_gravity="bottom"
-            app:layout_anchorGravity="bottom"
-            app:cardElevation="4dp"
-            app:cardCornerRadius="0dp">
-
-            <it.unical.mat.lifetune.view.CustomExoPlayerView
-                android:id="@+id/music_player"
+            <LinearLayout
+                android:id="@+id/bottom_sheet_music_player"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/music_player_height"
-                tools:context="it.unical.mat.lifetune.activity.MainActivity"
+                android:layout_height="match_parent"
+                android:background="@color/colorPrimary"
+                android:orientation="vertical"
+                app:behavior_hideable="false"
+                app:behavior_peekHeight="@dimen/music_player_height"
+                app:layout_behavior="@string/bottom_sheet_behavior">
 
-                app:player_layout_id="@layout/custom_exo_simple_player_view"
-                app:controller_layout_id="@layout/custom_exo_playback_control_view"
+                <android.support.v7.widget.CardView
+                    android:id="@+id/music_player_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/colorPrimary"
+                    app:layout_anchor="@id/main_content"
+                    app:cardCornerRadius="0dp">
 
-                app:use_controller="true"
-                app:hide_on_touch="false"
-                app:use_artwork="false"
-                app:show_timeout="0"
-                app:resize_mode="fit" />
+                    <it.unical.mat.lifetune.view.CustomExoPlayerView
+                        android:id="@+id/music_player"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/music_player_height"
+                        tools:context="it.unical.mat.lifetune.activity.MainActivity"
 
-        </android.support.v7.widget.CardView>
+                        app:player_layout_id="@layout/custom_exo_simple_player_view"
+                        app:controller_layout_id="@layout/custom_exo_playback_control_view"
 
+                        app:use_controller="true"
+                        app:hide_on_touch="false"
+                        app:use_artwork="false"
+                        app:show_timeout="0"
+                        app:resize_mode="fit" />
+
+                </android.support.v7.widget.CardView>
+
+            </LinearLayout>
+
+        </android.support.design.widget.CoordinatorLayout>
     </android.support.design.widget.CoordinatorLayout>
 
     <com.arlib.floatingsearchview.FloatingSearchView
@@ -96,6 +106,7 @@
         tools:context="it.unical.mat.lifetune.activity.MainActivity"
         android:layout_width="match_parent"
         android:layout_height="150dp"
+        android:animateLayoutChanges="true"
         app:floatingSearch_close_search_on_keyboard_dismiss="false"
         app:floatingSearch_dimBackground="true"
         app:floatingSearch_dismissOnOutsideTouch="true"
