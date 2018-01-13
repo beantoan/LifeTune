@@ -2,10 +2,12 @@ package it.unical.mat.lifetune.model;
 
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.airbnb.epoxy.DataBindingEpoxyModel;
 import com.airbnb.epoxy.EpoxyAttribute;
 import com.airbnb.epoxy.EpoxyModelClass;
+import com.squareup.picasso.Picasso;
 
 import it.unical.mat.lifetune.R;
 import it.unical.mat.lifetune.entity.Place;
@@ -27,14 +29,20 @@ abstract class PlaceHeaderModel extends DataBindingEpoxyModel {
     @Override
     protected View buildView(ViewGroup parent) {
         View view = super.buildView(parent);
-//
-//        ImageView image = view.findViewById(R.id.full_playlist_img);
-//
-//        Picasso.with(view.getContext())
-//                .load(place.getImg())
-//                .placeholder(R.drawable.no_image)
-//                .error(R.drawable.no_image)
-//                .into(image);
+
+        ImageView image = view.findViewById(R.id.place_avatar);
+
+        if (place.getPhotos().isEmpty()) {
+            image.setVisibility(View.GONE);
+        } else {
+            image.setVisibility(View.VISIBLE);
+
+            Picasso.with(view.getContext())
+                    .load("file:/" + place.getPhotos().get(0))
+                    .placeholder(R.drawable.no_image)
+                    .error(R.drawable.no_image)
+                    .into(image);
+        }
 
         return view;
     }

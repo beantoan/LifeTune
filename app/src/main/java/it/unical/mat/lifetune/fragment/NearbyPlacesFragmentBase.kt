@@ -1,27 +1,35 @@
 package it.unical.mat.lifetune.fragment
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.location.Address
 import android.location.Geocoder
 import android.location.Location
+import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.support.design.widget.BottomSheetBehavior
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.google.android.gms.awareness.Awareness
+import com.google.android.gms.location.places.GeoDataClient
 import com.google.android.gms.location.places.PlaceLikelihood
+import com.google.android.gms.location.places.Places
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.crash.FirebaseCrash
+import it.unical.mat.lifetune.BuildConfig
 import it.unical.mat.lifetune.R
 import it.unical.mat.lifetune.activity.MainActivity
 import it.unical.mat.lifetune.controller.NearbyPlacesController
@@ -31,6 +39,9 @@ import it.unical.mat.lifetune.entity.Place
 import it.unical.mat.lifetune.util.AppDialog
 import it.unical.mat.lifetune.util.AppUtils
 import kotlinx.android.synthetic.main.fragment_nearby_places.*
+import java.io.File
+import java.io.FileOutputStream
+import java.util.*
 
 
 /**
@@ -86,7 +97,18 @@ class NearbyPlacesFragmentBase : BaseLocationFragment(),
     }
 
     override fun onPlaceClicked(place: Place?) {
+        Log.d(TAG, "onPlaceClicked: ${place?.name}")
 
+        navigationToPlaceByGoogleMap(place!!)
+    }
+
+    private fun navigationToPlaceByGoogleMap(place: Place) {
+        val gmmIntentUri = Uri.parse("google.navigation:q=${place.latLng.latitude},${place.latLng.longitude}")
+
+        val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+        mapIntent.`package` = "com.google.android.apps.maps"
+
+        startActivity(mapIntent)
     }
 
     private fun onViewCreatedTasks() {
@@ -137,6 +159,8 @@ class NearbyPlacesFragmentBase : BaseLocationFragment(),
             }
         }
 
+        val tv = TypedValue()
+
         bottomSheetBehavior.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
 
@@ -145,7 +169,9 @@ class NearbyPlacesFragmentBase : BaseLocationFragment(),
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 when (newState) {
                     BottomSheetBehavior.STATE_DRAGGING -> bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-                    BottomSheetBehavior.STATE_EXPANDED -> showGoogleMap()
+                    BottomSheetBehavior.STATE_EXPANDED -> {
+                        showGoogleMap()
+                    }
                 }
             }
         })
@@ -253,6 +279,8 @@ class NearbyPlacesFragmentBase : BaseLocationFragment(),
                             showNearbyPlaces(placesResponse.placeLikelihoods)
 
                             addNearbyPlacesToMap()
+
+//                            getPhotosOfNearbyPlaces()
                         })
                         .addOnFailureListener(activity!!, { e ->
                             FirebaseCrash.logcat(Log.ERROR, TAG, "Awareness.getSnapshotClient#places#addOnFailureListener:" + e)
@@ -306,8 +334,109 @@ class NearbyPlacesFragmentBase : BaseLocationFragment(),
         }
     }
 
+    private fun getPhotosDir(): String = Environment.getExternalStorageDirectory().absolutePath + "/${BuildConfig.APPLICATION_ID}"
+
+    private fun createPhotosDir(photosDirPath: String) {
+        if (!File(photosDirPath)?.mkdirs()) {
+            Log.e(TAG, "Directory not created")
+        }
+    }
+
+    private fun clearPhotosDir(photosDirPath: String) {
+        val dir = File(photosDirPath)
+
+        if (dir.exists()) {
+            dir.delete()
+        }
+    }
+
+    private fun savePlacePhoto(photosDirPath: String, bitmap: Bitmap): File? {
+
+        val random = Random()
+        val filename = random.nextInt(999999).toString() + ".png"
+        val imgFile = File(photosDirPath, filename)
+
+        try {
+            val out = FileOutputStream(imgFile)
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+            out.flush()
+            out.close()
+
+            return imgFile
+        } catch (e: Exception) {
+
+        }
+
+        return null
+    }
+
+    private fun getPhotosOfNearbyPlaces() {
+        Log.d(TAG, "getPhotosOfNearbyPlaces")
+
+        if (nearbyPlaces.isNotEmpty()) {
+            val photosDirPath = getPhotosDir()
+
+            clearPhotosDir(photosDirPath)
+
+            createPhotosDir(photosDirPath)
+
+            val geoDataClient = Places.getGeoDataClient(context!!, null)
+
+            getPhotosForPlace(geoDataClient, photosDirPath)
+        }
+    }
+
+    private fun getPhotosForPlace(geoDataClient: GeoDataClient, photosDirPath: String) {
+        nearbyPlaces.forEach { place ->
+
+            geoDataClient.getPlacePhotos(place.id)
+                    .addOnCompleteListener(activity!!, { placePhotoMetadataResponse ->
+                        Log.d(TAG, "geoDataClient.getPlacePhotos#addOnCompleteListener")
+
+                        if (placePhotoMetadataResponse.isSuccessful) {
+                            placePhotoMetadataResponse.result.photoMetadata.take(1).forEach { placePhotoMetadata ->
+
+                                geoDataClient.getScaledPhoto(placePhotoMetadata, 500, 500)
+                                        .addOnSuccessListener(activity!!, {
+                                            Log.d(TAG, "geoDataClient.getScaledPhoto#addOnSuccessListener")
+                                        })
+                                        .addOnCompleteListener(activity!!, { placePhotoResponse ->
+                                            Log.d(TAG, "geoDataClient.getScaledPhoto#addOnCompleteListener")
+
+                                            if (placePhotoResponse.isSuccessful) {
+                                                val imgFile = savePlacePhoto(photosDirPath, placePhotoResponse.result.bitmap)
+
+                                                if (imgFile != null) {
+                                                    Log.d(TAG, imgFile.absolutePath)
+
+                                                    place.addPhoto(imgFile.absolutePath)
+                                                    place.notifyChange()
+                                                } else {
+                                                    Log.w(TAG, "geoDataClient.getScaledPhoto#addOnCompleteListener: scaled photos not found")
+                                                }
+                                            }
+                                        })
+                                        .addOnFailureListener(activity!!, {
+                                            Log.d(TAG, "geoDataClient.getScaledPhoto#addOnFailureListener")
+                                        })
+                            }
+                        } else {
+                            Log.w(TAG, "geoDataClient.getPlacePhotos#addOnCompleteListener: place photos not found")
+                        }
+                    })
+                    .addOnSuccessListener(activity!!, {
+                        Log.d(TAG, "geoDataClient.getPlacePhotos#addOnSuccessListener")
+
+                    })
+                    .addOnFailureListener(activity!!, {
+                        Log.d(TAG, "geoDataClient.getPlacePhotos#addOnFailureListener")
+                    })
+        }
+    }
+
     companion object {
         val TAG = NearbyPlacesFragmentBase::class.java.simpleName
+
         val GOOGLE_MAP_ZOOM_LEVEL = 15f
     }
 }
