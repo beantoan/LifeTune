@@ -102,7 +102,11 @@ class PlayMusicFragment : Fragment(),
     }
 
     private fun displayMusicPlayer(isShown: Boolean) {
-        music_player.layoutParams.height = when {
+        Log.d(TAG, "displayMusicPlayer: isShown=$isShown")
+
+        val bottomSheetBehavior = BottomSheetBehavior.from(bottom_sheet_music_player)
+
+        bottomSheetBehavior.peekHeight = when {
             isShown -> resources.getDimension(R.dimen.music_player_height).toInt()
             else -> 0
         }
