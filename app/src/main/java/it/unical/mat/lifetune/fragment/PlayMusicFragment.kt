@@ -36,8 +36,6 @@ class PlayMusicFragment : Fragment(),
 
     private var mLastQuery = ""
 
-    private var floatingSearchViewTranslationY = 0f
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         Log.d(TAG, "onCreateView")
         return inflater.inflate(R.layout.fragment_play_music, container, false)
@@ -59,7 +57,6 @@ class PlayMusicFragment : Fragment(),
     }
 
     override fun onOffsetChanged(appBarLayout: AppBarLayout?, verticalOffset: Int) {
-        floatingSearchViewTranslationY = verticalOffset.toFloat()
         floating_search_view.translationY = verticalOffset.toFloat()
     }
 
