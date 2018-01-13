@@ -65,7 +65,6 @@ class MainActivity :
             R.id.nav_play_music -> showPlayMusicFragment()
             R.id.nav_my_activities -> showMyActivitiesFragment()
             R.id.nav_nearby_places -> showNearbyPlacesFragment()
-            R.id.nav_schedules -> showSchedulesFragment()
         }
 
         drawer_layout.closeDrawer(GravityCompat.START)

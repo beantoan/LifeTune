@@ -50,8 +50,7 @@
             <android.support.v4.view.ViewPager
                 android:id="@+id/pager"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginBottom="@dimen/music_player_height" />
+                android:layout_height="match_parent" />
 
         </LinearLayout>
 
@@ -98,23 +97,16 @@
             </LinearLayout>
 
         </android.support.design.widget.CoordinatorLayout>
+
     </android.support.design.widget.CoordinatorLayout>
 
-    <com.arlib.floatingsearchview.FloatingSearchView
-        android:id="@+id/floating_search_view"
-        tools:context="it.unical.mat.lifetune.activity.MainActivity"
+    <com.lapism.searchview.SearchView
+        android:id="@+id/search_view"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
-        android:animateLayoutChanges="true"
-        app:floatingSearch_close_search_on_keyboard_dismiss="false"
-        app:floatingSearch_dimBackground="true"
-        app:floatingSearch_dismissOnOutsideTouch="true"
-        app:floatingSearch_leftActionMode="showHamburger"
-        app:floatingSearch_searchBarMarginLeft="8dp"
-        app:floatingSearch_searchBarMarginTop="8dp"
-        app:floatingSearch_searchBarMarginRight="8dp"
-        app:floatingSearch_searchHint="@string/search_music_title"
-        app:floatingSearch_showSearchKey="true"
-        app:floatingSearch_suggestionsListAnimDuration="250" />
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        app:search_hint="@string/search_music_title"
+        app:layout_behavior="com.lapism.searchview.SearchBehavior" />
 
 </RelativeLayout>

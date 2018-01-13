@@ -9,19 +9,17 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.arlib.floatingsearchview.FloatingSearchView
-import com.arlib.floatingsearchview.suggestions.model.SearchSuggestion
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory
 import com.google.android.exoplayer2.source.DynamicConcatenatingMediaSource
 import com.google.android.exoplayer2.source.ExtractorMediaSource
 import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
+import com.lapism.searchview.SearchHistoryTable
+import com.lapism.searchview.SearchItem
+import com.lapism.searchview.SearchView
 import it.unical.mat.lifetune.LifeTuneApplication
 import it.unical.mat.lifetune.R
-import it.unical.mat.lifetune.activity.MainActivity
 import it.unical.mat.lifetune.adapter.PlayMusicPagerAdapter
-import it.unical.mat.lifetune.data.ColorSuggestion
-import it.unical.mat.lifetune.data.DataHelper
 import it.unical.mat.lifetune.entity.TrackList
 import kotlinx.android.synthetic.main.fragment_play_music.*
 
@@ -34,7 +32,6 @@ class PlayMusicFragment : Fragment(),
 
     private lateinit var mPlayMusicPagerAdapter: PlayMusicPagerAdapter
 
-    private var mLastQuery = ""
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         Log.d(TAG, "onCreateView")
@@ -57,21 +54,21 @@ class PlayMusicFragment : Fragment(),
     }
 
     override fun onOffsetChanged(appBarLayout: AppBarLayout?, verticalOffset: Int) {
-        floating_search_view.translationY = verticalOffset.toFloat()
+        search_view.translationY = verticalOffset.toFloat()
     }
 
     private fun onViewCreatedTasks() {
         Log.d(TAG, "onViewCreatedTasks")
 
-        setupViewPager()
-
-        setupFloatingSearchView()
-
         app_bar_layout.addOnOffsetChangedListener(this)
 
+        setupViewPager()
+        
         setupMusicPlayer()
 
         setupBottomSheet()
+
+        setupSearchView()
     }
 
     private fun onDestroyTasks() {
@@ -106,10 +103,13 @@ class PlayMusicFragment : Fragment(),
 
         val bottomSheetBehavior = BottomSheetBehavior.from(bottom_sheet_music_player)
 
-        bottomSheetBehavior.peekHeight = when {
+        val musicPlayerHeight = when {
             isShown -> resources.getDimension(R.dimen.music_player_height).toInt()
             else -> 0
         }
+
+        bottomSheetBehavior.peekHeight = musicPlayerHeight
+        pager.setPadding(0, 0, 0, musicPlayerHeight)
     }
 
     fun showMusicPlayer() {
@@ -156,67 +156,6 @@ class PlayMusicFragment : Fragment(),
                 DefaultExtractorsFactory(), null, null)
     }
 
-    private fun setupFloatingSearchView() {
-        Log.d(TAG, "setupFloatingSearchView")
-
-        val drawerLayout = (activity as MainActivity).getDrawerLayout()!!
-
-        floating_search_view.attachNavigationDrawerToMenuButton(drawerLayout)
-
-        floating_search_view.setOnQueryChangeListener { oldQuery, newQuery ->
-            if (oldQuery.isNotBlank() && newQuery.isBlank()) {
-                floating_search_view.clearSuggestions()
-            } else {
-                floating_search_view.showProgress()
-
-                DataHelper.findSuggestions(activity, newQuery, 5,
-                        PlayMusicFragment.FIND_SUGGESTION_SIMULATED_DELAY) { results ->
-                    Log.d(PlayMusicFragment.TAG, "setupFloatingSearchView#setOnQueryChangeListener")
-
-                    floating_search_view.swapSuggestions(results)
-
-                    floating_search_view.hideProgress()
-                }
-            }
-        }
-
-        floating_search_view.setOnSearchListener(object : FloatingSearchView.OnSearchListener {
-            override fun onSearchAction(currentQuery: String?) {
-
-                mLastQuery = currentQuery!!
-
-                DataHelper.findColors(activity, currentQuery
-                ) { results ->
-                    Log.d(PlayMusicFragment.TAG, "setupFloatingSearchView#setOnSearchListener")
-                }
-            }
-
-            override fun onSuggestionClicked(searchSuggestion: SearchSuggestion?) {
-
-                val colorSuggestion = searchSuggestion as ColorSuggestion
-
-                DataHelper.findColors(activity, colorSuggestion.body
-                ) { results ->
-                    Log.d(PlayMusicFragment.TAG, "setupFloatingSearchView#setOnSearchListener")
-                }
-
-                mLastQuery = searchSuggestion.getBody()
-            }
-
-        })
-
-        floating_search_view.setOnFocusChangeListener(object : FloatingSearchView.OnFocusChangeListener {
-            override fun onFocus() {
-
-                floating_search_view.swapSuggestions(DataHelper.getHistory(activity, 3))
-            }
-
-            override fun onFocusCleared() {
-                floating_search_view.setSearchBarTitle(mLastQuery)
-            }
-        })
-    }
-
     private fun setupBottomSheet() {
         val bottomSheetBehavior = BottomSheetBehavior.from(bottom_sheet_music_player)
 
@@ -235,9 +174,43 @@ class PlayMusicFragment : Fragment(),
         })
     }
 
+    private fun setupSearchView() {
+        Log.d(TAG, "setupSearchView")
+
+        val mHistoryDatabase = SearchHistoryTable(context)
+
+        search_view.setVoice(false)
+
+        search_view.versionMargins = SearchView.VersionMargins.TOOLBAR_SMALL
+
+        search_view.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String): Boolean {
+                Log.d(TAG, "onQueryTextSubmit: query=$query")
+
+                mHistoryDatabase.addItem(SearchItem(query))
+                search_view.close(false)
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String): Boolean {
+                return false
+            }
+        })
+
+        search_view.setOnOpenCloseListener(object : SearchView.OnOpenCloseListener {
+            override fun onOpen(): Boolean {
+
+                return true
+            }
+
+            override fun onClose(): Boolean {
+
+                return true
+            }
+        })
+    }
+
     companion object {
         val TAG = PlayMusicFragment::class.java.simpleName
-
-        private val FIND_SUGGESTION_SIMULATED_DELAY = 250L
     }
 }
