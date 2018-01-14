@@ -25,7 +25,6 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
 
     protected val recommendationParameter: RecommendationParameter = RecommendationParameter()
 
-
     override fun onDestroy() {
         Log.d(TAG, "onDestroy")
 
@@ -78,11 +77,29 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
         onCommonApiFailure()
     }
 
+    open protected fun beforeCallFavouriteApi() {
+        if (playMusicFragment!!.isCurrentFavouriteMusicFragment()) {
+            showLoading()
+        }
+    }
+
+    open protected fun beforeCallRecommendationApi() {
+        if (playMusicFragment!!.isCurrentRecommendationMusicFragment()) {
+            showLoading()
+        }
+    }
+
+    open protected fun beforeCallSongsApi() {}
+
     private fun onCommonApiSuccess() {
+        Log.d(TAG, "onCommonApiSuccess")
+
         hideLoading()
     }
 
     private fun onCommonApiFailure() {
+        Log.d(TAG, "onCommonApiFailure")
+
         hideLoading()
         AppDialog.error(R.string.api_service_error_title, R.string.api_service_error_message, activity!!)
     }
@@ -97,6 +114,8 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
 
     @UiThread
     private fun displayLoading(isShown: Boolean) {
+        Log.d(TAG, "displayLoading: isShown=$isShown")
+
         when {
             isShown -> AppDialog.showProgress(R.string.progress_dialog_waiting_message, context!!)
             else -> AppDialog.hideProgress(context!!)
@@ -105,11 +124,15 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
 
     @UiThread
     protected fun showLoading() {
+        Log.d(TAG, "showLoading")
+
         displayLoading(true)
     }
 
     @UiThread
     protected fun hideLoading() {
+        Log.d(TAG, "hideLoading")
+
         displayLoading(false)
     }
 
@@ -127,6 +150,8 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
 
         if (AppUtils.isInternetConnected(context!!)) {
             showLoading()
+
+            beforeCallSongsApi()
 
             getCompositeDisposable().add(
                     ApiServiceFactory.createPlaylistXmlApi().songs(playlist.key)
@@ -147,9 +172,7 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
 
         if (AppUtils.isInternetConnected(context!!)) {
 
-            if (this.playMusicFragment!!.isCurrentRecommendationMusicFragment()) {
-                showLoading()
-            }
+            beforeCallRecommendationApi()
 
             getCompositeDisposable().add(
                     ApiServiceFactory.createCategoryApi().recommendation()
@@ -165,14 +188,12 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
         }
     }
 
-    fun callFavouritePlaylistsApi() {
-        Log.d(TAG, "callFavouritePlaylistsApi")
+    fun callFavouriteApi() {
+        Log.d(TAG, "callFavouriteApi")
 
         if (AppUtils.isInternetConnected(context!!)) {
 
-            if (this.playMusicFragment!!.isCurrentFavouriteMusicFragment()) {
-                showLoading()
-            }
+            beforeCallFavouriteApi()
 
             getCompositeDisposable().add(
                     ApiServiceFactory.createPlaylistApi().favourite()

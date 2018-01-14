@@ -39,9 +39,7 @@ import org.greenrobot.eventbus.Subscribe
  */
 class RecommendedMusicFragment : BaseMusicFragment() {
 
-    private lateinit var controller: RecommendationMusicController
-
-    var recommendationCategories: List<Category> = ArrayList()
+    private var controller: RecommendationMusicController? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_recommended_music, container, false)
@@ -59,20 +57,28 @@ class RecommendedMusicFragment : BaseMusicFragment() {
         super.onStop()
     }
 
+    override fun onPause() {
+        updateControllerData(ArrayList())
+
+        super.onPause()
+    }
+
+    override fun beforeCallRecommendationApi() {
+        super.beforeCallRecommendationApi()
+
+        updateControllerData(ArrayList())
+    }
+
     override fun onRecommendationApiSuccess(categories: List<Category>) {
         super.onRecommendationApiSuccess(categories)
 
-        recommendationCategories = categories
-
-        controller.setData(recommendationCategories)
+        updateControllerData(categories)
     }
 
     override fun onRecommendationApiFailure(error: Throwable) {
         super.onRecommendationApiFailure(error)
 
-        recommendationCategories = ArrayList()
-
-        controller.setData(recommendationCategories)
+        updateControllerData(ArrayList())
     }
 
     @Subscribe
@@ -280,19 +286,14 @@ class RecommendedMusicFragment : BaseMusicFragment() {
 
         recycler_view_categories.clear()
         recycler_view_categories.setController(controller)
-
-        controller.setData(recommendationCategories)
     }
 
-    private fun showCategories() {
-        Log.d(TAG, "showCategories: " + recommendationCategories.size + " items")
-
-        controller.setData(recommendationCategories)
-
-        hideLoading()
+    private fun updateControllerData(categories: List<Category>) {
+        controller?.cancelPendingModelBuild()
+        controller?.setData(categories)
     }
 
-    fun onCheckLocationSettingResult(resultCode: Int) {
+    private fun onCheckLocationSettingResult(resultCode: Int) {
         Log.d(TAG, "onCheckLocationSettingResult: resultCode = $resultCode")
 
         when (resultCode) {

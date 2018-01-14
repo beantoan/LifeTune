@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.support.design.widget.AppBarLayout
 import android.support.design.widget.BottomSheetBehavior
 import android.support.v4.app.Fragment
+import android.support.v4.view.GravityCompat
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -19,6 +20,7 @@ import com.lapism.searchview.SearchItem
 import com.lapism.searchview.SearchView
 import it.unical.mat.lifetune.LifeTuneApplication
 import it.unical.mat.lifetune.R
+import it.unical.mat.lifetune.activity.MainActivity
 import it.unical.mat.lifetune.adapter.PlayMusicPagerAdapter
 import it.unical.mat.lifetune.entity.TrackList
 import kotlinx.android.synthetic.main.fragment_play_music.*
@@ -197,17 +199,17 @@ class PlayMusicFragment : Fragment(),
             }
         })
 
-        search_view.setOnOpenCloseListener(object : SearchView.OnOpenCloseListener {
-            override fun onOpen(): Boolean {
+        search_view.setOnNavigationIconClickListener {
+            Log.d(TAG, "search_view.setOnNavigationIconClickListener")
 
-                return true
+            val drawerLayout = (activity as MainActivity).getDrawerLayout()!!
+
+            if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                drawerLayout.closeDrawer(GravityCompat.START)
+            } else {
+                drawerLayout.openDrawer(GravityCompat.START)
             }
-
-            override fun onClose(): Boolean {
-
-                return true
-            }
-        })
+        }
     }
 
     companion object {

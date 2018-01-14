@@ -20,9 +20,7 @@ import kotlinx.android.synthetic.main.fragment_favorite_music.*
  */
 class FavoriteMusicFragment : BaseMusicFragment() {
 
-    lateinit var controller: FavouriteMusicController
-
-    var favouritePlaylists: List<Playlist> = ArrayList()
+    private var controller: FavouriteMusicController? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         Log.d(TAG, "onCreateView")
@@ -46,20 +44,28 @@ class FavoriteMusicFragment : BaseMusicFragment() {
         onResumeTasks()
     }
 
+    override fun onPause() {
+        updateControllerData(ArrayList())
+
+        super.onPause()
+    }
+
+    override fun beforeCallFavouriteApi() {
+        super.beforeCallFavouriteApi()
+
+        updateControllerData(ArrayList())
+    }
+
     override fun onFavouriteApiSuccess(playlists: List<Playlist>) {
         super.onFavouriteApiSuccess(playlists)
 
-        favouritePlaylists = playlists
-
-        controller.setData(favouritePlaylists)
+        updateControllerData(playlists)
     }
 
     override fun onFavouriteApiFailure(error: Throwable) {
         super.onFavouriteApiFailure(error)
 
-        favouritePlaylists = ArrayList()
-
-        controller.setData(favouritePlaylists)
+        updateControllerData(ArrayList())
     }
 
     private fun onCreateViewTasks(view: View) {
@@ -71,7 +77,7 @@ class FavoriteMusicFragment : BaseMusicFragment() {
     }
 
     private fun onResumeTasks() {
-        callFavouritePlaylistsApi()
+        callFavouriteApi()
     }
 
     private fun setupRecyclerViewPlaylists() {
@@ -90,8 +96,11 @@ class FavoriteMusicFragment : BaseMusicFragment() {
 
         recycler_view_playlists.clear()
         recycler_view_playlists.setController(controller)
+    }
 
-        controller.setData(favouritePlaylists)
+    private fun updateControllerData(playlists: List<Playlist>) {
+        controller?.cancelPendingModelBuild()
+        controller?.setData(playlists)
     }
 
     companion object {

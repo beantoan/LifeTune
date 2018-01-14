@@ -41,6 +41,7 @@ import kotlinx.android.synthetic.main.fragment_nearby_places.*
 import java.io.File
 import java.io.FileOutputStream
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 /**
@@ -55,7 +56,7 @@ class NearbyPlacesFragmentBase : BaseLocationFragment(),
 
     private var mainActivity: MainActivity? = null
 
-    private lateinit var controller: NearbyPlacesController
+    private var controller: NearbyPlacesController? = null
 
     private var isLoadingPlaces = false
 
@@ -77,6 +78,12 @@ class NearbyPlacesFragmentBase : BaseLocationFragment(),
         super.onViewCreated(view, savedInstanceState)
 
         onViewCreatedTasks()
+    }
+
+    override fun onPause() {
+        updateControllerData(ArrayList())
+
+        super.onPause()
     }
 
     override fun onCheckLocationSettingResult(event: ActivityResultEvent) {
@@ -142,7 +149,7 @@ class NearbyPlacesFragmentBase : BaseLocationFragment(),
         recycler_view_nearby_places.clear()
         recycler_view_nearby_places.setController(controller)
 
-        controller.setData(nearbyPlaces)
+        controller?.setData(nearbyPlaces)
     }
 
     private fun setupBottomSheet() {
@@ -309,7 +316,12 @@ class NearbyPlacesFragmentBase : BaseLocationFragment(),
                     place.phoneNumber.toString(), place.latLng, place.rating))
         }
 
-        controller.setData(nearbyPlaces)
+        updateControllerData(nearbyPlaces)
+    }
+
+    private fun updateControllerData(places: List<Place>) {
+        controller?.cancelPendingModelBuild()
+        controller?.setData(places)
     }
 
     private fun addNearbyPlacesToMap() {
