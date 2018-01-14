@@ -15,7 +15,6 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -42,6 +41,7 @@ import kotlinx.android.synthetic.main.fragment_nearby_places.*
 import java.io.File
 import java.io.FileOutputStream
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 /**
@@ -56,7 +56,7 @@ class NearbyPlacesFragmentBase : BaseLocationFragment(),
 
     private var mainActivity: MainActivity? = null
 
-    private lateinit var controller: NearbyPlacesController
+    private var controller: NearbyPlacesController? = null
 
     private var isLoadingPlaces = false
 
@@ -78,6 +78,12 @@ class NearbyPlacesFragmentBase : BaseLocationFragment(),
         super.onViewCreated(view, savedInstanceState)
 
         onViewCreatedTasks()
+    }
+
+    override fun onPause() {
+        updateControllerData(ArrayList())
+
+        super.onPause()
     }
 
     override fun onCheckLocationSettingResult(event: ActivityResultEvent) {
@@ -143,11 +149,11 @@ class NearbyPlacesFragmentBase : BaseLocationFragment(),
         recycler_view_nearby_places.clear()
         recycler_view_nearby_places.setController(controller)
 
-        controller.setData(nearbyPlaces)
+        controller?.setData(nearbyPlaces)
     }
 
     private fun setupBottomSheet() {
-        val bottomSheetBehavior = BottomSheetBehavior.from(bottom_sheet)
+        val bottomSheetBehavior = BottomSheetBehavior.from(bottom_sheet_google_map)
 
         show_map.setOnClickListener {
             if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
@@ -158,8 +164,6 @@ class NearbyPlacesFragmentBase : BaseLocationFragment(),
                 show_map.text = getString(R.string.button_hide_map_title)
             }
         }
-
-        val tv = TypedValue()
 
         bottomSheetBehavior.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
@@ -312,7 +316,12 @@ class NearbyPlacesFragmentBase : BaseLocationFragment(),
                     place.phoneNumber.toString(), place.latLng, place.rating))
         }
 
-        controller.setData(nearbyPlaces)
+        updateControllerData(nearbyPlaces)
+    }
+
+    private fun updateControllerData(places: List<Place>) {
+        controller?.cancelPendingModelBuild()
+        controller?.setData(places)
     }
 
     private fun addNearbyPlacesToMap() {

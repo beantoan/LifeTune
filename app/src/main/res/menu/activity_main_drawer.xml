@@ -13,10 +13,6 @@
             android:title="@string/nav_my_activities_title"
             android:icon="@drawable/ic_directions_run_black_24dp" />
         <item
-            android:id="@+id/nav_schedules"
-            android:title="@string/nav_schedules_title"
-            android:icon="@drawable/ic_schedule_black_24dp" />
-        <item
             android:id="@+id/nav_nearby_places"
             android:title="@string/nav_nearby_places_title"
             android:icon="@drawable/ic_location_on_black_24dp" />
@@ -24,9 +20,6 @@
 
     <item android:title="@string/nav_settings_title">
         <menu>
-            <item
-                android:id="@+id/nav_share"
-                android:title="@string/nav_my_profile_title" />
             <item
                 android:id="@+id/nav_send"
                 android:title="@string/nav_logout_title" />
