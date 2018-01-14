@@ -33,7 +33,7 @@ public class FullPlaylistModelGroup extends EpoxyModelGroup {
 
         // Header for FullPlaylistCarousel
         FullPlaylistHeaderModel_ fullPlaylistHeaderModel = new FullPlaylistHeaderModel_(_playlist);
-        fullPlaylistHeaderModel.id(_playlist.getId());
+        fullPlaylistHeaderModel.id("header-" + _playlist.getId());
         fullPlaylistHeaderModel.clickListener((model, parentView, clickedView, position) -> {
             Log.d(TAG, "FullPlaylistHeaderModel_.clickListener position=" + position);
             callbacks.onPlaylistClicked(model.playlist);
@@ -57,6 +57,10 @@ public class FullPlaylistModelGroup extends EpoxyModelGroup {
         fullPlaylistCarouselViewModel.models(songModels);
 
         models.add(fullPlaylistCarouselViewModel);
+
+        FullPlaylistFooterModel_ fullPlaylistFooterModel = new FullPlaylistFooterModel_(_playlist);
+        fullPlaylistFooterModel.id("footer-" + _playlist.getId());
+        models.add(fullPlaylistFooterModel);
 
         return models;
     }

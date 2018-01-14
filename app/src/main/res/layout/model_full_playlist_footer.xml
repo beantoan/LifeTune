@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+        <variable
+            name="playlist"
+            type="it.unical.mat.lifetune.entity.Playlist" />
+
+        <variable
+            name="clickListener"
+            type="android.view.View.OnClickListener" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:paddingBottom="5dp"
+        android:orientation="horizontal">
+
+        <com.mikepenz.iconics.view.IconicsButton
+            android:text="{faw-heart} Unlike"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
+
+            android:foreground="?android:attr/selectableItemBackground" />
+
+        <com.mikepenz.iconics.view.IconicsButton
+            android:text="{faw-share-alt} Share"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground" />
+    </LinearLayout>
+</layout>

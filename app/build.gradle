@@ -116,6 +116,9 @@ dependencies {
     implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3'
     implementation 'com.google.android:flexbox:0.3.2'
     implementation 'com.lapism:searchview:5.0.0-alpha7'
+    implementation "com.mikepenz:iconics-core:3.0.0@aar"
+    implementation 'com.mikepenz:fontawesome-typeface:4.7.0.2@aar'
+    implementation "com.mikepenz:iconics-views:3.0.0@aar"
 }
 
 apply plugin: 'com.google.gms.google-services'

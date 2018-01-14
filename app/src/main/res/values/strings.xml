@@ -55,5 +55,7 @@
     <string name="get_current_location_error_message">Cannot locate your location</string>
     <string name="button_hide_map_title">Hide map</string>
     <string name="locating_location_title">Locating your location ...</string>
+    <string name="button_unlike_title">Unlike</string>
+    <string name="button_share_title">Share</string>
 
 </resources>
