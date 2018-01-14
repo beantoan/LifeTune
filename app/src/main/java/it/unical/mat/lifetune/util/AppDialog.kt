@@ -20,6 +20,7 @@ object AppDialog {
     private val TAG = "AppDialog"
 
     private var alertDialog: SweetAlertDialog? = null
+    private var isShowingProgressDialog: Boolean = false
     private var progressDialog: ProgressDialog? = null
 
     fun hideAlert(activity: Activity) {
@@ -84,16 +85,24 @@ object AppDialog {
     }
 
     private fun initProgressDialog(context: Context) {
-        AppDialog.progressDialog = ProgressDialog(context)
-        AppDialog.progressDialog!!.setCancelable(true)
-        AppDialog.progressDialog!!.setCanceledOnTouchOutside(true)
-        AppDialog.progressDialog!!.setMessage(context.getString(R.string.progress_dialog_waiting_message))
+        if (AppDialog.progressDialog == null) {
+            AppDialog.progressDialog = ProgressDialog(context)
+            AppDialog.progressDialog!!.setCancelable(true)
+            AppDialog.progressDialog!!.setCanceledOnTouchOutside(true)
+            AppDialog.progressDialog!!.setMessage(context.getString(R.string.progress_dialog_waiting_message))
+        }
     }
 
     fun hideProgress(context: Context) {
+        if (!isShowingProgressDialog) {
+            return
+        }
+        
         if (AppDialog.progressDialog != null) {
             try {
                 AppDialog.progressDialog!!.dismiss()
+
+                isShowingProgressDialog = false
 
             } catch (e: Exception) {
                 Log.e(TAG, "hideProgress", e)
@@ -102,6 +111,10 @@ object AppDialog {
     }
 
     fun showProgress(messageId: Int?, context: Context) {
+        if (isShowingProgressDialog) {
+            return
+        }
+        
         AppDialog.initProgressDialog(context)
 
         AppDialog.hideProgress(context)
@@ -113,6 +126,8 @@ object AppDialog {
 
             try {
                 AppDialog.progressDialog!!.show()
+
+                isShowingProgressDialog = true
 
             } catch (e: Exception) {
                 Log.e(TAG, "showProgress", e)

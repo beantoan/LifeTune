@@ -25,6 +25,16 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
 
     protected val recommendationParameter: RecommendationParameter = RecommendationParameter()
 
+    abstract protected fun startLoadingData()
+
+    abstract protected fun clearControllerData()
+
+    override fun onResume() {
+        super.onResume()
+
+        startLoadingData()
+    }
+
     override fun onDestroy() {
         Log.d(TAG, "onDestroy")
 
@@ -89,9 +99,9 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
         }
     }
 
-    open protected fun beforeCallSongsApi() {}
-
-    open fun startLoadingData() {}
+    open protected fun beforeCallSongsApi() {
+        showLoading()
+    }
 
     private fun onCommonApiSuccess() {
         Log.d(TAG, "onCommonApiSuccess")
@@ -118,10 +128,10 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
     private fun displayLoading(isShown: Boolean) {
         Log.d(TAG, "displayLoading: isShown=$isShown")
 
-//        when {
-//            isShown -> AppDialog.showProgress(R.string.progress_dialog_waiting_message, context!!)
-//            else -> AppDialog.hideProgress(context!!)
-//        }
+        when {
+            isShown -> AppDialog.showProgress(R.string.progress_dialog_waiting_message, context!!)
+            else -> AppDialog.hideProgress(context!!)
+        }
     }
 
     @UiThread
@@ -151,8 +161,6 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
         Log.d(TAG, "callSongsApi#${playlist.id}-${playlist.title}")
 
         if (AppUtils.isInternetConnected(context!!)) {
-            showLoading()
-
             beforeCallSongsApi()
 
             getCompositeDisposable().add(
@@ -193,7 +201,7 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
     fun callFavouriteApi() {
         Log.d(TAG, "callFavouriteApi")
 
-        if (AppUtils.isInternetConnected(context!!)) {
+        if (AppUtils.isInternetConnected(activity!!)) {
 
             beforeCallFavouriteApi()
 

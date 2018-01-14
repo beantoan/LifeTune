@@ -31,6 +31,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import it.unical.mat.lifetune.BuildConfig
 import it.unical.mat.lifetune.R
 import it.unical.mat.lifetune.activity.MainActivity
+import it.unical.mat.lifetune.adapter.NearbyPlacesAdapter
 import it.unical.mat.lifetune.controller.NearbyPlacesController
 import it.unical.mat.lifetune.decoration.RecyclerViewDividerItemDecoration
 import it.unical.mat.lifetune.entity.ActivityResultEvent
@@ -56,11 +57,9 @@ class NearbyPlacesFragment : BaseLocationFragment(),
 
     private var mainActivity: MainActivity? = null
 
-    private var controller: NearbyPlacesController? = null
+    private var adapter = NearbyPlacesAdapter(ArrayList())
 
     private var isLoadingPlaces = false
-
-    private val nearbyPlaces = ArrayList<Place>()
 
     private var googleMap: GoogleMap? = null
 
@@ -81,7 +80,7 @@ class NearbyPlacesFragment : BaseLocationFragment(),
     }
 
     override fun onPause() {
-        updateControllerData(ArrayList())
+        updateAdapterData(ArrayList())
 
         super.onPause()
     }
@@ -126,9 +125,9 @@ class NearbyPlacesFragment : BaseLocationFragment(),
 
         setupRecyclerViewNearbyPlaces()
 
-        setupNearbyPlacesController()
-
         setupBottomSheet()
+
+        initializeGoogleMap()
     }
 
     private fun setupRecyclerViewNearbyPlaces() {
@@ -139,17 +138,8 @@ class NearbyPlacesFragment : BaseLocationFragment(),
 
         recycler_view_nearby_places.layoutManager = LinearLayoutManager(activity!!.applicationContext)
         recycler_view_nearby_places.addItemDecoration(dividerItemDecoration)
-    }
 
-    private fun setupNearbyPlacesController() {
-        Log.d(TAG, "setupNearbyPlacesController")
-
-        controller = NearbyPlacesController(this)
-
-        recycler_view_nearby_places.clear()
-        recycler_view_nearby_places.setController(controller)
-
-        controller?.setData(nearbyPlaces)
+        recycler_view_nearby_places.adapter = adapter
     }
 
     private fun setupBottomSheet() {
@@ -164,22 +154,6 @@ class NearbyPlacesFragment : BaseLocationFragment(),
                 show_map.text = getString(R.string.button_hide_map_title)
             }
         }
-
-        bottomSheetBehavior.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
-            override fun onSlide(bottomSheet: View, slideOffset: Float) {
-
-            }
-
-            override fun onStateChanged(bottomSheet: View, newState: Int) {
-                when (newState) {
-                    BottomSheetBehavior.STATE_DRAGGING -> bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-                    BottomSheetBehavior.STATE_EXPANDED -> {
-                        showGoogleMap()
-                    }
-                }
-            }
-        })
-
     }
 
     private fun callSnapshotLocationApi() {
@@ -225,7 +199,9 @@ class NearbyPlacesFragment : BaseLocationFragment(),
         }
     }
 
-    private fun showGoogleMap() {
+    private fun initializeGoogleMap() {
+        Log.d(TAG, "initializeGoogleMap")
+
         if (googleMap == null) {
             val map = childFragmentManager.findFragmentById(R.id.google_map) as SupportMapFragment
 
@@ -238,13 +214,9 @@ class NearbyPlacesFragment : BaseLocationFragment(),
                 }
 
                 zoomToCurrentAddressOnMap()
-
-                addNearbyPlacesToMap()
             }
         } else {
             zoomToCurrentAddressOnMap()
-
-            addNearbyPlacesToMap()
         }
     }
 
@@ -280,11 +252,11 @@ class NearbyPlacesFragment : BaseLocationFragment(),
                         .addOnSuccessListener(activity!!, { placesResponse ->
                             Log.d(TAG, "Awareness.getSnapshotClient#places#addOnSuccessListener")
 
-                            showNearbyPlaces(placesResponse.placeLikelihoods)
+                            val places = parseNearbyPlaces(placesResponse.placeLikelihoods)
 
-                            addNearbyPlacesToMap()
+                            updateAdapterData(places)
 
-//                            getPhotosOfNearbyPlaces()
+                            addNearbyPlacesToMap(places)
                         })
                         .addOnFailureListener(activity!!, { e ->
                             Crashlytics.log(Log.ERROR, TAG, "Awareness.getSnapshotClient#places#addOnFailureListener:" + e)
@@ -302,36 +274,38 @@ class NearbyPlacesFragment : BaseLocationFragment(),
         }
     }
 
-    private fun showNearbyPlaces(placeLikelihoods: List<PlaceLikelihood>?) {
+    private fun parseNearbyPlaces(placeLikelihoods: List<PlaceLikelihood>?): List<Place> {
         Log.d(TAG, "showNearbyPlaces")
 
-        nearbyPlaces.clear()
+        val places = ArrayList<Place>()
 
         placeLikelihoods?.forEach { placeLikelihood ->
             Log.d(TAG, placeLikelihood.toString())
 
-            val place = placeLikelihood.place
+            val place = Place(placeLikelihood.place.id, placeLikelihood.place.name.toString(),
+                    placeLikelihood.place.address.toString(), placeLikelihood.place.phoneNumber.toString(),
+                    placeLikelihood.place.latLng, placeLikelihood.place.rating)
 
-            nearbyPlaces.add(Place(place.id, place.name.toString(), place.address.toString(),
-                    place.phoneNumber.toString(), place.latLng, place.rating))
+            places.add(place)
         }
 
-        updateControllerData(nearbyPlaces)
+        return places
     }
 
-    private fun updateControllerData(places: List<Place>) {
-        controller?.cancelPendingModelBuild()
-        controller?.setData(places)
+    private fun updateAdapterData(places: List<Place>) {
+        Log.d(TAG, "updateAdapterData: places.size=${places.size}")
+
+        adapter.addAll(places)
     }
 
-    private fun addNearbyPlacesToMap() {
-        Log.d(TAG, "addNearbyPlacesToMap")
+    private fun addNearbyPlacesToMap(places: List<Place>) {
+        Log.d(TAG, "addNearbyPlacesToMap: places.size=${places.size}")
 
         if (googleMap != null) {
 
             googleMap?.clear()
 
-            nearbyPlaces.forEach { place ->
+            places.forEach { place ->
 
                 val markerOptions = MarkerOptions()
                 markerOptions.title(place.name)
@@ -379,10 +353,10 @@ class NearbyPlacesFragment : BaseLocationFragment(),
         return null
     }
 
-    private fun getPhotosOfNearbyPlaces() {
+    private fun getPhotosOfNearbyPlaces(places: List<Place>) {
         Log.d(TAG, "getPhotosOfNearbyPlaces")
 
-        if (nearbyPlaces.isNotEmpty()) {
+        if (places.isNotEmpty()) {
             val photosDirPath = getPhotosDir()
 
             clearPhotosDir(photosDirPath)
@@ -391,12 +365,12 @@ class NearbyPlacesFragment : BaseLocationFragment(),
 
             val geoDataClient = Places.getGeoDataClient(context!!, null)
 
-            getPhotosForPlace(geoDataClient, photosDirPath)
+            getPhotosForPlace(geoDataClient, photosDirPath, places)
         }
     }
 
-    private fun getPhotosForPlace(geoDataClient: GeoDataClient, photosDirPath: String) {
-        nearbyPlaces.forEach { place ->
+    private fun getPhotosForPlace(geoDataClient: GeoDataClient, photosDirPath: String, places: List<Place>) {
+        places.forEach { place ->
 
             geoDataClient.getPlacePhotos(place.id)
                     .addOnCompleteListener(activity!!, { placePhotoMetadataResponse ->

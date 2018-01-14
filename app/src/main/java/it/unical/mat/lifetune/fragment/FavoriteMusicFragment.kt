@@ -36,14 +36,6 @@ class FavoriteMusicFragment : BaseMusicFragment() {
         onCreateViewTasks(view)
     }
 
-    override fun onResume() {
-        Log.d(TAG, "onResume")
-
-        super.onResume()
-
-        onResumeTasks()
-    }
-
     override fun onPause() {
         updateControllerData(ArrayList())
 
@@ -72,16 +64,16 @@ class FavoriteMusicFragment : BaseMusicFragment() {
         callFavouriteApi()
     }
 
+    override fun clearControllerData() {
+        updateControllerData(ArrayList())
+    }
+
     private fun onCreateViewTasks(view: View) {
         Log.d(TAG, "onCreateViewTasks")
 
         setupRecyclerViewPlaylists()
 
         setupMusicController()
-    }
-
-    private fun onResumeTasks() {
-
     }
 
     private fun setupRecyclerViewPlaylists() {
@@ -96,13 +88,16 @@ class FavoriteMusicFragment : BaseMusicFragment() {
 
     private fun setupMusicController() {
         Log.d(TAG, "setupMusicController")
+
         controller = FavouriteMusicController(this)
 
         recycler_view_playlists.clear()
-        recycler_view_playlists.setController(controller)
+        recycler_view_playlists.setController(controller!!)
     }
 
     private fun updateControllerData(playlists: List<Playlist>) {
+        Log.d(TAG, "updateControllerData")
+        
         controller?.cancelPendingModelBuild()
         controller?.setData(playlists)
     }

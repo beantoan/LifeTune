@@ -57,12 +57,6 @@ class RecommendedMusicFragment : BaseMusicFragment() {
         super.onStop()
     }
 
-    override fun onPause() {
-        updateControllerData(ArrayList())
-
-        super.onPause()
-    }
-
     override fun beforeCallRecommendationApi() {
         super.beforeCallRecommendationApi()
 
@@ -83,6 +77,10 @@ class RecommendedMusicFragment : BaseMusicFragment() {
 
     override fun startLoadingData() {
         checkLocationSetting()
+    }
+
+    override fun clearControllerData() {
+        updateControllerData(ArrayList())
     }
 
     @Subscribe
@@ -289,10 +287,12 @@ class RecommendedMusicFragment : BaseMusicFragment() {
         controller = RecommendationMusicController(this)
 
         recycler_view_categories.clear()
-        recycler_view_categories.setController(controller)
+        recycler_view_categories.setController(controller!!)
     }
 
     private fun updateControllerData(categories: List<Category>) {
+        Log.d(TAG, "updateControllerData")
+        
         controller?.cancelPendingModelBuild()
         controller?.setData(categories)
     }

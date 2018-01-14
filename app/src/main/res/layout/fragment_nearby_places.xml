@@ -32,7 +32,7 @@
         android:paddingBottom="60dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <com.airbnb.epoxy.EpoxyRecyclerView
+        <android.support.v7.widget.RecyclerView
             android:id="@+id/recycler_view_nearby_places"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -49,7 +49,7 @@ object ActivityUtils {
     }
 
     fun replaceFragmentToPlaceholder(fragmentManager: FragmentManager,
-                                     fragment: Fragment, frameId: Int, tag: String?) {
+                                     fragment: Fragment, frameId: Int, tag: String? = null) {
         val transaction = fragmentManager.beginTransaction()
         if (tag == null) {
             transaction.replace(frameId, fragment)
