@@ -51,7 +51,7 @@ import kotlin.collections.ArrayList
 /**
  * A dummy fragment representing a section of the app, but that simply displays dummy text.
  */
-class NearbyPlacesFragmentBase : BaseLocationFragment(),
+class NearbyPlacesFragment : BaseLocationFragment(),
         NearbyPlacesController.AdapterCallbacks {
 
     private var mainActivity: MainActivity? = null
@@ -444,7 +444,7 @@ class NearbyPlacesFragmentBase : BaseLocationFragment(),
     }
 
     companion object {
-        val TAG = NearbyPlacesFragmentBase::class.java.simpleName
+        val TAG = NearbyPlacesFragment::class.java.simpleName
 
         val GOOGLE_MAP_ZOOM_LEVEL = 15f
     }

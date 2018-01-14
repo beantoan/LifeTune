@@ -25,7 +25,7 @@ import com.google.firebase.crash.FirebaseCrash
 import it.unical.mat.lifetune.R
 import it.unical.mat.lifetune.entity.ActivityResultEvent
 import it.unical.mat.lifetune.fragment.MyActivitiesFragment
-import it.unical.mat.lifetune.fragment.NearbyPlacesFragmentBase
+import it.unical.mat.lifetune.fragment.NearbyPlacesFragment
 import it.unical.mat.lifetune.fragment.PlayMusicFragment
 import it.unical.mat.lifetune.fragment.SchedulesFragment
 import it.unical.mat.lifetune.util.AppDialog
@@ -48,7 +48,7 @@ class MainActivity :
 
     private var schedulesFragment: SchedulesFragment? = null
 
-    private var nearbyPlacesFragment: NearbyPlacesFragmentBase? = null
+    private var nearbyPlacesFragment: NearbyPlacesFragment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG, "onCreate")
@@ -195,11 +195,11 @@ class MainActivity :
         Log.d(TAG, "showNearbyPlacesFragment")
 
         if (nearbyPlacesFragment == null) {
-            nearbyPlacesFragment = NearbyPlacesFragmentBase()
+            nearbyPlacesFragment = NearbyPlacesFragment()
         }
 
         ActivityUtils.addOrAttachFragment(supportFragmentManager,
-                nearbyPlacesFragment!!, R.id.content_main_placeholder, NearbyPlacesFragmentBase.TAG)
+                nearbyPlacesFragment!!, R.id.content_main_placeholder, NearbyPlacesFragment.TAG)
 
     }
 
