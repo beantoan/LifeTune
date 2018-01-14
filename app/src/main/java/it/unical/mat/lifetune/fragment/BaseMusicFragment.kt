@@ -3,7 +3,7 @@ package it.unical.mat.lifetune.fragment
 import android.support.annotation.UiThread
 import android.support.v4.app.Fragment
 import android.util.Log
-import com.google.firebase.crash.FirebaseCrash
+import com.crashlytics.android.Crashlytics
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -33,8 +33,8 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
         } catch (err: Exception) {
             Log.e(TAG, "errorOnDestroy", err)
 
-            FirebaseCrash.logcat(Log.ERROR, TAG, "errorOnDestroy" + err)
-            FirebaseCrash.report(err)
+            Crashlytics.log(Log.ERROR, TAG, "errorOnDestroy" + err)
+            Crashlytics.logException(err)
         }
 
         super.onDestroy()
@@ -58,8 +58,8 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
     }
 
     open protected fun onRecommendationApiFailure(error: Throwable) {
-        FirebaseCrash.logcat(Log.ERROR, TAG, "onRecommendationApiFailure:" + error)
-        FirebaseCrash.report(error)
+        Crashlytics.log(Log.ERROR, TAG, "onRecommendationApiFailure:" + error)
+        Crashlytics.logException(error)
 
         onCommonApiFailure()
     }
@@ -71,8 +71,8 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
     }
 
     open protected fun onFavouriteApiFailure(error: Throwable) {
-        FirebaseCrash.logcat(Log.ERROR, TAG, "onFavouriteApiFailure:" + error)
-        FirebaseCrash.report(error)
+        Crashlytics.log(Log.ERROR, TAG, "onFavouriteApiFailure:" + error)
+        Crashlytics.logException(error)
 
         onCommonApiFailure()
     }
@@ -90,6 +90,8 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
     }
 
     open protected fun beforeCallSongsApi() {}
+
+    open fun startLoadingData() {}
 
     private fun onCommonApiSuccess() {
         Log.d(TAG, "onCommonApiSuccess")
@@ -116,10 +118,10 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
     private fun displayLoading(isShown: Boolean) {
         Log.d(TAG, "displayLoading: isShown=$isShown")
 
-        when {
-            isShown -> AppDialog.showProgress(R.string.progress_dialog_waiting_message, context!!)
-            else -> AppDialog.hideProgress(context!!)
-        }
+//        when {
+//            isShown -> AppDialog.showProgress(R.string.progress_dialog_waiting_message, context!!)
+//            else -> AppDialog.hideProgress(context!!)
+//        }
     }
 
     @UiThread
@@ -220,8 +222,8 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
 
     @UiThread
     private fun onSongsApiFailure(error: Throwable) {
-        FirebaseCrash.logcat(Log.ERROR, TAG, "onSongsApiFailure:" + error)
-        FirebaseCrash.report(error)
+        Crashlytics.log(Log.ERROR, TAG, "onSongsApiFailure:" + error)
+        Crashlytics.logException(error)
         
         playSongs(null)
 

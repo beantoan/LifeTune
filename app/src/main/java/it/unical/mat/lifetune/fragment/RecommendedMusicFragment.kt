@@ -14,6 +14,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.crashlytics.android.Crashlytics
 import com.google.android.gms.awareness.Awareness
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.ResolvableApiException
@@ -21,7 +22,6 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.LocationSettingsRequest
 import com.google.android.gms.location.LocationSettingsStatusCodes
-import com.google.firebase.crash.FirebaseCrash
 import it.unical.mat.lifetune.R
 import it.unical.mat.lifetune.controller.RecommendationMusicController
 import it.unical.mat.lifetune.decoration.RecyclerViewDividerItemDecoration
@@ -81,6 +81,10 @@ class RecommendedMusicFragment : BaseMusicFragment() {
         updateControllerData(ArrayList())
     }
 
+    override fun startLoadingData() {
+        checkLocationSetting()
+    }
+
     @Subscribe
     fun onActivityResultEvent(event: ActivityResultEvent) {
         Log.d(TAG, "onActivityResultEvent: requestCode=${event.requestCode}, resultCode=${event.resultCode}")
@@ -133,8 +137,8 @@ class RecommendedMusicFragment : BaseMusicFragment() {
                     callSnapshotLocationApi()
 
                 } catch (exception: ApiException) {
-                    FirebaseCrash.logcat(Log.ERROR, TAG, "checkLocationSetting#addOnCompleteListener#ApiException:" + exception)
-                    FirebaseCrash.report(exception)
+                    Crashlytics.log(Log.ERROR, TAG, "checkLocationSetting#addOnCompleteListener#ApiException:" + exception)
+                    Crashlytics.logException(exception)
 
                     when (exception.statusCode) {
                         LocationSettingsStatusCodes.RESOLUTION_REQUIRED -> {
@@ -144,13 +148,13 @@ class RecommendedMusicFragment : BaseMusicFragment() {
                                 resolvable.startResolutionForResult(activity, CHECK_LOCATION_SETTINGS_REQUEST_CODE)
 
                             } catch (e: IntentSender.SendIntentException) {
-                                FirebaseCrash.logcat(Log.ERROR, TAG, "checkLocationSetting#addOnCompleteListener#SendIntentException:" + e)
-                                FirebaseCrash.report(e)
+                                Crashlytics.log(Log.ERROR, TAG, "checkLocationSetting#addOnCompleteListener#SendIntentException:" + e)
+                                Crashlytics.logException(e)
 
                                 AppDialog.warning(R.string.error_turn_on_location_title, R.string.error_turn_on_location_message, activity!!)
                             } catch (e: ClassCastException) {
-                                FirebaseCrash.logcat(Log.ERROR, TAG, "checkLocationSetting#addOnCompleteListener#ClassCastException:" + e)
-                                FirebaseCrash.report(e)
+                                Crashlytics.log(Log.ERROR, TAG, "checkLocationSetting#addOnCompleteListener#ClassCastException:" + e)
+                                Crashlytics.logException(e)
 
                                 AppDialog.warning(R.string.error_turn_on_location_title, R.string.error_turn_on_location_message, activity!!)
                             }
@@ -189,15 +193,15 @@ class RecommendedMusicFragment : BaseMusicFragment() {
 
                                 recommendationParameter.countryCode = countryCode
                             } catch (e: Exception) {
-                                FirebaseCrash.logcat(Log.ERROR, TAG, "Awareness.getSnapshotClient#location#addOnSuccessListener:" + e)
-                                FirebaseCrash.report(e)
+                                Crashlytics.log(Log.ERROR, TAG, "Awareness.getSnapshotClient#location#addOnSuccessListener:" + e)
+                                Crashlytics.logException(e)
                             }
 
                             callSnapshotActivity()
                         })
                         .addOnFailureListener(activity!!, { e ->
-                            FirebaseCrash.logcat(Log.ERROR, TAG, "Awareness.getSnapshotClient#location#addOnFailureListener:" + e)
-                            FirebaseCrash.report(e)
+                            Crashlytics.log(Log.ERROR, TAG, "Awareness.getSnapshotClient#location#addOnFailureListener:" + e)
+                            Crashlytics.logException(e)
 
                             recommendationParameter.countryCode = null
 
@@ -226,8 +230,8 @@ class RecommendedMusicFragment : BaseMusicFragment() {
                         callSnapshotWeather()
                     })
                     .addOnFailureListener(activity!!, { e ->
-                        FirebaseCrash.logcat(Log.ERROR, TAG, "Awareness.getSnapshotClient#detectedActivity#addOnFailureListener:" + e)
-                        FirebaseCrash.report(e)
+                        Crashlytics.log(Log.ERROR, TAG, "Awareness.getSnapshotClient#detectedActivity#addOnFailureListener:" + e)
+                        Crashlytics.logException(e)
 
                         recommendationParameter.activityType = null
 
@@ -256,8 +260,8 @@ class RecommendedMusicFragment : BaseMusicFragment() {
                             callRecommendationApi()
                         })
                         .addOnFailureListener(activity!!, { e ->
-                            FirebaseCrash.logcat(Log.ERROR, TAG, "Awareness.getSnapshotClient#weather#addOnFailureListener:" + e)
-                            FirebaseCrash.report(e)
+                            Crashlytics.log(Log.ERROR, TAG, "Awareness.getSnapshotClient#weather#addOnFailureListener:" + e)
+                            Crashlytics.logException(e)
 
                             recommendationParameter.temp = null
 

@@ -3,6 +3,7 @@ package it.unical.mat.lifetune.adapter
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
+import it.unical.mat.lifetune.fragment.BaseMusicFragment
 import it.unical.mat.lifetune.fragment.FavoriteMusicFragment
 import it.unical.mat.lifetune.fragment.PlayMusicFragment
 import it.unical.mat.lifetune.fragment.RecommendedMusicFragment
@@ -26,6 +27,10 @@ class PlayMusicPagerAdapter(playMusicFragment: PlayMusicFragment, fragmentManage
     override fun getPageTitle(position: Int): CharSequence = when (position) {
         RECOMMENDATION_MUSIC_FRAGMENT -> "Recommendation"
         else -> "Favourite"
+    }
+
+    fun currentMusicFragment(position: Int): BaseMusicFragment {
+        return getItem(position) as BaseMusicFragment
     }
 
     companion object {

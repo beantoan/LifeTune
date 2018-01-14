@@ -18,6 +18,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.crashlytics.android.Crashlytics
 import com.google.android.gms.awareness.Awareness
 import com.google.android.gms.location.places.GeoDataClient
 import com.google.android.gms.location.places.PlaceLikelihood
@@ -27,7 +28,6 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.firebase.crash.FirebaseCrash
 import it.unical.mat.lifetune.BuildConfig
 import it.unical.mat.lifetune.R
 import it.unical.mat.lifetune.activity.MainActivity
@@ -196,8 +196,8 @@ class NearbyPlacesFragment : BaseLocationFragment(),
                             getCurrentAddress(locationResponse.location)
                         })
                         .addOnFailureListener(activity!!, { e ->
-                            FirebaseCrash.logcat(Log.ERROR, TAG, "Awareness.getSnapshotClient#location#addOnFailureListener:" + e)
-                            FirebaseCrash.report(e)
+                            Crashlytics.log(Log.ERROR, TAG, "Awareness.getSnapshotClient#location#addOnFailureListener:" + e)
+                            Crashlytics.logException(e)
                         })
             }
         }
@@ -220,8 +220,8 @@ class NearbyPlacesFragment : BaseLocationFragment(),
             zoomToCurrentAddressOnMap()
 
         } catch (e: Exception) {
-            FirebaseCrash.logcat(Log.ERROR, TAG, "getCurrentAddress:" + e)
-            FirebaseCrash.report(e)
+            Crashlytics.log(Log.ERROR, TAG, "getCurrentAddress:" + e)
+            Crashlytics.logException(e)
         }
     }
 
@@ -287,8 +287,8 @@ class NearbyPlacesFragment : BaseLocationFragment(),
 //                            getPhotosOfNearbyPlaces()
                         })
                         .addOnFailureListener(activity!!, { e ->
-                            FirebaseCrash.logcat(Log.ERROR, TAG, "Awareness.getSnapshotClient#places#addOnFailureListener:" + e)
-                            FirebaseCrash.report(e)
+                            Crashlytics.log(Log.ERROR, TAG, "Awareness.getSnapshotClient#places#addOnFailureListener:" + e)
+                            Crashlytics.logException(e)
 
                             isLoadingPlaces = false
 

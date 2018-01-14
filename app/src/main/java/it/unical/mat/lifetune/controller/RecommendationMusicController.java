@@ -2,7 +2,7 @@ package it.unical.mat.lifetune.controller;
 
 import android.util.Log;
 
-import com.google.firebase.crash.FirebaseCrash;
+import com.crashlytics.android.Crashlytics;
 
 import java.util.List;
 
@@ -26,8 +26,8 @@ public class RecommendationMusicController extends BaseMusicController<List<Cate
 
     @Override
     protected void onExceptionSwallowed(RuntimeException exception) {
-        FirebaseCrash.logcat(Log.ERROR, TAG, "onExceptionSwallowed:" + exception);
-        FirebaseCrash.report(exception);
+        Crashlytics.log(Log.ERROR, TAG, "onExceptionSwallowed:" + exception);
+        Crashlytics.logException(exception);
 
         // Best practice is to throw in debug so you are aware of any issues that Epoxy notices.
         // Otherwise Epoxy does its best to swallow these exceptions and continue gracefully

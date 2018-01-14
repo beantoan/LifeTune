@@ -15,13 +15,14 @@ import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.MenuItem
 import com.beantoan.smsbackup.util.ActivityUtils
+import com.crashlytics.android.Crashlytics
 import com.firebase.ui.auth.IdpResponse
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.fitness.Fitness
 import com.google.android.gms.fitness.FitnessOptions
 import com.google.android.gms.fitness.data.DataType
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.crash.FirebaseCrash
+import io.fabric.sdk.android.Fabric
 import it.unical.mat.lifetune.R
 import it.unical.mat.lifetune.entity.ActivityResultEvent
 import it.unical.mat.lifetune.fragment.MyActivitiesFragment
@@ -131,6 +132,8 @@ class MainActivity :
 
     private fun onCreateTasks() {
         Log.d(TAG, "onCreateTasks")
+
+        Fabric.with(this, Crashlytics())
 
         setContentView(R.layout.activity_main)
 
@@ -253,8 +256,8 @@ class MainActivity :
                     if (task.isSuccessful) {
                         Log.d(TAG, "Fitness.getRecordingClient#addOnCompleteListener: Successfully subscribed!")
                     } else {
-                        FirebaseCrash.logcat(Log.ERROR, TAG, "Fitness.getRecordingClient#addOnCompleteListener:" + task.exception!!)
-                        FirebaseCrash.report(task.exception)
+                        Crashlytics.log(Log.ERROR, TAG, "Fitness.getRecordingClient#addOnCompleteListener:" + task.exception!!)
+                        Crashlytics.logException(task.exception)
                     }
                 })
 
@@ -264,8 +267,8 @@ class MainActivity :
                     if (task.isSuccessful) {
                         Log.d(TAG, "Fitness.getRecordingClient#addOnCompleteListener: Successfully subscribed!")
                     } else {
-                        FirebaseCrash.logcat(Log.ERROR, TAG, "Fitness.getRecordingClient#addOnCompleteListener:" + task.exception!!)
-                        FirebaseCrash.report(task.exception)
+                        Crashlytics.log(Log.ERROR, TAG, "Fitness.getRecordingClient#addOnCompleteListener:" + task.exception!!)
+                        Crashlytics.logException(task.exception)
                     }
                 })
 
@@ -275,8 +278,8 @@ class MainActivity :
                     if (task.isSuccessful) {
                         Log.d(TAG, "Fitness.getRecordingClient#addOnCompleteListener: Successfully subscribed!")
                     } else {
-                        FirebaseCrash.logcat(Log.ERROR, TAG, "Fitness.getRecordingClient#addOnCompleteListener:" + task.exception!!)
-                        FirebaseCrash.report(task.exception)
+                        Crashlytics.log(Log.ERROR, TAG, "Fitness.getRecordingClient#addOnCompleteListener:" + task.exception!!)
+                        Crashlytics.logException(task.exception)
                     }
                 })
 
@@ -286,8 +289,8 @@ class MainActivity :
                     if (task.isSuccessful) {
                         Log.d(TAG, "Fitness.getRecordingClient#addOnCompleteListener: Successfully subscribed!")
                     } else {
-                        FirebaseCrash.logcat(Log.ERROR, TAG, "Fitness.getRecordingClient#addOnCompleteListener:" + task.exception!!)
-                        FirebaseCrash.report(task.exception)
+                        Crashlytics.log(Log.ERROR, TAG, "Fitness.getRecordingClient#addOnCompleteListener:" + task.exception!!)
+                        Crashlytics.logException(task.exception)
                     }
                 })
     }

@@ -5,10 +5,10 @@ import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.data.DataType;
-import com.google.firebase.crash.FirebaseCrash;
 
 /**
  * Created by beantoan on 1/7/18.
@@ -32,8 +32,8 @@ public class RecordStepsService extends IntentService {
                             if (task.isSuccessful()) {
                                 Log.d(TAG, "Fitness.getRecordingClient#addOnCompleteListener: Successfully subscribed!");
                             } else {
-                                FirebaseCrash.logcat(Log.ERROR, TAG, "Fitness.getRecordingClient#addOnCompleteListener:" + task.getException());
-                                FirebaseCrash.report(task.getException());
+                                Crashlytics.log(Log.ERROR, TAG, "Fitness.getRecordingClient#addOnCompleteListener:" + task.getException());
+                                Crashlytics.logException(task.getException());
                             }
                         });
 

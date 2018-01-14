@@ -68,6 +68,10 @@ class FavoriteMusicFragment : BaseMusicFragment() {
         updateControllerData(ArrayList())
     }
 
+    override fun startLoadingData() {
+        callFavouriteApi()
+    }
+
     private fun onCreateViewTasks(view: View) {
         Log.d(TAG, "onCreateViewTasks")
 
@@ -77,7 +81,7 @@ class FavoriteMusicFragment : BaseMusicFragment() {
     }
 
     private fun onResumeTasks() {
-        callFavouriteApi()
+
     }
 
     private fun setupRecyclerViewPlaylists() {

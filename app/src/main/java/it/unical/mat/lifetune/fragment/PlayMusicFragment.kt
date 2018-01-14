@@ -6,6 +6,7 @@ import android.support.design.widget.AppBarLayout
 import android.support.design.widget.BottomSheetBehavior
 import android.support.v4.app.Fragment
 import android.support.v4.view.GravityCompat
+import android.support.v4.view.ViewPager
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -84,7 +85,28 @@ class PlayMusicFragment : Fragment(),
 
         pager.adapter = mPlayMusicPagerAdapter
 
+        pager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+            override fun onPageScrollStateChanged(state: Int) {
+            }
+
+            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+            }
+
+            override fun onPageSelected(position: Int) {
+                Log.d(TAG, "pager.addOnPageChangeListener#onPageSelected: position=$position")
+                loadFragmentData(position)
+            }
+
+        })
+
         tabs.setupWithViewPager(pager)
+    }
+
+    private fun loadFragmentData(position: Int) {
+        Log.d(TAG, "loadFragmentData")
+
+        val baseMusicFragment = mPlayMusicPagerAdapter.currentMusicFragment(position)
+        baseMusicFragment.startLoadingData()
     }
 
     private fun setupMusicPlayer() {
@@ -147,7 +169,7 @@ class PlayMusicFragment : Fragment(),
         showMusicPlayer()
     }
 
-    fun currentViewPagerItem(): Int = pager.currentItem
+    private fun currentViewPagerItem(): Int = pager.currentItem
 
     fun isCurrentRecommendationMusicFragment(): Boolean = currentViewPagerItem() == PlayMusicPagerAdapter.RECOMMENDATION_MUSIC_FRAGMENT
 
@@ -210,6 +232,8 @@ class PlayMusicFragment : Fragment(),
                 drawerLayout.openDrawer(GravityCompat.START)
             }
         }
+
+        search_view.removeFocus()
     }
 
     companion object {

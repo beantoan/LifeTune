@@ -6,13 +6,13 @@ import android.content.pm.PackageManager
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.util.Log
+import com.crashlytics.android.Crashlytics
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.LocationSettingsRequest
 import com.google.android.gms.location.LocationSettingsStatusCodes
-import com.google.firebase.crash.FirebaseCrash
 import it.unical.mat.lifetune.R
 import it.unical.mat.lifetune.entity.ActivityResultEvent
 import it.unical.mat.lifetune.util.AppDialog
@@ -80,8 +80,8 @@ abstract class BaseLocationFragment : Fragment() {
                     onLocationSettingEnabled()
 
                 } catch (exception: ApiException) {
-                    FirebaseCrash.logcat(Log.ERROR, TAG, "checkLocationSetting#addOnCompleteListener#ApiException:" + exception)
-                    FirebaseCrash.report(exception)
+                    Crashlytics.log(Log.ERROR, TAG, "checkLocationSetting#addOnCompleteListener#ApiException:" + exception)
+                    Crashlytics.logException(exception)
 
                     when (exception.statusCode) {
                         LocationSettingsStatusCodes.RESOLUTION_REQUIRED -> {
@@ -91,13 +91,13 @@ abstract class BaseLocationFragment : Fragment() {
                                 resolvable.startResolutionForResult(activity, CHECK_LOCATION_SETTINGS_REQUEST_CODE)
 
                             } catch (e: IntentSender.SendIntentException) {
-                                FirebaseCrash.logcat(Log.ERROR, TAG, "checkLocationSetting#addOnCompleteListener#SendIntentException:" + e)
-                                FirebaseCrash.report(e)
+                                Crashlytics.log(Log.ERROR, TAG, "checkLocationSetting#addOnCompleteListener#SendIntentException:" + e)
+                                Crashlytics.logException(e)
 
                                 AppDialog.warning(R.string.error_turn_on_location_title, R.string.error_turn_on_location_message, activity!!)
                             } catch (e: ClassCastException) {
-                                FirebaseCrash.logcat(Log.ERROR, TAG, "checkLocationSetting#addOnCompleteListener#ClassCastException:" + e)
-                                FirebaseCrash.report(e)
+                                Crashlytics.log(Log.ERROR, TAG, "checkLocationSetting#addOnCompleteListener#ClassCastException:" + e)
+                                Crashlytics.logException(e)
 
                                 AppDialog.warning(R.string.error_turn_on_location_title, R.string.error_turn_on_location_message, activity!!)
                             }
