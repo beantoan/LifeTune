@@ -14,6 +14,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.crashlytics.android.Crashlytics
+import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory
 import com.google.android.exoplayer2.source.DynamicConcatenatingMediaSource
 import com.google.android.exoplayer2.source.ExtractorMediaSource
@@ -50,7 +51,7 @@ class PlayMusicFragment : Fragment(),
 
     private val searchSongResultsAdapter = SearchSongResultsAdapter(ArrayList())
 
-    private val playingTrackAdapter = PlayingTracksAdapter(ArrayList())
+    private var playingTrackAdapter: PlayingTracksAdapter? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         Log.d(TAG, "onCreateView")
@@ -197,7 +198,9 @@ class PlayMusicFragment : Fragment(),
 
         showMusicPlayer()
 
-        updatePlayingTrackAdapter(playlist!!.tracks)
+        updatePlayingTrackAdapter(playlist?.tracks)
+
+        updateLikeUnlikeButton(playlist)
     }
 
     private fun currentViewPagerItem(): Int = pager.currentItem
@@ -376,6 +379,8 @@ class PlayMusicFragment : Fragment(),
         recycler_view_playing_tracks.layoutManager = LinearLayoutManager(activity!!.applicationContext)
         recycler_view_playing_tracks.addItemDecoration(dividerItemDecoration)
 
+        playingTrackAdapter = PlayingTracksAdapter(this@PlayMusicFragment, ArrayList())
+
         recycler_view_playing_tracks.adapter = playingTrackAdapter
     }
 
@@ -398,8 +403,12 @@ class PlayMusicFragment : Fragment(),
         searchSongResultsAdapter.addAll(songs)
     }
 
-    private fun updatePlayingTrackAdapter(tracks: List<Track>) {
-        playingTrackAdapter.addAll(tracks)
+    private fun updatePlayingTrackAdapter(tracks: List<Track>?) {
+        if (tracks == null) {
+            playingTrackAdapter?.clear()
+        } else {
+            playingTrackAdapter?.addAll(tracks)
+        }
     }
 
     private fun displayTrackList(isShown: Boolean) {
@@ -414,7 +423,11 @@ class PlayMusicFragment : Fragment(),
     }
 
     private fun updateLikeUnlikeButton(playlist: Playlist?) {
-        if (playlist != null) {
+        if (playlist == null) {
+            playing_playlist_actions.visibility = View.GONE
+        } else {
+            playing_playlist_actions.visibility = View.VISIBLE
+
             like_playling_playlist.visibility = if (playlist.isLiked) View.GONE else View.VISIBLE
             unlike_playling_playlist.visibility = if (playlist.isLiked) View.VISIBLE else View.GONE
         }
@@ -422,5 +435,9 @@ class PlayMusicFragment : Fragment(),
 
     companion object {
         val TAG = PlayMusicFragment::class.java.simpleName
+    }
+
+    fun playTrackAtPosition(position: Int) {
+        LifeTuneApplication.musicPlayer.seekTo(position, C.TIME_UNSET)
     }
 }

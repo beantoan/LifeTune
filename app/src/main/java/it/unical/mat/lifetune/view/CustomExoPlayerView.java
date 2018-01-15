@@ -842,7 +842,7 @@ public final class CustomExoPlayerView extends FrameLayout {
                 break;
             case Player.STATE_IDLE:
             case Player.STATE_ENDED:
-                setTrackTitle(R.string.no_song_play);
+                setTitle(R.string.no_song_play);
                 setAvatar(null);
                 break;
         }
@@ -862,15 +862,16 @@ public final class CustomExoPlayerView extends FrameLayout {
                 new ArrayList() : this.player.getPlaylist().getTracks();
 
         if (tracks.isEmpty() || this.player.getCurrentWindowIndex() > tracks.size() - 1) {
-            setTrackTitle(null);
+            setTitle(null);
             setAvatar(null);
         } else {
             Track currentTrack = tracks.get(this.player.getCurrentWindowIndex());
+            String title = currentTrack.getCombinedTitle() + " >> " + currentTrack.getTitle();
             String avatarUrl = currentTrack.getPlayerAvatar();
 
             setCurrentPlayingTrack(tracks, currentTrack);
 
-            setTrackTitle(currentTrack.getCombinedTitle());
+            setTitle(title);
             setAvatar(avatarUrl);
         }
     }
@@ -1012,11 +1013,11 @@ public final class CustomExoPlayerView extends FrameLayout {
 
     }
 
-    private void setTrackTitle(int resId) {
-        setTrackTitle(getResources().getString(resId));
+    private void setTitle(int resId) {
+        setTitle(getResources().getString(resId));
     }
 
-    private void setTrackTitle(String title) {
+    private void setTitle(String title) {
         if (title == null) {
             title = getResources().getString(R.string.no_song_play);
         }

@@ -42,6 +42,7 @@
             android:scrollbars="vertical" />
 
         <LinearLayout
+            android:id="@+id/playing_playlist_actions"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:paddingStart="10dp"
