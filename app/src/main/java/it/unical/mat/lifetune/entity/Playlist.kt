@@ -14,6 +14,8 @@ data class Playlist(
         @SerializedName("key") @get:Bindable var key: String,
         @SerializedName("img") @get:Bindable var img: String,
         @SerializedName("favourite", alternate = ["songs"]) @get:Bindable var songs: List<Song>,
-        @get:Bindable var isPlaying: Boolean = false
+        @get:Bindable var isPlaying: Boolean = false,
+        @get:Bindable var isLiked: Boolean = false,
+        var tracks: List<Track>
 
 ) : BaseObservable()

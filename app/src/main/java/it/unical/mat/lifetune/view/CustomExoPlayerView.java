@@ -60,6 +60,7 @@ import com.squareup.picasso.Picasso;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import it.unical.mat.lifetune.R;
@@ -857,9 +858,10 @@ public final class CustomExoPlayerView extends FrameLayout {
             return;
         }
 
-        List<Track> tracks = this.player.getTracks();
+        List<Track> tracks = this.player.getPlaylist() == null ?
+                new ArrayList() : this.player.getPlaylist().getTracks();
 
-        if (this.player.getTracks().isEmpty() || this.player.getCurrentWindowIndex() > tracks.size() - 1) {
+        if (tracks.isEmpty() || this.player.getCurrentWindowIndex() > tracks.size() - 1) {
             setTrackTitle(null);
             setAvatar(null);
         } else {

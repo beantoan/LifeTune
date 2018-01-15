@@ -30,9 +30,9 @@ import it.unical.mat.lifetune.adapter.PlayingTracksAdapter
 import it.unical.mat.lifetune.adapter.SearchSongResultsAdapter
 import it.unical.mat.lifetune.api.ApiServiceFactory
 import it.unical.mat.lifetune.decoration.RecyclerViewDividerItemDecoration
+import it.unical.mat.lifetune.entity.Playlist
 import it.unical.mat.lifetune.entity.Song
 import it.unical.mat.lifetune.entity.Track
-import it.unical.mat.lifetune.entity.TrackList
 import it.unical.mat.lifetune.view.CustomPlaybackControlView
 import it.unical.mat.lifetune.view.CustomSearchView
 import kotlinx.android.synthetic.main.bottom_sheet_music_player.*
@@ -89,7 +89,7 @@ class PlayMusicFragment : Fragment(),
     private fun onViewCreatedTasks() {
         Log.d(TAG, "onViewCreatedTasks")
 
-        app_bar_layout.addOnOffsetChangedListener(this)
+        setupAppBarLayout()
 
         setupViewPager()
         
@@ -108,6 +108,10 @@ class PlayMusicFragment : Fragment(),
 
     private fun onDestroyTasks() {
         Log.d(TAG, "onDestroyTasks")
+    }
+
+    private fun setupAppBarLayout() {
+        app_bar_layout.addOnOffsetChangedListener(this)
     }
 
     private fun setupViewPager() {
@@ -140,7 +144,7 @@ class PlayMusicFragment : Fragment(),
 
         })
 
-        if (LifeTuneApplication.musicPlayer.tracks.isEmpty()) {
+        if (LifeTuneApplication.musicPlayer.playlist == null) {
             hideMusicPlayer()
         } else {
             showMusicPlayer()
@@ -169,21 +173,21 @@ class PlayMusicFragment : Fragment(),
         displayMusicPlayer(false)
     }
 
-    fun playSongs(trackList: TrackList?) {
+    fun playSongs(playlist: Playlist?) {
         Log.d(TAG, "playSongs")
 
         music_player.player.stop()
 
         val dynamicConcatenatingMediaSource = DynamicConcatenatingMediaSource()
 
-        if (trackList == null || trackList.tracks.isEmpty()) {
-            LifeTuneApplication.musicPlayer.tracks = ArrayList()
+        if (playlist == null || playlist.tracks.isEmpty()) {
+            LifeTuneApplication.musicPlayer.playlist = null
         } else {
-            LifeTuneApplication.musicPlayer.tracks = trackList.tracks
+            LifeTuneApplication.musicPlayer.playlist = playlist
 
             val mediaSources = ArrayList<MediaSource>()
 
-            trackList.tracks.forEach { mediaSources.add(buildMediaSource(Uri.parse(it.url))) }
+            playlist.tracks.forEach { mediaSources.add(buildMediaSource(Uri.parse(it.url))) }
 
             dynamicConcatenatingMediaSource.addMediaSources(mediaSources)
         }
@@ -193,14 +197,16 @@ class PlayMusicFragment : Fragment(),
 
         showMusicPlayer()
 
-        updatePlayingTrackAdapter(trackList!!.tracks)
+        updatePlayingTrackAdapter(playlist!!.tracks)
     }
 
     private fun currentViewPagerItem(): Int = pager.currentItem
 
-    fun isCurrentRecommendationMusicFragment(): Boolean = currentViewPagerItem() == PlayMusicPagerAdapter.RECOMMENDATION_MUSIC_FRAGMENT
+    fun isCurrentRecommendationMusicFragment(): Boolean =
+            currentViewPagerItem() == PlayMusicPagerAdapter.RECOMMENDATION_MUSIC_FRAGMENT
 
-    fun isCurrentFavouriteMusicFragment(): Boolean = currentViewPagerItem() == PlayMusicPagerAdapter.FAVOURITE_MUSIC_FRAGMENT
+    fun isCurrentFavouriteMusicFragment():
+            Boolean = currentViewPagerItem() == PlayMusicPagerAdapter.FAVOURITE_MUSIC_FRAGMENT
 
     private fun buildMediaSource(uri: Uri): ExtractorMediaSource {
         return ExtractorMediaSource(uri, DefaultHttpDataSourceFactory("ua"),
@@ -404,6 +410,13 @@ class PlayMusicFragment : Fragment(),
         bottomSheetBehavior.state = when (isShown) {
             true -> BottomSheetBehavior.STATE_EXPANDED
             false -> BottomSheetBehavior.STATE_COLLAPSED
+        }
+    }
+
+    private fun updateLikeUnlikeButton(playlist: Playlist?) {
+        if (playlist != null) {
+            like_playling_playlist.visibility = if (playlist.isLiked) View.GONE else View.VISIBLE
+            unlike_playling_playlist.visibility = if (playlist.isLiked) View.VISIBLE else View.GONE
         }
     }
 

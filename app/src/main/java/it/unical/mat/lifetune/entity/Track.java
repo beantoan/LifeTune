@@ -44,8 +44,6 @@ public class Track extends BaseObservable {
 
     private Boolean isPlaying = false;
 
-    private Playlist playlist;
-
     public Track() {
     }
 
@@ -115,14 +113,6 @@ public class Track extends BaseObservable {
         this.avatar = avatar;
     }
 
-    public Playlist getPlaylist() {
-        return playlist;
-    }
-
-    public void setPlaylist(Playlist playlist) {
-        this.playlist = playlist;
-    }
-
     @Bindable
     public Boolean getPlaying() {
         return isPlaying;
@@ -135,13 +125,8 @@ public class Track extends BaseObservable {
 
     public String getCombinedTitle() {
 
-        StringBuilder combinedTitle = new StringBuilder();
-
-        if (getPlaylist() != null) {
-            combinedTitle.append(getPlaylist().getTitle()).append(" >> ");
-        }
-
-        combinedTitle.append(getTitle())
+        StringBuilder combinedTitle = new StringBuilder()
+                .append(getTitle())
                 .append(" >> ")
                 .append(getSingers());
 

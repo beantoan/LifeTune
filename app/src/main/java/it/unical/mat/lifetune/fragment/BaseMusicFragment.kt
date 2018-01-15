@@ -149,10 +149,10 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
     }
 
     @UiThread
-    private fun playSongs(trackList: TrackList?) {
+    private fun playSongs(playlist: Playlist?) {
         Log.d(TAG, "playSongs")
 
-        this.playMusicFragment?.playSongs(trackList)
+        this.playMusicFragment?.playSongs(playlist)
 
         hideLoading()
     }
@@ -223,9 +223,9 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
     private fun onSongsApiSuccess(playlist: Playlist, trackList: TrackList) {
         Log.d(TAG, "onSongsApiSuccess")
 
-        trackList.tracks.forEach { it.playlist = playlist }
+        playlist.tracks = trackList.tracks
 
-        playSongs(trackList)
+        playSongs(playlist)
     }
 
     @UiThread
