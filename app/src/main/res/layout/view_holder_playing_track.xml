@@ -4,9 +4,11 @@
 
     <data>
 
+        <import type="org.apache.commons.lang3.StringUtils" />
+
         <variable
-            name="song"
-            type="it.unical.mat.lifetune.entity.Song" />
+            name="track"
+            type="it.unical.mat.lifetune.entity.Track" />
     </data>
 
     <android.support.v7.widget.CardView
@@ -14,6 +16,7 @@
         android:layout_height="wrap_content"
         android:clickable="true"
         android:focusable="true"
+        android:background="@{track.playing ? @color/quantum_googblue300 : @color/background}"
         android:foreground="?android:attr/selectableItemBackground"
         app:cardCornerRadius="0dp">
 
@@ -31,14 +34,14 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text='@{song.title}'
+                android:text='@{StringUtils.trim(track.title)}'
                 android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text='@{song.singers}'
+                android:text='@{StringUtils.trim(track.singers)}'
                 android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
         </LinearLayout>

@@ -25,10 +25,12 @@ import it.unical.mat.lifetune.LifeTuneApplication
 import it.unical.mat.lifetune.R
 import it.unical.mat.lifetune.activity.MainActivity
 import it.unical.mat.lifetune.adapter.PlayMusicPagerAdapter
+import it.unical.mat.lifetune.adapter.PlayingTracksAdapter
 import it.unical.mat.lifetune.adapter.SearchSongResultsAdapter
 import it.unical.mat.lifetune.api.ApiServiceFactory
 import it.unical.mat.lifetune.decoration.RecyclerViewDividerItemDecoration
 import it.unical.mat.lifetune.entity.Song
+import it.unical.mat.lifetune.entity.Track
 import it.unical.mat.lifetune.entity.TrackList
 import it.unical.mat.lifetune.view.CustomSearchView
 import kotlinx.android.synthetic.main.fragment_play_music.*
@@ -44,6 +46,7 @@ class PlayMusicFragment : Fragment(),
 
     private val searchSongResultsAdapter = SearchSongResultsAdapter(ArrayList())
 
+    private val playingTrackAdapter = PlayingTracksAdapter(ArrayList())
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         Log.d(TAG, "onCreateView")
@@ -94,7 +97,9 @@ class PlayMusicFragment : Fragment(),
         
         setupSearchView()
 
-        setupRecycleSearchSongResults()
+        setupRecyclerViewSearchSongResults()
+
+        setupRecyclerViewPlayingTracks()
     }
 
     private fun onDestroyTasks() {
@@ -121,6 +126,8 @@ class PlayMusicFragment : Fragment(),
 
         if (LifeTuneApplication.musicPlayer.tracks.isEmpty()) {
             hideMusicPlayer()
+        } else {
+            showMusicPlayer()
         }
     }
 
@@ -169,6 +176,8 @@ class PlayMusicFragment : Fragment(),
         music_player.player.playWhenReady = true
 
         showMusicPlayer()
+
+        updatePlayingTrackAdapter(trackList!!.tracks)
     }
 
     private fun currentViewPagerItem(): Int = pager.currentItem
@@ -256,7 +265,7 @@ class PlayMusicFragment : Fragment(),
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
                                 { songs -> onSearchSongsSuccess(songs) },
-                                { error -> }
+                                { error -> onSearchSongsError(error) }
                         )
 
                 return true
@@ -302,7 +311,11 @@ class PlayMusicFragment : Fragment(),
         }
     }
 
-    private fun setupRecycleSearchSongResults() {
+    private fun onSearchSongsError(error: Throwable?) {
+        Log.e(TAG, "onSearchSongsError", error)
+    }
+
+    private fun setupRecyclerViewSearchSongResults() {
         val dividerDrawable = ContextCompat.getDrawable(activity!!.applicationContext, R.drawable.song_divider)
         val dividerItemDecoration = RecyclerViewDividerItemDecoration(activity!!.applicationContext, DividerItemDecoration.VERTICAL, dividerDrawable!!)
 
@@ -310,6 +323,16 @@ class PlayMusicFragment : Fragment(),
         recycler_view_search_song_results.addItemDecoration(dividerItemDecoration)
 
         recycler_view_search_song_results.adapter = searchSongResultsAdapter
+    }
+
+    private fun setupRecyclerViewPlayingTracks() {
+        val dividerDrawable = ContextCompat.getDrawable(activity!!.applicationContext, R.drawable.song_divider)
+        val dividerItemDecoration = RecyclerViewDividerItemDecoration(activity!!.applicationContext, DividerItemDecoration.VERTICAL, dividerDrawable!!)
+
+        recycler_view_playing_tracks.layoutManager = LinearLayoutManager(activity!!.applicationContext)
+        recycler_view_playing_tracks.addItemDecoration(dividerItemDecoration)
+
+        recycler_view_playing_tracks.adapter = playingTrackAdapter
     }
 
     private fun displaySearchSongResults(isShown: Boolean) {
@@ -329,6 +352,10 @@ class PlayMusicFragment : Fragment(),
 
     private fun updateSearchSongResultAdapter(songs: List<Song>) {
         searchSongResultsAdapter.addAll(songs)
+    }
+
+    private fun updatePlayingTrackAdapter(tracks: List<Track>) {
+        playingTrackAdapter.addAll(tracks)
     }
 
     companion object {

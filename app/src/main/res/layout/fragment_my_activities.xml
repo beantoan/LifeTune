@@ -272,7 +272,7 @@
 
         <EditText
             android:id="@+id/fitness_date"
-            android:textColor="@color/active_mode_text_color"
+            android:textColor="@color/quantum_grey100"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"

@@ -11,7 +11,7 @@ import android.view.View
 /**
  * Created by beantoan on 1/12/18.
  */
-class NoDragBottomSheetBehavior<V : View> : BottomSheetBehavior<V> {
+class NoDraggableBottomSheetBehavior<V : View> : BottomSheetBehavior<V> {
 
     constructor() : super()
 

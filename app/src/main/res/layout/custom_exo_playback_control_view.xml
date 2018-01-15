@@ -15,112 +15,118 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="@dimen/music_player_height"
-    android:layout_gravity="bottom"
     android:layoutDirection="ltr"
     android:background="@color/colorPrimary"
-    android:orientation="horizontal">
+    android:orientation="vertical">
 
-    <ImageView
-        android:id="@+id/exo_avatar"
-        android:layout_width="@dimen/music_player_height"
-        android:layout_height="@dimen/music_player_height" />
+    <TextView
+        android:id="@+id/exo_title"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/exo_title_height"
+        android:layout_gravity="center"
+        android:textColor="@color/quantum_grey100"
+        android:singleLine="true"
+        android:ellipsize="marquee"
+        android:marqueeRepeatLimit="-1"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:includeFontPadding="false"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:scrollHorizontally="true" />
 
     <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:orientation="vertical">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/exo_title"
-            android:layout_width="250dp"
-            android:layout_height="15dp"
-            android:textColor="@color/background"
-            android:singleLine="true"
-            android:ellipsize="marquee"
-            android:marqueeRepeatLimit="-1"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:paddingLeft="8dp"
-            android:paddingRight="8dp"
-            android:includeFontPadding="false"
-            android:layout_marginTop="4dp"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
-            android:scrollHorizontally="true" />
+        <ImageView
+            android:id="@+id/exo_avatar"
+            android:layout_width="@dimen/music_player_avatar_height"
+            android:layout_height="@dimen/music_player_avatar_height" />
 
         <LinearLayout
-            android:layout_width="250dp"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:layout_gravity="center">
+            android:layout_weight="1"
+            android:orientation="vertical">
 
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="horizontal">
+                android:layout_width="250dp"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:layout_gravity="center">
 
-                <ImageButton
-                    android:id="@id/exo_prev"
-                    style="@style/ExoMediaButton.Previous" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal">
 
-                <ImageButton
-                    android:id="@id/exo_repeat_toggle"
-                    style="@style/ExoMediaButton" />
+                    <ImageButton
+                        android:id="@id/exo_prev"
+                        style="@style/ExoMediaButton.Previous" />
 
-                <ImageButton
-                    android:id="@id/exo_play"
-                    style="@style/ExoMediaButton.Play" />
+                    <ImageButton
+                        android:id="@id/exo_repeat_toggle"
+                        style="@style/ExoMediaButton" />
 
-                <ImageButton
-                    android:id="@id/exo_pause"
-                    style="@style/ExoMediaButton.Pause" />
+                    <ImageButton
+                        android:id="@id/exo_play"
+                        style="@style/ExoMediaButton.Play" />
 
-                <ImageButton
-                    android:id="@id/exo_next"
-                    style="@style/ExoMediaButton.Next" />
+                    <ImageButton
+                        android:id="@id/exo_pause"
+                        style="@style/ExoMediaButton.Pause" />
+
+                    <ImageButton
+                        android:id="@id/exo_next"
+                        style="@style/ExoMediaButton.Next" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@id/exo_position"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:paddingLeft="4dp"
+                        android:paddingRight="4dp"
+                        android:includeFontPadding="false"
+                        android:textColor="#FFBEBEBE" />
+
+                    <com.google.android.exoplayer2.ui.DefaultTimeBar
+                        android:id="@id/exo_progress"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="26dp" />
+
+                    <TextView
+                        android:id="@id/exo_duration"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:paddingLeft="4dp"
+                        android:paddingRight="4dp"
+                        android:includeFontPadding="false"
+                        android:textColor="#FFBEBEBE" />
+
+                </LinearLayout>
 
             </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@id/exo_position"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:paddingLeft="4dp"
-                    android:paddingRight="4dp"
-                    android:includeFontPadding="false"
-                    android:textColor="#FFBEBEBE" />
-
-                <com.google.android.exoplayer2.ui.DefaultTimeBar
-                    android:id="@id/exo_progress"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="26dp" />
-
-                <TextView
-                    android:id="@id/exo_duration"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:paddingLeft="4dp"
-                    android:paddingRight="4dp"
-                    android:includeFontPadding="false"
-                    android:textColor="#FFBEBEBE" />
-
-            </LinearLayout>
-
         </LinearLayout>
     </LinearLayout>
-
 
 </LinearLayout>

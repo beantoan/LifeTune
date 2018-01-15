@@ -42,6 +42,8 @@ public class Track extends BaseObservable {
     @Element(name = "avatar", data = true, required = false)
     String avatar;
 
+    private Boolean isPlaying = false;
+
     private Playlist playlist;
 
     public Track() {
@@ -58,7 +60,7 @@ public class Track extends BaseObservable {
     }
 
     public String getTitle() {
-        return title;
+        return StringUtils.strip(title);
     }
 
     public void setTitle(String title) {
@@ -66,7 +68,7 @@ public class Track extends BaseObservable {
     }
 
     public String getSingers() {
-        return singers;
+        return StringUtils.strip(singers);
     }
 
     public void setSingers(String singers) {
@@ -74,7 +76,7 @@ public class Track extends BaseObservable {
     }
 
     public String getUrl() {
-        return url;
+        return StringUtils.strip(url);
     }
 
     public void setUrl(String url) {
@@ -82,7 +84,7 @@ public class Track extends BaseObservable {
     }
 
     public String getImage() {
-        return image;
+        return StringUtils.strip(image);
     }
 
     public void setImage(String image) {
@@ -90,7 +92,7 @@ public class Track extends BaseObservable {
     }
 
     public String getBgimage() {
-        return bgimage;
+        return StringUtils.strip(bgimage);
     }
 
     public void setBgimage(String bgimage) {
@@ -98,7 +100,7 @@ public class Track extends BaseObservable {
     }
 
     public String getThumb() {
-        return thumb;
+        return StringUtils.strip(thumb);
     }
 
     public void setThumb(String thumb) {
@@ -106,7 +108,7 @@ public class Track extends BaseObservable {
     }
 
     public String getAvatar() {
-        return avatar;
+        return StringUtils.strip(avatar);
     }
 
     public void setAvatar(String avatar) {
@@ -121,31 +123,46 @@ public class Track extends BaseObservable {
         this.playlist = playlist;
     }
 
-    public String getCombinedTitle() {
-        String fullTitle = StringUtils.strip(getTitle()) + " >> " + StringUtils.strip(getSingers());
+    @Bindable
+    public Boolean getPlaying() {
+        return isPlaying;
+    }
 
-        if (playlist != null) {
-            fullTitle = playlist.getTitle() + " >> " + fullTitle;
+    public void setPlaying(Boolean playing) {
+        isPlaying = playing;
+        notifyChange();
+    }
+
+    public String getCombinedTitle() {
+
+        StringBuilder combinedTitle = new StringBuilder();
+
+        if (getPlaylist() != null) {
+            combinedTitle.append(getPlaylist().getTitle()).append(" >> ");
         }
 
-        return fullTitle;
+        combinedTitle.append(getTitle())
+                .append(" >> ")
+                .append(getSingers());
+
+        return combinedTitle.toString();
     }
 
     public String getPlayerAvatar() {
         if (StringUtils.isNotBlank(getAvatar())) {
-            return StringUtils.strip(getAvatar());
+            return getAvatar();
         }
 
         if (StringUtils.isNotBlank(getImage())) {
-            return StringUtils.strip(getImage());
+            return getImage();
         }
 
         if (StringUtils.isNotBlank(getThumb())) {
-            return StringUtils.strip(getThumb());
+            return getThumb();
         }
 
         if (StringUtils.isNotBlank(getBgimage())) {
-            return StringUtils.strip(getBgimage());
+            return getBgimage();
         }
 
         return null;

@@ -19,7 +19,7 @@
     <style name="ExoMediaButton.Tracks">
         <item name="android:src">@drawable/ic_playlist_music_black_24dp</item>
         <item name="android:contentDescription">@string/exo_controls_show_tracks</item>
-        <item name="android:color">@color/background</item>
+        <item name="android:color">@color/quantum_grey100</item>
     </style>
 
     <string name="exo_controls_show_tracks">Show tracks</string>

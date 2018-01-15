@@ -53,7 +53,7 @@
             android:orientation="vertical"
             app:behavior_hideable="false"
             app:behavior_peekHeight="60dp"
-            app:layout_behavior="it.unical.mat.lifetune.behavior.NoDragBottomSheetBehavior">
+            app:layout_behavior="it.unical.mat.lifetune.behavior.NoDraggableBottomSheetBehavior">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -65,7 +65,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:textColor="@color/active_mode_text_color"
+                    android:textColor="@color/quantum_grey100"
                     android:layout_gravity="center_vertical"
                     android:text="@string/locating_location_title"
                     android:layout_marginStart="5dp" />

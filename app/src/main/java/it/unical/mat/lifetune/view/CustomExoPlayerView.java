@@ -60,6 +60,8 @@ import com.google.android.exoplayer2.util.RepeatModeUtil;
 import com.google.android.exoplayer2.util.Util;
 import com.squareup.picasso.Picasso;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.List;
 
 import it.unical.mat.lifetune.R;
@@ -834,7 +836,7 @@ public final class CustomExoPlayerView extends FrameLayout {
                 break;
             case Player.STATE_IDLE:
             case Player.STATE_ENDED:
-                setTitle(R.string.no_song_play);
+                setTrackTitle(R.string.no_song_play);
                 setAvatar(null);
                 break;
         }
@@ -853,15 +855,25 @@ public final class CustomExoPlayerView extends FrameLayout {
         List<Track> tracks = this.player.getTracks();
 
         if (this.player.getTracks().isEmpty() || this.player.getCurrentWindowIndex() > tracks.size() - 1) {
-            setTitle(null);
+            setTrackTitle(null);
             setAvatar(null);
         } else {
             Track currentTrack = tracks.get(this.player.getCurrentWindowIndex());
             String avatarUrl = currentTrack.getPlayerAvatar();
 
-            setTitle(currentTrack.getCombinedTitle());
+            setCurrentPlayingTrack(tracks, currentTrack);
+
+            setTrackTitle(currentTrack.getCombinedTitle());
             setAvatar(avatarUrl);
         }
+    }
+
+    private void setCurrentPlayingTrack(List<Track> tracks, Track playingTrack) {
+        for (Track track : tracks) {
+            track.setPlaying(false);
+        }
+
+        playingTrack.setPlaying(true);
     }
 
     private boolean setArtworkFromMetadata(Metadata metadata) {
@@ -993,11 +1005,11 @@ public final class CustomExoPlayerView extends FrameLayout {
 
     }
 
-    private void setTitle(int resId) {
-        setTitle(getResources().getString(resId));
+    private void setTrackTitle(int resId) {
+        setTrackTitle(getResources().getString(resId));
     }
 
-    private void setTitle(String title) {
+    private void setTrackTitle(String title) {
         if (title == null) {
             title = getResources().getString(R.string.no_song_play);
         }
@@ -1007,6 +1019,14 @@ public final class CustomExoPlayerView extends FrameLayout {
         mTitle.setText(title);
         mTitle.setSelected(true);
         mTitle.setMarqueeRepeatLimit(Animation.INFINITE);
+
+        int height = 0;
+
+        if (StringUtils.isNotBlank(title)) {
+            height = (int) getResources().getDimension(R.dimen.exo_title_height);
+        }
+
+        mTitle.setHeight(height);
     }
 
     private void setAvatar(String avatarUrl) {
