@@ -131,6 +131,7 @@ class PlayMusicFragment : Fragment(),
         music_player.setOnCollapseExpandListener(object : CustomPlaybackControlView.CollapseExpandListener {
             override fun onExpanded() {
                 displayTrackList(true)
+                displaySearchView(false)
             }
 
             override fun onCollapsed() {
@@ -206,6 +207,19 @@ class PlayMusicFragment : Fragment(),
                 DefaultExtractorsFactory(), null, null)
     }
 
+    private fun displaySearchView(isShown: Boolean) {
+        when (isShown) {
+            false -> {
+                app_bar_layout.setExpanded(false, true)
+                search_view.visibility = View.GONE
+            }
+            true -> {
+                app_bar_layout.setExpanded(true, true)
+                search_view.visibility = View.VISIBLE
+            }
+        }
+    }
+
     private fun setupBottomSheet() {
         val bottomSheetBehavior = BottomSheetBehavior.from(bottom_sheet_music_player)
 
@@ -217,12 +231,10 @@ class PlayMusicFragment : Fragment(),
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 when (newState) {
                     BottomSheetBehavior.STATE_EXPANDED -> {
-                        app_bar_layout.setExpanded(false, true)
-                        search_view.visibility = View.GONE
+
                     }
                     BottomSheetBehavior.STATE_COLLAPSED -> {
-                        app_bar_layout.setExpanded(true, true)
-                        search_view.visibility = View.VISIBLE
+                        displaySearchView(true)
                     }
                 }
             }
