@@ -52,8 +52,6 @@ import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout.ResizeMode;
-import com.google.android.exoplayer2.ui.PlaybackControlView;
-import com.google.android.exoplayer2.ui.PlaybackControlView.ControlDispatcher;
 import com.google.android.exoplayer2.ui.SubtitleView;
 import com.google.android.exoplayer2.util.Assertions;
 import com.google.android.exoplayer2.util.RepeatModeUtil;
@@ -70,7 +68,7 @@ import it.unical.mat.lifetune.util.CustomExoPlayer;
 
 /**
  * A high level view for {@link SimpleExoPlayer} media playbacks. It displays video, subtitles and
- * album art during playback, and displays playback controls using a {@link PlaybackControlView}.
+ * album art during playback, and displays playback controls using a {@link CustomPlaybackControlView}.
  * <p>
  * A SimpleExoPlayerView can be customized by setting attributes (or calling corresponding methods),
  * overriding the view's layout file or by specifying a custom view layout file, as outlined below.
@@ -135,13 +133,13 @@ import it.unical.mat.lifetune.util.CustomExoPlayer;
  * <li>Default: {@code R.id.exo_simple_player_view}</li>
  * </ul>
  * <li><b>{@code controller_layout_id}</b> - Specifies the id of the layout resource to be
- * inflated by the child {@link PlaybackControlView}. See below for more details.
+ * inflated by the child {@link CustomPlaybackControlView}. See below for more details.
  * <ul>
  * <li>Corresponding method: None</li>
  * <li>Default: {@code R.id.exo_playback_control_view}</li>
  * </ul>
- * <li>All attributes that can be set on a {@link PlaybackControlView} can also be set on a
- * SimpleExoPlayerView, and will be propagated to the inflated {@link PlaybackControlView}
+ * <li>All attributes that can be set on a {@link CustomPlaybackControlView} can also be set on a
+ * SimpleExoPlayerView, and will be propagated to the inflated {@link CustomPlaybackControlView}
  * unless the layout is overridden to specify a custom {@code exo_controller} (see below).
  * </li>
  * </ul>
@@ -179,17 +177,17 @@ import it.unical.mat.lifetune.util.CustomExoPlayer;
  * </ul>
  * </li>
  * <li><b>{@code exo_controller_placeholder}</b> - A placeholder that's replaced with the inflated
- * {@link PlaybackControlView}. Ignored if an {@code exo_controller} view exists.
+ * {@link CustomPlaybackControlView}. Ignored if an {@code exo_controller} view exists.
  * <ul>
  * <li>Type: {@link View}</li>
  * </ul>
  * </li>
- * <li><b>{@code exo_controller}</b> - An already inflated {@link PlaybackControlView}. Allows use
- * of a custom extension of {@link PlaybackControlView}. Note that attributes such as
+ * <li><b>{@code exo_controller}</b> - An already inflated {@link CustomPlaybackControlView}. Allows use
+ * of a custom extension of {@link CustomPlaybackControlView}. Note that attributes such as
  * {@code rewind_increment} will not be automatically propagated through to this instance. If
  * a view exists with this id, any {@code exo_controller_placeholder} view will be ignored.
  * <ul>
- * <li>Type: {@link PlaybackControlView}</li>
+ * <li>Type: {@link CustomPlaybackControlView}</li>
  * </ul>
  * </li>
  * <li><b>{@code exo_overlay}</b> - A {@link FrameLayout} positioned on top of the player which
@@ -224,7 +222,7 @@ public final class CustomExoPlayerView extends FrameLayout {
     private final View surfaceView;
     private final ImageView artworkView;
     private final SubtitleView subtitleView;
-    private final PlaybackControlView controller;
+    private final CustomPlaybackControlView controller;
     private final ComponentListener componentListener;
     private final FrameLayout overlayFrameLayout;
 
@@ -272,7 +270,7 @@ public final class CustomExoPlayerView extends FrameLayout {
         boolean useController = true;
         int surfaceType = SURFACE_TYPE_SURFACE_VIEW;
         int resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT;
-        int controllerShowTimeoutMs = PlaybackControlView.DEFAULT_SHOW_TIMEOUT_MS;
+        int controllerShowTimeoutMs = CustomPlaybackControlView.DEFAULT_SHOW_TIMEOUT_MS;
         boolean controllerHideOnTouch = true;
         boolean controllerAutoShow = true;
         if (attrs != null) {
@@ -341,14 +339,14 @@ public final class CustomExoPlayerView extends FrameLayout {
         }
 
         // Playback control view.
-        PlaybackControlView customController = (PlaybackControlView) findViewById(com.google.android.exoplayer2.ui.R.id.exo_controller);
+        CustomPlaybackControlView customController = (CustomPlaybackControlView) findViewById(com.google.android.exoplayer2.ui.R.id.exo_controller);
         View controllerPlaceholder = findViewById(com.google.android.exoplayer2.ui.R.id.exo_controller_placeholder);
         if (customController != null) {
             this.controller = customController;
         } else if (controllerPlaceholder != null) {
             // Propagate attrs as playbackAttrs so that PlaybackControlView's custom attributes are
             // transferred, but standard FrameLayout attributes (e.g. background) are not.
-            this.controller = new PlaybackControlView(context, null, 0, attrs);
+            this.controller = new CustomPlaybackControlView(context, null, 0, attrs);
             controller.setLayoutParams(controllerPlaceholder.getLayoutParams());
             ViewGroup parent = ((ViewGroup) controllerPlaceholder.getParent());
             int controllerIndex = parent.indexOfChild(controllerPlaceholder);
@@ -455,6 +453,13 @@ public final class CustomExoPlayerView extends FrameLayout {
         }
     }
 
+    public void setOnCollapseExpandListener(CustomPlaybackControlView.CollapseExpandListener collapseExpandListener) {
+
+        if (this.controller != null) {
+            this.controller.setOnCollapseExpandListener(collapseExpandListener);
+        }
+    }
+    
     /**
      * Sets the resize mode.
      *
@@ -638,22 +643,22 @@ public final class CustomExoPlayerView extends FrameLayout {
     }
 
     /**
-     * Set the {@link PlaybackControlView.VisibilityListener}.
+     * Set the {@link CustomPlaybackControlView.VisibilityListener}.
      *
      * @param listener The listener to be notified about visibility changes.
      */
-    public void setControllerVisibilityListener(PlaybackControlView.VisibilityListener listener) {
+    public void setControllerVisibilityListener(CustomPlaybackControlView.VisibilityListener listener) {
         Assertions.checkState(controller != null);
         controller.setVisibilityListener(listener);
     }
 
     /**
-     * Sets the {@link ControlDispatcher}.
+     * Sets the {@link CustomPlaybackControlView.ControlDispatcher}.
      *
-     * @param controlDispatcher The {@link ControlDispatcher}, or null to use
-     *                          {@link PlaybackControlView#DEFAULT_CONTROL_DISPATCHER}.
+     * @param controlDispatcher The {@link CustomPlaybackControlView}, or null to use
+     *                          {@link CustomPlaybackControlView#DEFAULT_CONTROL_DISPATCHER}.
      */
-    public void setControlDispatcher(ControlDispatcher controlDispatcher) {
+    public void setControlDispatcher(CustomPlaybackControlView.ControlDispatcher controlDispatcher) {
         Assertions.checkState(controller != null);
         controller.setControlDispatcher(controlDispatcher);
     }

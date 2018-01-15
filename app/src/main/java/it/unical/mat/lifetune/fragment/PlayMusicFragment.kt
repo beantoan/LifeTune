@@ -13,6 +13,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.crashlytics.android.Crashlytics
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory
 import com.google.android.exoplayer2.source.DynamicConcatenatingMediaSource
 import com.google.android.exoplayer2.source.ExtractorMediaSource
@@ -32,7 +33,10 @@ import it.unical.mat.lifetune.decoration.RecyclerViewDividerItemDecoration
 import it.unical.mat.lifetune.entity.Song
 import it.unical.mat.lifetune.entity.Track
 import it.unical.mat.lifetune.entity.TrackList
+import it.unical.mat.lifetune.view.CustomPlaybackControlView
 import it.unical.mat.lifetune.view.CustomSearchView
+import kotlinx.android.synthetic.main.bottom_sheet_music_player.*
+import kotlinx.android.synthetic.main.bottom_sheet_search_song_results.*
 import kotlinx.android.synthetic.main.fragment_play_music.*
 
 
@@ -124,6 +128,17 @@ class PlayMusicFragment : Fragment(),
         music_player.controllerAutoShow = true
         music_player.showController()
 
+        music_player.setOnCollapseExpandListener(object : CustomPlaybackControlView.CollapseExpandListener {
+            override fun onExpanded() {
+                displayTrackList(true)
+            }
+
+            override fun onCollapsed() {
+                displayTrackList(false)
+            }
+
+        })
+
         if (LifeTuneApplication.musicPlayer.tracks.isEmpty()) {
             hideMusicPlayer()
         } else {
@@ -202,7 +217,12 @@ class PlayMusicFragment : Fragment(),
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 when (newState) {
                     BottomSheetBehavior.STATE_EXPANDED -> {
+                        app_bar_layout.setExpanded(false, true)
+                        search_view.visibility = View.GONE
+                    }
+                    BottomSheetBehavior.STATE_COLLAPSED -> {
                         app_bar_layout.setExpanded(true, true)
+                        search_view.visibility = View.VISIBLE
                     }
                 }
             }
@@ -260,13 +280,19 @@ class PlayMusicFragment : Fragment(),
 
                 search_view.close(true)
 
-                ApiServiceFactory.createSongApi().search(query)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(
-                                { songs -> onSearchSongsSuccess(songs) },
-                                { error -> onSearchSongsError(error) }
-                        )
+                try {
+                    ApiServiceFactory.createSongApi().search(query)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(
+                                    { songs -> onSearchSongsSuccess(songs) },
+                                    { error -> onSearchSongsError(error) }
+                            )
+
+                } catch (error: Exception) {
+                    Crashlytics.log(Log.ERROR, TAG, "setupSearchView" + error)
+                    Crashlytics.logException(error)
+                }
 
                 return true
             }
@@ -356,6 +382,17 @@ class PlayMusicFragment : Fragment(),
 
     private fun updatePlayingTrackAdapter(tracks: List<Track>) {
         playingTrackAdapter.addAll(tracks)
+    }
+
+    private fun displayTrackList(isShown: Boolean) {
+        Log.d(TAG, "displayTrackList: isShown=$isShown")
+
+        val bottomSheetBehavior = BottomSheetBehavior.from(bottom_sheet_music_player)
+
+        bottomSheetBehavior.state = when (isShown) {
+            true -> BottomSheetBehavior.STATE_EXPANDED
+            false -> BottomSheetBehavior.STATE_COLLAPSED
+        }
     }
 
     companion object {
