@@ -157,7 +157,7 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
         hideLoading()
     }
 
-    private fun callSongsApi(playlist: Playlist) {
+    public fun callSongsApi(playlist: Playlist) {
         Log.d(TAG, "callSongsApi#${playlist.id}-${playlist.title}")
 
         if (AppUtils.isInternetConnected(context!!)) {

@@ -11,7 +11,7 @@ import android.view.View
 /**
  * Created by beantoan on 1/12/18.
  */
-class GoogleMapBottomSheetBehavior<V : View> : BottomSheetBehavior<V> {
+class NoDragBottomSheetBehavior<V : View> : BottomSheetBehavior<V> {
 
     constructor() : super()
 

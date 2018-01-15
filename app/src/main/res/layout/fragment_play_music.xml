@@ -96,11 +96,30 @@
 
             </LinearLayout>
 
+            <LinearLayout
+                android:id="@+id/bottom_sheet_search_song_results"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/colorPrimary"
+                android:orientation="vertical"
+                app:behavior_hideable="true"
+                app:behavior_peekHeight="0dp"
+                app:layout_behavior="it.unical.mat.lifetune.behavior.NoDragBottomSheetBehavior">
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/recycler_view_search_song_results"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:scrollbars="vertical" />
+
+            </LinearLayout>
+
         </android.support.design.widget.CoordinatorLayout>
 
     </android.support.design.widget.CoordinatorLayout>
 
-    <com.lapism.searchview.SearchView
+    <it.unical.mat.lifetune.view.CustomSearchView
         android:id="@+id/search_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

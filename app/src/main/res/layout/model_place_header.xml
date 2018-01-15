@@ -6,7 +6,7 @@
         <import type="org.apache.commons.lang3.StringUtils" />
 
         <variable
-            name="place"
+            name="song"
             type="it.unical.mat.lifetune.entity.Place" />
 
         <variable
@@ -39,7 +39,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_gravity="center_vertical"
-                    android:text='@{place.name}'
+                    android:text='@{song.name}'
                     android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
 
                 <ImageView
@@ -60,7 +60,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text='@{place.info}'
+                android:text='@{song.info}'
                 android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
             <ImageView

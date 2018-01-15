@@ -10,5 +10,7 @@ import com.google.gson.annotations.SerializedName
 data class Song(
         @SerializedName("id") var id: Int,
         @SerializedName("title") @get:Bindable var title: String,
-        @SerializedName("mp3_url") @get:Bindable var mp3_url: String
+        @SerializedName("mp3_url") @get:Bindable var mp3_url: String,
+        @SerializedName("singers") @get:Bindable var singers: String,
+        @SerializedName("playlist") @get:Bindable var playlist: Playlist
 ) : BaseObservable()

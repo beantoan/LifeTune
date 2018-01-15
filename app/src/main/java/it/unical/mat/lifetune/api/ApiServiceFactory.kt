@@ -80,6 +80,9 @@ object ApiServiceFactory {
     fun createPlaylistApi(): PlaylistApiInterface =
             ApiServiceFactory.create(PlaylistApiInterface::class.java)
 
+    fun createSongApi(): SongApiInterface =
+            ApiServiceFactory.create(SongApiInterface::class.java)
+
     fun createPlaylistXmlApi(): TrackListApiInterface =
             ApiServiceFactory.createXml(TrackListApiInterface::class.java, EnvConstants.NCT_BASE_URL)
 }
