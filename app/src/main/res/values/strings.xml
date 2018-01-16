@@ -58,8 +58,8 @@
     <string name="button_unlike_title">Unlike</string>
     <string name="button_share_title">Share</string>
     <string name="liked_playlist_successfully_message">Liked the playlist %1$s successfully</string>
-    <string name="liked_playlist_unsuccessfully_message">Liked the playlist %1$s unsuccessfully. Please try again.</string>
+    <string name="liked_playlist_unsuccessfully_message">Error when like the playlist %1$s. Please try again.</string>
     <string name="unliked_playlist_successfully_message">Unliked the playlist %1$s successfully</string>
-    <string name="unliked_playlist_unsuccessfully_message">Unliked the playlist %1$s unsuccessfully. Please try again.</string>
+    <string name="unliked_playlist_unsuccessfully_message">Error when unliked the playlist %1$s. Please try again.</string>
 
 </resources>

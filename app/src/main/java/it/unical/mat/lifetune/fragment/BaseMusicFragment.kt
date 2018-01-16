@@ -248,7 +248,7 @@ abstract class BaseMusicFragment :
             playlist.isLiked = true
             playlist.notifyChange()
 
-            val msg = activity!!.getString(R.string.unliked_playlist_successfully_message, playlist.title)
+            val msg = activity!!.getString(R.string.liked_playlist_successfully_message, playlist.title)
 
             Snackbar.make(activity!!.findViewById(R.id.main_content), msg, Snackbar.LENGTH_SHORT).show()
         }
@@ -266,7 +266,7 @@ abstract class BaseMusicFragment :
             playlist.isLiked = false
             playlist.notifyChange()
 
-            val msg = activity!!.getString(R.string.liked_playlist_successfully_message, playlist.title)
+            val msg = activity!!.getString(R.string.unliked_playlist_successfully_message, playlist.title)
 
             Snackbar.make(activity!!.findViewById(R.id.main_content), msg, Snackbar.LENGTH_SHORT).show()
         }
