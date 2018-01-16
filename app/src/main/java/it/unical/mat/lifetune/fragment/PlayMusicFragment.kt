@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.support.design.widget.AppBarLayout
 import android.support.design.widget.BottomSheetBehavior
 import android.support.design.widget.Snackbar
-import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.GravityCompat
 import android.support.v7.widget.DividerItemDecoration
@@ -14,6 +13,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource
 import com.google.android.exoplayer2.source.ExtractorMediaSource
@@ -47,7 +47,7 @@ import kotlinx.android.synthetic.main.fragment_play_music.*
 /**
  * Created by beantoan on 12/12/17.
  */
-class PlayMusicFragment : Fragment(), AppBarLayout.OnOffsetChangedListener {
+class PlayMusicFragment : BaseFragment(), AppBarLayout.OnOffsetChangedListener {
 
     private lateinit var mPlayMusicPagerAdapter: PlayMusicPagerAdapter
 
@@ -321,6 +321,10 @@ class PlayMusicFragment : Fragment(), AppBarLayout.OnOffsetChangedListener {
         updatePlayingTrackAdapter(LifeTuneApplication.musicPlayer.playlist?.tracks)
 
         updateLikeUnlikeButton(LifeTuneApplication.musicPlayer.playlist)
+
+        playlist_playlist_title.text = LifeTuneApplication.musicPlayer.playlist?.title
+        playlist_playlist_title.isSelected = true
+        playlist_playlist_title.marqueeRepeatLimit = Animation.INFINITE
     }
 
     private fun currentViewPagerItem(): Int = pager.currentItem
@@ -535,7 +539,7 @@ class PlayMusicFragment : Fragment(), AppBarLayout.OnOffsetChangedListener {
     }
 
     fun displayProgressBar(isShown: Boolean) {
-        progress_bar.visibility = if (isShown) View.VISIBLE else View.GONE
+        displayProgressBar(progress_bar, isShown)
     }
 
     fun playTrackAtPosition(position: Int) {

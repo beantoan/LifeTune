@@ -127,7 +127,7 @@ public class Track extends BaseObservable {
 
         StringBuilder combinedTitle = new StringBuilder()
                 .append(getTitle())
-                .append(" >> ")
+                .append(" - ")
                 .append(getSingers());
 
         return combinedTitle.toString();

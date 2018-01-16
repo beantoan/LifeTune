@@ -33,6 +33,28 @@
             app:show_timeout="0"
             app:resize_mode="fit" />
 
+        <TextView
+            android:id="@+id/playlist_playlist_title"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:textColor="@color/quantum_grey800"
+            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+            android:paddingStart="15dp"
+            android:paddingEnd="15dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:singleLine="true"
+            android:ellipsize="marquee"
+            android:marqueeRepeatLimit="-1"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:includeFontPadding="false"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:scrollHorizontally="true" />
+
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recycler_view_playing_tracks"
             android:layout_width="match_parent"

@@ -9,7 +9,7 @@ import android.widget.ProgressBar
  */
 abstract class BaseFragment : Fragment() {
 
-    private fun displayProgressBar(progressBar: ProgressBar, isShown: Boolean) {
+    protected fun displayProgressBar(progressBar: ProgressBar, isShown: Boolean) {
         progressBar.visibility = if (isShown) View.VISIBLE else View.GONE
     }
 
