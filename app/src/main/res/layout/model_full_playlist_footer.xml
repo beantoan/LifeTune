@@ -3,6 +3,8 @@
 
     <data>
 
+        <import type="android.view.View" />
+
         <variable
             name="playlist"
             type="it.unical.mat.lifetune.entity.Playlist" />
@@ -34,6 +36,7 @@
             android:clickable="true"
             android:focusable="true"
             android:onClick="@{clickLikeListener}"
+            android:visibility="@{playlist.isLiked ? View.GONE : View.VISIBLE}"
             android:foreground="?android:attr/selectableItemBackground" />
 
         <com.mikepenz.iconics.view.IconicsButton
@@ -46,6 +49,7 @@
             android:clickable="true"
             android:focusable="true"
             android:onClick="@{clickUnlikeListener}"
+            android:visibility="@{playlist.isLiked ? View.VISIBLE : View.GONE}"
             android:foreground="?android:attr/selectableItemBackground" />
 
         <com.mikepenz.iconics.view.IconicsButton

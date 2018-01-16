@@ -34,7 +34,7 @@ class PlaylistPresenter {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         { commonApiResponse -> likePlaylistCallbacks?.onLikePlaylistSuccess(commonApiResponse, playlist) },
-                        { error -> likePlaylistCallbacks?.onLikePlaylistError(error) }
+                        { error -> likePlaylistCallbacks?.onLikePlaylistError(error, playlist) }
                 )
     }
 
@@ -44,7 +44,7 @@ class PlaylistPresenter {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         { commonApiResponse -> unlikePlaylistCallbacks?.onUnlikePlaylistSuccess(commonApiResponse, playlist) },
-                        { error -> unlikePlaylistCallbacks?.onUnlikePlaylistError(error) }
+                        { error -> unlikePlaylistCallbacks?.onUnlikePlaylistError(error, playlist) }
                 )
     }
 
@@ -60,12 +60,12 @@ class PlaylistPresenter {
 
     interface LikePlaylistCallbacks {
         fun onLikePlaylistSuccess(commonApiResponse: CommonApiResponse, playlist: Playlist)
-        fun onLikePlaylistError(error: Throwable)
+        fun onLikePlaylistError(error: Throwable, playlist: Playlist)
     }
 
     interface UnlikePlaylistCallbacks {
         fun onUnlikePlaylistSuccess(commonApiResponse: CommonApiResponse, playlist: Playlist)
-        fun onUnlikePlaylistError(error: Throwable)
+        fun onUnlikePlaylistError(error: Throwable, playlist: Playlist)
     }
 
     interface FavouriteCallbacks {

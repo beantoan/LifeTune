@@ -1,6 +1,7 @@
 package it.unical.mat.lifetune.fragment
 
 import android.support.annotation.UiThread
+import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.util.Log
 import com.crashlytics.android.Crashlytics
@@ -240,6 +241,41 @@ abstract class BaseMusicFragment :
         PlaylistPresenter(ImplUnlikePlaylistCallbacks(this)).callUnlikePlaylistApi(playlist, userId)
     }
 
+    private fun onLikePlaylistSuccess(commonApiResponse: CommonApiResponse, playlist: Playlist) {
+        if (commonApiResponse.isOk()) {
+            playlist.isLiked = true
+            playlist.notifyChange()
+
+            val msg = activity!!.getString(R.string.unliked_playlist_successfully_message, playlist.title)
+
+            Snackbar.make(activity!!.findViewById(R.id.main_content), msg, Snackbar.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun onLikePlaylistError(playlist: Playlist) {
+        val msg = activity!!.getString(R.string.liked_playlist_unsuccessfully_message, playlist.title)
+
+        Snackbar.make(activity!!.findViewById(R.id.main_content), msg, Snackbar.LENGTH_SHORT).show()
+    }
+
+    private fun onUnlikePlaylistSuccess(commonApiResponse: CommonApiResponse, playlist: Playlist) {
+
+        if (commonApiResponse.isOk()) {
+            playlist.isLiked = false
+            playlist.notifyChange()
+
+            val msg = activity!!.getString(R.string.liked_playlist_successfully_message, playlist.title)
+
+            Snackbar.make(activity!!.findViewById(R.id.main_content), msg, Snackbar.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun onUnlikePlaylistError(playlist: Playlist) {
+        val msg = activity!!.getString(R.string.unliked_playlist_unsuccessfully_message, playlist.title)
+
+        Snackbar.make(activity!!.findViewById(R.id.main_content), msg, Snackbar.LENGTH_SHORT).show()
+    }
+
     companion object {
         private val TAG = BaseMusicFragment::class.java.simpleName
     }
@@ -252,10 +288,13 @@ abstract class BaseMusicFragment :
         override fun onLikePlaylistSuccess(commonApiResponse: CommonApiResponse, playlist: Playlist) {
             Log.d(TAG, "onLikePlaylistSuccess: commonApiResponse=$commonApiResponse, playlist=${playlist.shortLog()}")
 
+            baseMusicFragment.onLikePlaylistSuccess(commonApiResponse, playlist)
         }
 
-        override fun onLikePlaylistError(error: Throwable) {
+        override fun onLikePlaylistError(error: Throwable, playlist: Playlist) {
+            Log.e(TAG, "onLikePlaylistError", error)
 
+            baseMusicFragment.onLikePlaylistError(playlist)
         }
     }
 
@@ -267,10 +306,13 @@ abstract class BaseMusicFragment :
         override fun onUnlikePlaylistSuccess(commonApiResponse: CommonApiResponse, playlist: Playlist) {
             Log.d(TAG, "onUnlikePlaylistSuccess: commonApiResponse=$commonApiResponse, playlist=${playlist.shortLog()}")
 
+            baseMusicFragment.onUnlikePlaylistSuccess(commonApiResponse, playlist)
         }
 
-        override fun onUnlikePlaylistError(error: Throwable) {
+        override fun onUnlikePlaylistError(error: Throwable, playlist: Playlist) {
+            Log.e(TAG, "onUnlikePlaylistError", error)
 
+            baseMusicFragment.onUnlikePlaylistError(playlist)
         }
     }
 

@@ -4,6 +4,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.AppBarLayout
 import android.support.design.widget.BottomSheetBehavior
+import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.GravityCompat
@@ -292,10 +293,6 @@ class PlayMusicFragment : Fragment(), AppBarLayout.OnOffsetChangedListener {
 
         music_player.player.stop()
 
-//        val dupPlaylist : Playlist? = playlist?.dup()
-//
-//        Log.d(TAG, "dupPlaylist=${dupPlaylist?.shortLog()}")
-
         if (playlist == null || playlist.tracks.isEmpty()) {
             LifeTuneApplication.musicPlayer.playlist = null
 
@@ -497,6 +494,46 @@ class PlayMusicFragment : Fragment(), AppBarLayout.OnOffsetChangedListener {
         }
     }
 
+    private fun onLikePlaylistError(playlist: Playlist) {
+        val msg = activity!!.getString(R.string.liked_playlist_unsuccessfully_message, playlist.title)
+
+        Snackbar.make(main_content, msg, Snackbar.LENGTH_SHORT).show()
+    }
+
+    private fun onLikePlaylistSuccess(commonApiResponse: CommonApiResponse, playlist: Playlist) {
+
+        if (commonApiResponse.isOk()) {
+            playlist.isLiked = true
+            playlist.notifyChange()
+
+            updateLikeUnlikeButton(playlist)
+
+            val msg = activity!!.getString(R.string.liked_playlist_successfully_message, playlist.title)
+
+            Snackbar.make(main_content, msg, Snackbar.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun onUnlikePlaylistSuccess(commonApiResponse: CommonApiResponse, playlist: Playlist) {
+
+        if (commonApiResponse.isOk()) {
+            playlist.isLiked = false
+            playlist.notifyChange()
+
+            updateLikeUnlikeButton(playlist)
+
+            val msg = activity!!.getString(R.string.unliked_playlist_successfully_message, playlist.title)
+
+            Snackbar.make(main_content, msg, Snackbar.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun onUnlikePlaylistError(playlist: Playlist) {
+        val msg = activity!!.getString(R.string.unliked_playlist_unsuccessfully_message, playlist.title)
+
+        Snackbar.make(main_content, msg, Snackbar.LENGTH_SHORT).show()
+    }
+    
     fun playTrackAtPosition(position: Int) {
         Log.d(TAG, "playTrackAtPosition: position=$position")
 
@@ -515,15 +552,13 @@ class PlayMusicFragment : Fragment(), AppBarLayout.OnOffsetChangedListener {
         override fun onLikePlaylistSuccess(commonApiResponse: CommonApiResponse, playlist: Playlist) {
             Log.d(TAG, "onLikePlaylistSuccess: commonApiResponse=$commonApiResponse, playlist=${playlist.shortLog()}")
 
-            if (commonApiResponse.isOk()) {
-                playlist.isLiked = true
-
-                playMusicFragment.updateLikeUnlikeButton(playlist)
-            }
+            playMusicFragment.onLikePlaylistSuccess(commonApiResponse, playlist)
         }
 
-        override fun onLikePlaylistError(error: Throwable) {
+        override fun onLikePlaylistError(error: Throwable, playlist: Playlist) {
+            Log.e(TAG, "onLikePlaylistError", error)
 
+            playMusicFragment.onLikePlaylistError(playlist)
         }
     }
 
@@ -535,15 +570,13 @@ class PlayMusicFragment : Fragment(), AppBarLayout.OnOffsetChangedListener {
         override fun onUnlikePlaylistSuccess(commonApiResponse: CommonApiResponse, playlist: Playlist) {
             Log.d(TAG, "onLikePlaylistSuccess: commonApiResponse=$commonApiResponse, playlist=${playlist.shortLog()}")
 
-            if (commonApiResponse.isOk()) {
-                playlist.isLiked = false
-
-                playMusicFragment.updateLikeUnlikeButton(playlist)
-            }
+            playMusicFragment.onUnlikePlaylistSuccess(commonApiResponse, playlist)
         }
 
-        override fun onUnlikePlaylistError(error: Throwable) {
+        override fun onUnlikePlaylistError(error: Throwable, playlist: Playlist) {
+            Log.e(TAG, "onUnlikePlaylistError", error)
 
+            playMusicFragment.onUnlikePlaylistError(playlist)
         }
     }
 
