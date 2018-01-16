@@ -160,10 +160,11 @@ abstract class BaseMusicFragment :
     private fun displayLoading(isShown: Boolean) {
         Log.d(TAG, "displayLoading: isShown=$isShown")
 
-        when {
-            isShown -> AppDialog.showProgress(R.string.progress_dialog_waiting_message, context!!)
-            else -> AppDialog.hideProgress(context!!)
-        }
+//        when {
+//            isShown -> AppDialog.showProgress(R.string.progress_dialog_waiting_message, context!!)
+//            else -> AppDialog.hideProgress(context!!)
+//        }
+        playMusicFragment!!.displayProgressBar(isShown)
     }
 
     @UiThread

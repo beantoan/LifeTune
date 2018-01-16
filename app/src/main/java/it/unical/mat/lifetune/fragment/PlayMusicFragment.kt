@@ -533,7 +533,11 @@ class PlayMusicFragment : Fragment(), AppBarLayout.OnOffsetChangedListener {
 
         Snackbar.make(main_content, msg, Snackbar.LENGTH_SHORT).show()
     }
-    
+
+    fun displayProgressBar(isShown: Boolean) {
+        progress_bar.visibility = if (isShown) View.VISIBLE else View.GONE
+    }
+
     fun playTrackAtPosition(position: Int) {
         Log.d(TAG, "playTrackAtPosition: position=$position")
 
