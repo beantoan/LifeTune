@@ -194,7 +194,7 @@ abstract class BaseMusicFragment :
         if (AppUtils.isInternetConnected(context!!)) {
             beforeCallSongsApi()
 
-            SongPresenter(ImplSongCallbacks(this)).callSongsApi(playlist)
+            SongPresenter(ImplSongsCallback(this)).callSongsApi(playlist)
         } else {
             AppDialog.error(R.string.no_internet_error_title, R.string.no_internet_error_message, activity!!)
         }
@@ -250,7 +250,7 @@ abstract class BaseMusicFragment :
         }
 
         override fun onLikePlaylistSuccess(commonApiResponse: CommonApiResponse, playlist: Playlist) {
-            Log.d(TAG, "onLikePlaylistSuccess: commonApiResponse=$commonApiResponse, playlist.id=${playlist.id}")
+            Log.d(TAG, "onLikePlaylistSuccess: commonApiResponse=$commonApiResponse, playlist=${playlist.shortLog}")
 
         }
 
@@ -265,7 +265,7 @@ abstract class BaseMusicFragment :
         }
 
         override fun onUnlikePlaylistSuccess(commonApiResponse: CommonApiResponse, playlist: Playlist) {
-            Log.d(TAG, "onUnlikePlaylistSuccess: commonApiResponse=$commonApiResponse, playlist.id=${playlist.id}")
+            Log.d(TAG, "onUnlikePlaylistSuccess: commonApiResponse=$commonApiResponse, playlist=${playlist.shortLog}")
 
         }
 
@@ -298,7 +298,7 @@ abstract class BaseMusicFragment :
         }
     }
 
-    private class ImplSongCallbacks(val baseMusicFragment: BaseMusicFragment) : SongPresenter.Callbacks {
+    private class ImplSongsCallback(val baseMusicFragment: BaseMusicFragment) : SongPresenter.SongsCallback {
         override fun onSongsApiSuccess(playlist: Playlist, trackList: TrackList) {
             baseMusicFragment.onSongsApiSuccess(playlist, trackList)
         }

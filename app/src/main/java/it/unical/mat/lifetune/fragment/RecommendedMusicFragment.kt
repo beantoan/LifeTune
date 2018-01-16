@@ -291,7 +291,7 @@ class RecommendedMusicFragment : BaseMusicFragment() {
     }
 
     private fun updateControllerData(categories: List<Category>) {
-        Log.d(TAG, "updateControllerData")
+        Log.d(TAG, "updateControllerData: categories.size=${categories.size}")
         
         controller?.cancelPendingModelBuild()
         controller?.setData(categories)

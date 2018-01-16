@@ -13,7 +13,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.crashlytics.android.Crashlytics
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource
 import com.google.android.exoplayer2.source.ExtractorMediaSource
@@ -23,8 +22,6 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 import com.google.firebase.auth.FirebaseAuth
 import com.lapism.searchview.SearchView
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import it.unical.mat.lifetune.BuildConfig
 import it.unical.mat.lifetune.LifeTuneApplication
 import it.unical.mat.lifetune.R
@@ -32,13 +29,13 @@ import it.unical.mat.lifetune.activity.MainActivity
 import it.unical.mat.lifetune.adapter.PlayMusicPagerAdapter
 import it.unical.mat.lifetune.adapter.PlayingTracksAdapter
 import it.unical.mat.lifetune.adapter.SearchSongResultsAdapter
-import it.unical.mat.lifetune.api.ApiServiceFactory
 import it.unical.mat.lifetune.decoration.RecyclerViewDividerItemDecoration
 import it.unical.mat.lifetune.entity.CommonApiResponse
 import it.unical.mat.lifetune.entity.Playlist
 import it.unical.mat.lifetune.entity.Song
 import it.unical.mat.lifetune.entity.Track
 import it.unical.mat.lifetune.presenter.PlaylistPresenter
+import it.unical.mat.lifetune.presenter.SongPresenter
 import it.unical.mat.lifetune.view.CustomSearchView
 import it.unical.mat.lifetune.view.PlaybackControlView
 import kotlinx.android.synthetic.main.bottom_sheet_music_player.*
@@ -118,6 +115,8 @@ class PlayMusicFragment : Fragment(), AppBarLayout.OnOffsetChangedListener {
     }
 
     private fun setupAppBarLayout() {
+        Log.d(TAG, "setupAppBarLayout")
+
         app_bar_layout.addOnOffsetChangedListener(this)
     }
 
@@ -159,6 +158,8 @@ class PlayMusicFragment : Fragment(), AppBarLayout.OnOffsetChangedListener {
     }
 
     private fun setupBottomSheetMusicPlayer() {
+        Log.d(TAG, "setupBottomSheetMusicPlayer")
+
         val bottomSheetBehavior = BottomSheetBehavior.from(bottom_sheet_music_player)
 
         bottomSheetBehavior.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
@@ -180,6 +181,8 @@ class PlayMusicFragment : Fragment(), AppBarLayout.OnOffsetChangedListener {
     }
 
     private fun setupBottomSheetSearchSongResults() {
+        Log.d(TAG, "setupBottomSheetSearchSongResults")
+
         val bottomSheetBehavior = BottomSheetBehavior.from(bottom_sheet_search_song_results)
 
         bottomSheetBehavior.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
@@ -201,6 +204,8 @@ class PlayMusicFragment : Fragment(), AppBarLayout.OnOffsetChangedListener {
     }
 
     private fun setupRecyclerViewSearchSongResults() {
+        Log.d(TAG, "setupRecyclerViewSearchSongResults")
+
         val dividerDrawable = ContextCompat.getDrawable(activity!!.applicationContext, R.drawable.song_divider)
         val dividerItemDecoration = RecyclerViewDividerItemDecoration(activity!!.applicationContext, DividerItemDecoration.VERTICAL, dividerDrawable!!)
 
@@ -211,6 +216,8 @@ class PlayMusicFragment : Fragment(), AppBarLayout.OnOffsetChangedListener {
     }
 
     private fun setupRecyclerViewPlayingTracks() {
+        Log.d(TAG, "setupRecyclerViewPlayingTracks")
+
         val dividerDrawable = ContextCompat.getDrawable(activity!!.applicationContext, R.drawable.song_divider)
         val dividerItemDecoration = RecyclerViewDividerItemDecoration(activity!!.applicationContext, DividerItemDecoration.VERTICAL, dividerDrawable!!)
 
@@ -223,6 +230,8 @@ class PlayMusicFragment : Fragment(), AppBarLayout.OnOffsetChangedListener {
     }
 
     private fun setupPlayingPlaylistActions() {
+        Log.d(TAG, "setupPlayingPlaylistActions")
+
         like_playing_playlist.setOnClickListener {
             likePlaylist(LifeTuneApplication.musicPlayer.playlist)
         }
@@ -233,6 +242,8 @@ class PlayMusicFragment : Fragment(), AppBarLayout.OnOffsetChangedListener {
     }
 
     private fun likePlaylist(playlist: Playlist?) {
+        Log.d(TAG, "likePlaylist: ${playlist?.shortLog}")
+
         if (playlist != null) {
             val userId = FirebaseAuth.getInstance().currentUser!!.uid
 
@@ -241,6 +252,8 @@ class PlayMusicFragment : Fragment(), AppBarLayout.OnOffsetChangedListener {
     }
 
     private fun unlikePlaylist(playlist: Playlist?) {
+        Log.d(TAG, "unlikePlaylist: ${playlist?.shortLog}")
+
         if (playlist != null) {
             val userId = FirebaseAuth.getInstance().currentUser!!.uid
 
@@ -271,7 +284,7 @@ class PlayMusicFragment : Fragment(), AppBarLayout.OnOffsetChangedListener {
     }
 
     fun playSongs(playlist: Playlist?) {
-        Log.d(TAG, "playSongs")
+        Log.d(TAG, "playSongs: ${playlist?.shortLog}")
 
         music_player.player.stop()
 
@@ -296,7 +309,7 @@ class PlayMusicFragment : Fragment(), AppBarLayout.OnOffsetChangedListener {
             music_player.player.playWhenReady = true
         }
 
-        updatePlayingTrackAdapter(playlist?.tracks)
+        updatePlayingTrackAdapter(LifeTuneApplication.musicPlayer.playlist?.tracks)
 
         updateLikeUnlikeButton(playlist)
     }
@@ -318,6 +331,8 @@ class PlayMusicFragment : Fragment(), AppBarLayout.OnOffsetChangedListener {
     }
 
     private fun expandCollapseAppBar(isExpand: Boolean) {
+        Log.d(TAG, "expandCollapseAppBar: isExpand=$isExpand")
+
         when (isExpand) {
             false -> {
                 app_bar_layout.setExpanded(false, true)
@@ -331,6 +346,8 @@ class PlayMusicFragment : Fragment(), AppBarLayout.OnOffsetChangedListener {
     }
 
     private fun setScrollFragsForAppBarLayout(isScroll: Boolean) {
+        Log.d(TAG, "setScrollFragsForAppBarLayout: isScroll=$isScroll")
+
         val layoutParams = floating_search_view_placeholder.layoutParams as AppBarLayout.LayoutParams
 
         when (isScroll) {
@@ -360,19 +377,7 @@ class PlayMusicFragment : Fragment(), AppBarLayout.OnOffsetChangedListener {
 
                 search_view.close(true)
 
-                try {
-                    ApiServiceFactory.createSongApi().search(query)
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(
-                                    { songs -> onSearchSongsSuccess(songs) },
-                                    { error -> onSearchSongsError(error) }
-                            )
-
-                } catch (error: Exception) {
-                    Crashlytics.log(Log.ERROR, TAG, "setupSearchView" + error)
-                    Crashlytics.logException(error)
-                }
+                SongPresenter(ImplSearchCallbacks(this@PlayMusicFragment)).callSearchApi(query)
 
                 return true
             }
@@ -422,6 +427,8 @@ class PlayMusicFragment : Fragment(), AppBarLayout.OnOffsetChangedListener {
     }
 
     private fun displaySearchSongResults(isShown: Boolean) {
+        Log.d(TAG, "displaySearchSongResults: isShown=$isShown")
+
         val bottomSheetBehavior = BottomSheetBehavior.from(bottom_sheet_search_song_results)
 
         bottomSheetBehavior.state = when (isShown) {
@@ -431,16 +438,22 @@ class PlayMusicFragment : Fragment(), AppBarLayout.OnOffsetChangedListener {
     }
 
     private fun onSearchSongsSuccess(songs: List<Song>) {
+        Log.d(TAG, "onSearchSongsSuccess: songs.size=${songs.size}")
+
         updateSearchSongResultAdapter(songs)
 
         displaySearchSongResults(true)
     }
 
     private fun updateSearchSongResultAdapter(songs: List<Song>) {
+        Log.d(TAG, "updateSearchSongResultAdapter: songs.size=${songs.size}")
+
         searchSongResultsAdapter.addAll(songs)
     }
 
     private fun updatePlayingTrackAdapter(tracks: List<Track>?) {
+        Log.d(TAG, "updatePlayingTrackAdapter: tracks.size=${tracks?.size}")
+
         if (tracks == null) {
             playingTrackAdapter?.clear()
         } else {
@@ -473,6 +486,8 @@ class PlayMusicFragment : Fragment(), AppBarLayout.OnOffsetChangedListener {
     }
 
     fun playTrackAtPosition(position: Int) {
+        Log.d(TAG, "playTrackAtPosition: position=$position")
+
         LifeTuneApplication.musicPlayer.seekTo(position, C.TIME_UNSET)
     }
 
@@ -486,7 +501,7 @@ class PlayMusicFragment : Fragment(), AppBarLayout.OnOffsetChangedListener {
         }
 
         override fun onLikePlaylistSuccess(commonApiResponse: CommonApiResponse, playlist: Playlist) {
-            Log.d(TAG, "onLikePlaylistSuccess: commonApiResponse=$commonApiResponse, playlist.id=${playlist.id}")
+            Log.d(TAG, "onLikePlaylistSuccess: commonApiResponse=$commonApiResponse, playlist=${playlist.shortLog}")
 
             if (commonApiResponse.isOk()) {
                 playlist.isLiked = true
@@ -506,7 +521,7 @@ class PlayMusicFragment : Fragment(), AppBarLayout.OnOffsetChangedListener {
         }
 
         override fun onUnlikePlaylistSuccess(commonApiResponse: CommonApiResponse, playlist: Playlist) {
-            Log.d(TAG, "onLikePlaylistSuccess: commonApiResponse=$commonApiResponse, playlist.id=${playlist.id}")
+            Log.d(TAG, "onLikePlaylistSuccess: commonApiResponse=$commonApiResponse, playlist=${playlist.shortLog}")
 
             if (commonApiResponse.isOk()) {
                 playlist.isLiked = false
@@ -517,6 +532,16 @@ class PlayMusicFragment : Fragment(), AppBarLayout.OnOffsetChangedListener {
 
         override fun onUnlikePlaylistError(error: Throwable) {
 
+        }
+    }
+
+    private class ImplSearchCallbacks(val playMusicFragment: PlayMusicFragment) : SongPresenter.SearchCallback {
+        override fun onSearchSuccess(songs: List<Song>) {
+            playMusicFragment.onSearchSongsSuccess(songs)
+        }
+
+        override fun onSearchError(error: Throwable) {
+            playMusicFragment.onSearchSongsError(error)
         }
     }
 }

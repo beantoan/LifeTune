@@ -96,7 +96,7 @@ class FavoriteMusicFragment : BaseMusicFragment() {
     }
 
     private fun updateControllerData(playlists: List<Playlist>) {
-        Log.d(TAG, "updateControllerData")
+        Log.d(TAG, "updateControllerData: playlists.size=${playlists.size}")
         
         controller?.cancelPendingModelBuild()
         controller?.setData(playlists)

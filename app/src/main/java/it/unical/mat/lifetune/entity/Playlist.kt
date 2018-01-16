@@ -18,4 +18,6 @@ data class Playlist(
         @get:Bindable var isPlaying: Boolean = false,
         var tracks: List<Track>
 
-) : BaseObservable()
+) : BaseObservable() {
+    val shortLog = "Playlist(id=$id, title=$title)"
+}
