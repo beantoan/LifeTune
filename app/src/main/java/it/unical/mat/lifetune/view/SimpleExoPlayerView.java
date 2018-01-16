@@ -25,6 +25,7 @@ import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -882,7 +883,6 @@ public final class SimpleExoPlayerView extends FrameLayout {
         }
         // Artwork disabled or unavailable.
         hideArtwork();
-        showTrackInfo();
     }
 
     private boolean setArtworkFromMetadata(Metadata metadata) {
@@ -979,6 +979,8 @@ public final class SimpleExoPlayerView extends FrameLayout {
         @Override
         public void onTracksChanged(TrackGroupArray tracks, TrackSelectionArray selections) {
             updateForCurrentTrackSelections();
+
+            showTrackInfo();
         }
 
         // Player.EventListener implementation
@@ -1006,7 +1008,11 @@ public final class SimpleExoPlayerView extends FrameLayout {
     /**
      * Customize
      */
+    private final String TAG = SimpleExoPlayerView.class.getSimpleName();
+
     public void showTrackInfo() {
+        Log.d(TAG, "showTrackInfo");
+
         if (this.player == null) {
             return;
         }
@@ -1017,9 +1023,11 @@ public final class SimpleExoPlayerView extends FrameLayout {
         if (tracks.isEmpty() || this.player.getCurrentWindowIndex() > tracks.size() - 1) {
             setTitle(null);
             setAvatar(null);
+
+            setCurrentPlayingTrack(tracks, null);
         } else {
             Track currentTrack = tracks.get(this.player.getCurrentWindowIndex());
-            String title = currentTrack.getCombinedTitle() + " >> " + currentTrack.getTitle();
+            String title = currentTrack.getCombinedTitle() + " >> " + this.player.getPlaylist().getTitle();
             String avatarUrl = currentTrack.getPlayerAvatar();
 
             setCurrentPlayingTrack(tracks, currentTrack);
@@ -1068,14 +1076,25 @@ public final class SimpleExoPlayerView extends FrameLayout {
     }
 
     private void setCurrentPlayingTrack(List<Track> tracks, Track playingTrack) {
+
+        String title = playingTrack == null ? "no title" : playingTrack.getCombinedTitle();
+
+        Log.d(TAG, "setCurrentPlayingTrack: track=" + title);
+
         for (Track track : tracks) {
             track.setPlaying(false);
+            track.notifyChange();
         }
 
-        playingTrack.setPlaying(true);
+        if (playingTrack != null) {
+            playingTrack.setPlaying(true);
+            playingTrack.notifyChange();
+        }
     }
 
     private void updateOnPlayerStateChanged(int playbackState) {
+        Log.d(TAG, "updateOnPlayerStateChanged");
+
         switch (playbackState) {
             case Player.STATE_READY:
             case Player.STATE_BUFFERING:
