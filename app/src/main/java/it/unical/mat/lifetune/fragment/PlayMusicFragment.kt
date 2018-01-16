@@ -73,7 +73,11 @@ class PlayMusicFragment : Fragment(), AppBarLayout.OnOffsetChangedListener {
     }
 
     private fun onResumeTasks() {
+        Log.d(TAG, "onResumeTasks")
+
         search_view.close(false)
+
+        updateMediaPlayControl()
     }
 
     override fun onDestroy() {
@@ -242,7 +246,7 @@ class PlayMusicFragment : Fragment(), AppBarLayout.OnOffsetChangedListener {
     }
 
     private fun likePlaylist(playlist: Playlist?) {
-        Log.d(TAG, "likePlaylist: ${playlist?.shortLog}")
+        Log.d(TAG, "likePlaylist: ${playlist?.shortLog()}")
 
         if (playlist != null) {
             val userId = FirebaseAuth.getInstance().currentUser!!.uid
@@ -252,7 +256,7 @@ class PlayMusicFragment : Fragment(), AppBarLayout.OnOffsetChangedListener {
     }
 
     private fun unlikePlaylist(playlist: Playlist?) {
-        Log.d(TAG, "unlikePlaylist: ${playlist?.shortLog}")
+        Log.d(TAG, "unlikePlaylist: ${playlist?.shortLog()}")
 
         if (playlist != null) {
             val userId = FirebaseAuth.getInstance().currentUser!!.uid
@@ -284,9 +288,13 @@ class PlayMusicFragment : Fragment(), AppBarLayout.OnOffsetChangedListener {
     }
 
     fun playSongs(playlist: Playlist?) {
-        Log.d(TAG, "playSongs: ${playlist?.shortLog}")
+        Log.d(TAG, "playSongs: ${playlist?.shortLog()}")
 
         music_player.player.stop()
+
+//        val dupPlaylist : Playlist? = playlist?.dup()
+//
+//        Log.d(TAG, "dupPlaylist=${dupPlaylist?.shortLog()}")
 
         if (playlist == null || playlist.tracks.isEmpty()) {
             LifeTuneApplication.musicPlayer.playlist = null
@@ -309,9 +317,13 @@ class PlayMusicFragment : Fragment(), AppBarLayout.OnOffsetChangedListener {
             music_player.player.playWhenReady = true
         }
 
+        updateMediaPlayControl()
+    }
+
+    private fun updateMediaPlayControl() {
         updatePlayingTrackAdapter(LifeTuneApplication.musicPlayer.playlist?.tracks)
 
-        updateLikeUnlikeButton(playlist)
+        updateLikeUnlikeButton(LifeTuneApplication.musicPlayer.playlist)
     }
 
     private fun currentViewPagerItem(): Int = pager.currentItem
@@ -501,7 +513,7 @@ class PlayMusicFragment : Fragment(), AppBarLayout.OnOffsetChangedListener {
         }
 
         override fun onLikePlaylistSuccess(commonApiResponse: CommonApiResponse, playlist: Playlist) {
-            Log.d(TAG, "onLikePlaylistSuccess: commonApiResponse=$commonApiResponse, playlist=${playlist.shortLog}")
+            Log.d(TAG, "onLikePlaylistSuccess: commonApiResponse=$commonApiResponse, playlist=${playlist.shortLog()}")
 
             if (commonApiResponse.isOk()) {
                 playlist.isLiked = true
@@ -521,7 +533,7 @@ class PlayMusicFragment : Fragment(), AppBarLayout.OnOffsetChangedListener {
         }
 
         override fun onUnlikePlaylistSuccess(commonApiResponse: CommonApiResponse, playlist: Playlist) {
-            Log.d(TAG, "onLikePlaylistSuccess: commonApiResponse=$commonApiResponse, playlist=${playlist.shortLog}")
+            Log.d(TAG, "onLikePlaylistSuccess: commonApiResponse=$commonApiResponse, playlist=${playlist.shortLog()}")
 
             if (commonApiResponse.isOk()) {
                 playlist.isLiked = false

@@ -69,11 +69,11 @@ class RecommendedMusicFragment : BaseMusicFragment() {
         updateControllerData(categories)
     }
 
-    override fun onRecommendationApiError(error: Throwable) {
-        super.onRecommendationApiError(error)
-
-        updateControllerData(ArrayList())
-    }
+//    override fun onRecommendationApiError(error: Throwable) {
+//        super.onRecommendationApiError(error)
+//
+//        updateControllerData(ArrayList())
+//    }
 
     override fun startLoadingData() {
         checkLocationSetting()
@@ -98,7 +98,9 @@ class RecommendedMusicFragment : BaseMusicFragment() {
     private fun onCreateViewTasks(view: View) {
         Log.d(TAG, "onCreateViewTasks")
 
-        EventBus.getDefault().register(this)
+        if (!EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().register(this)
+        }
 
         setupRecyclerViewCategories()
 
@@ -108,7 +110,9 @@ class RecommendedMusicFragment : BaseMusicFragment() {
     }
 
     private fun onStopTasks() {
-        EventBus.getDefault().unregister(this)
+        if (EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().unregister(this)
+        }
     }
 
     private fun checkLocationSetting() {

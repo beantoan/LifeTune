@@ -43,7 +43,7 @@ object ApiServiceFactory {
     fun getRetrofitXml(baseUrl: String): Retrofit {
         if (ApiServiceFactory.retrofitXml == null) {
             val logging = HttpLoggingInterceptor()
-            logging.level = HttpLoggingInterceptor.Level.BODY
+            logging.level = HttpLoggingInterceptor.Level.BASIC
 
 
             val client = OkHttpClient.Builder()

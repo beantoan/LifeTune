@@ -857,6 +857,7 @@ public final class SimpleExoPlayerView extends FrameLayout {
                 // Video enabled so artwork must be hidden. If the shutter is closed, it will be opened in
                 // onRenderedFirstFrame().
                 hideArtwork();
+                showTrackInfo();
                 return;
             }
         }
@@ -872,17 +873,20 @@ public final class SimpleExoPlayerView extends FrameLayout {
                     for (int j = 0; j < selection.length(); j++) {
                         Metadata metadata = selection.getFormat(j).metadata;
                         if (metadata != null && setArtworkFromMetadata(metadata)) {
+                            showTrackInfo();
                             return;
                         }
                     }
                 }
             }
             if (setArtworkFromBitmap(defaultArtwork)) {
+                showTrackInfo();
                 return;
             }
         }
         // Artwork disabled or unavailable.
         hideArtwork();
+        showTrackInfo();
     }
 
     private boolean setArtworkFromMetadata(Metadata metadata) {
@@ -979,8 +983,6 @@ public final class SimpleExoPlayerView extends FrameLayout {
         @Override
         public void onTracksChanged(TrackGroupArray tracks, TrackSelectionArray selections) {
             updateForCurrentTrackSelections();
-
-            showTrackInfo();
         }
 
         // Player.EventListener implementation

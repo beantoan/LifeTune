@@ -53,30 +53,30 @@ abstract class BaseMusicFragment :
     }
 
     override final fun onPlaylistClicked(playlist: Playlist) {
-        Log.d(TAG, "onPlaylistClicked#${playlist.id}-${playlist.title}")
+        Log.d(TAG, "onPlaylistClicked: ${playlist.shortLog()}")
 
         callSongsApi(playlist)
     }
 
     override final fun onSongClicked(song: Song) {
-        Log.d(TAG, "onPlaylistClicked#${song.id}-${song.title}")
+        Log.d(TAG, "onPlaylistClicked: ${song.shortLog()}")
 
     }
 
     override fun onLikePlaylistClicked(playlist: Playlist) {
-        Log.d(TAG, "onLikePlaylistClicked#${playlist.id}-${playlist.title}")
+        Log.d(TAG, "onLikePlaylistClicked: ${playlist.shortLog()}")
 
         callLikePlaylistApi(playlist)
     }
 
     override fun onUnlikePlaylistClicked(playlist: Playlist) {
-        Log.d(TAG, "onUnlikePlaylistClicked#${playlist.id}-${playlist.title}")
+        Log.d(TAG, "onUnlikePlaylistClicked: ${playlist.shortLog()}")
 
         callUnlikePlaylistApi(playlist)
     }
 
     open protected fun onSongsApiSuccess(playlist: Playlist, trackList: TrackList) {
-        Log.d(TAG, "onSongsApiSuccess")
+        Log.d(TAG, "onSongsApiSuccess: ${playlist.shortLog()}")
 
         playlist.tracks = trackList.tracks
 
@@ -181,7 +181,7 @@ abstract class BaseMusicFragment :
 
     @UiThread
     private fun playSongs(playlist: Playlist?) {
-        Log.d(TAG, "playSongs")
+        Log.d(TAG, "playSongs: ${playlist?.shortLog()}")
 
         this.playMusicFragment?.playSongs(playlist)
 
@@ -189,7 +189,7 @@ abstract class BaseMusicFragment :
     }
 
     fun callSongsApi(playlist: Playlist) {
-        Log.d(TAG, "callSongsApi#${playlist.id}-${playlist.title}")
+        Log.d(TAG, "callSongsApi: ${playlist.shortLog()}")
 
         if (AppUtils.isInternetConnected(context!!)) {
             beforeCallSongsApi()
@@ -250,7 +250,7 @@ abstract class BaseMusicFragment :
         }
 
         override fun onLikePlaylistSuccess(commonApiResponse: CommonApiResponse, playlist: Playlist) {
-            Log.d(TAG, "onLikePlaylistSuccess: commonApiResponse=$commonApiResponse, playlist=${playlist.shortLog}")
+            Log.d(TAG, "onLikePlaylistSuccess: commonApiResponse=$commonApiResponse, playlist=${playlist.shortLog()}")
 
         }
 
@@ -265,7 +265,7 @@ abstract class BaseMusicFragment :
         }
 
         override fun onUnlikePlaylistSuccess(commonApiResponse: CommonApiResponse, playlist: Playlist) {
-            Log.d(TAG, "onUnlikePlaylistSuccess: commonApiResponse=$commonApiResponse, playlist=${playlist.shortLog}")
+            Log.d(TAG, "onUnlikePlaylistSuccess: commonApiResponse=$commonApiResponse, playlist=${playlist.shortLog()}")
 
         }
 

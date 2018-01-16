@@ -1,5 +1,6 @@
 package it.unical.mat.lifetune.presenter
 
+import android.util.Log
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import it.unical.mat.lifetune.api.ApiServiceFactory
@@ -23,7 +24,13 @@ class SongPresenter {
         searchCallback = callbacks
     }
 
+    companion object {
+        val TAG = SongPresenter::class.java.simpleName
+    }
+
     fun callSongsApi(playlist: Playlist) {
+        Log.d(TAG, "callSongsApi: ${playlist.shortLog()}")
+
         ApiServiceFactory.createPlaylistXmlApi().songs(playlist.key)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -34,6 +41,8 @@ class SongPresenter {
     }
 
     fun callSearchApi(term: String) {
+        Log.d(TAG, "callSearchApi: term=$term")
+
         ApiServiceFactory.createSongApi().search(term)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

@@ -13,4 +13,6 @@ data class Song(
         @SerializedName("mp3_url") @get:Bindable var mp3_url: String,
         @SerializedName("singers") @get:Bindable var singers: String,
         @SerializedName("playlist") @get:Bindable var playlist: Playlist
-) : BaseObservable()
+) : BaseObservable() {
+    fun shortLog(): String = "Song(id=$id, title=$title)"
+}
