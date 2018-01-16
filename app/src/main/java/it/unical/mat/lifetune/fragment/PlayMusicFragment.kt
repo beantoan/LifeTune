@@ -15,15 +15,17 @@ import android.view.View
 import android.view.ViewGroup
 import com.crashlytics.android.Crashlytics
 import com.google.android.exoplayer2.C
-import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory
-import com.google.android.exoplayer2.source.DynamicConcatenatingMediaSource
+import com.google.android.exoplayer2.source.ConcatenatingMediaSource
 import com.google.android.exoplayer2.source.ExtractorMediaSource
 import com.google.android.exoplayer2.source.MediaSource
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
+import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
+import com.google.android.exoplayer2.util.Util
 import com.google.firebase.auth.FirebaseAuth
 import com.lapism.searchview.SearchView
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import it.unical.mat.lifetune.BuildConfig
 import it.unical.mat.lifetune.LifeTuneApplication
 import it.unical.mat.lifetune.R
 import it.unical.mat.lifetune.activity.MainActivity
@@ -98,7 +100,7 @@ class PlayMusicFragment : Fragment(), AppBarLayout.OnOffsetChangedListener {
         
         setupMusicPlayer()
 
-        setupBottomSheet()
+        setupBottomSheetMusicPlayer()
 
         setupBottomSheetSearchSongResults()
         
@@ -140,7 +142,7 @@ class PlayMusicFragment : Fragment(), AppBarLayout.OnOffsetChangedListener {
         music_player.setOnCollapseExpandListener(object : PlaybackControlView.CollapseExpandListener {
             override fun onExpanded() {
                 displayTrackList(true)
-                displaySearchView(false)
+                expandCollapseAppBar(false)
             }
 
             override fun onCollapsed() {
@@ -156,7 +158,7 @@ class PlayMusicFragment : Fragment(), AppBarLayout.OnOffsetChangedListener {
         }
     }
 
-    private fun setupBottomSheet() {
+    private fun setupBottomSheetMusicPlayer() {
         val bottomSheetBehavior = BottomSheetBehavior.from(bottom_sheet_music_player)
 
         bottomSheetBehavior.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
@@ -170,7 +172,7 @@ class PlayMusicFragment : Fragment(), AppBarLayout.OnOffsetChangedListener {
 
                     }
                     BottomSheetBehavior.STATE_COLLAPSED -> {
-                        displaySearchView(true)
+                        expandCollapseAppBar(true)
                     }
                 }
             }
@@ -273,8 +275,6 @@ class PlayMusicFragment : Fragment(), AppBarLayout.OnOffsetChangedListener {
 
         music_player.player.stop()
 
-        val dynamicConcatenatingMediaSource = DynamicConcatenatingMediaSource()
-
         if (playlist == null || playlist.tracks.isEmpty()) {
             LifeTuneApplication.musicPlayer.playlist = null
 
@@ -288,11 +288,11 @@ class PlayMusicFragment : Fragment(), AppBarLayout.OnOffsetChangedListener {
 
             playlist.tracks.forEach { mediaSources.add(buildMediaSource(Uri.parse(it.url))) }
 
-            dynamicConcatenatingMediaSource.addMediaSources(mediaSources)
+            val concatenatingMediaSource = ConcatenatingMediaSource(*mediaSources.toTypedArray())
 
             showMusicPlayer()
 
-            music_player.player.prepare(dynamicConcatenatingMediaSource)
+            music_player.player.prepare(concatenatingMediaSource)
             music_player.player.playWhenReady = true
         }
 
@@ -310,12 +310,15 @@ class PlayMusicFragment : Fragment(), AppBarLayout.OnOffsetChangedListener {
             Boolean = currentViewPagerItem() == PlayMusicPagerAdapter.FAVOURITE_MUSIC_FRAGMENT
 
     private fun buildMediaSource(uri: Uri): ExtractorMediaSource {
-        return ExtractorMediaSource(uri, DefaultHttpDataSourceFactory("ua"),
-                DefaultExtractorsFactory(), null, null)
+        val dataSourceFactory = DefaultDataSourceFactory(context,
+                Util.getUserAgent(context, BuildConfig.APPLICATION_ID), DefaultBandwidthMeter())
+
+        return ExtractorMediaSource.Factory(dataSourceFactory)
+                .createMediaSource(uri)
     }
 
-    private fun displaySearchView(isShown: Boolean) {
-        when (isShown) {
+    private fun expandCollapseAppBar(isExpand: Boolean) {
+        when (isExpand) {
             false -> {
                 app_bar_layout.setExpanded(false, true)
                 search_view.visibility = View.GONE
