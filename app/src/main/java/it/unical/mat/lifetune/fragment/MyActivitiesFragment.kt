@@ -3,7 +3,6 @@ package it.unical.mat.lifetune.fragment
 import android.graphics.Color
 import android.graphics.Paint
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.text.InputType
 import android.util.Log
 import android.view.LayoutInflater
@@ -40,7 +39,7 @@ import kotlin.collections.ArrayList
 /**
  * Created by beantoan on 11/17/17.
  */
-class MyActivitiesFragment : Fragment() {
+class MyActivitiesFragment : BaseFragment() {
 
     private var runningData: ArrayList<FitnessChartEntry> = ArrayList()
     private var onBicycleData: ArrayList<FitnessChartEntry> = ArrayList()
@@ -180,7 +179,7 @@ class MyActivitiesFragment : Fragment() {
 
         val account = GoogleSignIn.getLastSignedInAccount(activity)
 
-        AppDialog.showProgress(R.string.progress_dialog_waiting_message, context!!)
+        showProgressBar(progress_bar)
 
         Fitness.getHistoryClient(activity!!, account)
                 .readData(readRequest)
@@ -194,7 +193,7 @@ class MyActivitiesFragment : Fragment() {
 
                     isLoadingFitnessData = false
 
-                    AppDialog.hideProgress(context!!)
+                    hideProgressBar(progress_bar)
 
                     fitnessHours.sortBy { it }
 
@@ -218,7 +217,7 @@ class MyActivitiesFragment : Fragment() {
 
                     isLoadingFitnessData = false
 
-                    AppDialog.hideProgress(context!!)
+                    hideProgressBar(progress_bar)
 
                     AppDialog.error(R.string.fitness_read_history_error_title, R.string.fitness_read_history_error_message, activity!!)
                 })

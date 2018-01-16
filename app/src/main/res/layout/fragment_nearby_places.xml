@@ -32,6 +32,18 @@
         android:paddingBottom="60dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            style="@android:style/Widget.DeviceDefault.ProgressBar.Horizontal"
+            android:progressDrawable="@drawable/progress_bar"
+            android:indeterminateBehavior="cycle"
+            android:indeterminateDuration="100"
+            android:indeterminate="true"
+            android:layout_width="match_parent"
+            android:layout_height="15dp"
+            android:maxHeight="10dp"
+            android:minHeight="10dp" />
+
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recycler_view_nearby_places"
             android:layout_width="match_parent"

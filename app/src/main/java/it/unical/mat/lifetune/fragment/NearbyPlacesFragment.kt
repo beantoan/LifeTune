@@ -241,13 +241,13 @@ class NearbyPlacesFragment : BaseLocationFragment(),
 
             if (AppUtils.isInternetConnected(context!!)) {
 
-                AppDialog.showProgress(R.string.progress_dialog_waiting_message, context!!)
+                showProgressBar(progress_bar)
 
                 Awareness.getSnapshotClient(activity).places
                         .addOnCompleteListener(activity!!, {
                             isLoadingPlaces = false
 
-                            AppDialog.hideProgress(context!!)
+                            hideProgressBar(progress_bar)
                         })
                         .addOnSuccessListener(activity!!, { placesResponse ->
                             Log.d(TAG, "Awareness.getSnapshotClient#places#addOnSuccessListener")
@@ -264,7 +264,7 @@ class NearbyPlacesFragment : BaseLocationFragment(),
 
                             isLoadingPlaces = false
 
-                            AppDialog.hideProgress(context!!)
+                            hideProgressBar(progress_bar)
 
                             AppDialog.error(R.string.get_nearby_places_error_title, R.string.get_nearby_places_error_message, activity!!)
                         })

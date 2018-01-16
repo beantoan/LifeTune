@@ -50,12 +50,14 @@
             <ProgressBar
                 android:id="@+id/progress_bar"
                 style="@android:style/Widget.DeviceDefault.ProgressBar.Horizontal"
-                android:progressDrawable="@drawable/progressbar"
+                android:progressDrawable="@drawable/progress_bar"
                 android:indeterminateBehavior="cycle"
                 android:indeterminateDuration="100"
                 android:indeterminate="true"
                 android:layout_width="match_parent"
-                android:layout_height="10dp" />
+                android:layout_height="15dp"
+                android:maxHeight="10dp"
+                android:minHeight="10dp" />
 
             <android.support.v4.view.ViewPager
                 android:id="@+id/pager"

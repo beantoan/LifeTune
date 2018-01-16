@@ -24,34 +24,30 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <android.support.v4.widget.NestedScrollView
+    <LinearLayout
         android:id="@+id/main_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:paddingBottom="55dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <LinearLayout
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            style="@android:style/Widget.DeviceDefault.ProgressBar.Horizontal"
+            android:progressDrawable="@drawable/progress_bar"
+            android:indeterminateBehavior="cycle"
+            android:indeterminateDuration="100"
+            android:indeterminate="true"
+            android:layout_width="match_parent"
+            android:layout_height="15dp"
+            android:maxHeight="10dp"
+            android:minHeight="10dp" />
+
+        <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingBottom="55dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginStart="5dp"
-                android:layout_marginTop="10dp">
-
-                <TextView
-                    style="@style/TextAppearance.AppCompat.Headline"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginStart="5dp"
-                    android:text="@string/my_activities_summary_title" />
-            </LinearLayout>
+            android:orientation="vertical">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -60,206 +56,228 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginEnd="20dp">
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="wrap_content"
-                        android:src="@drawable/ic_activetime_gray" />
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="10dp">
 
                     <TextView
-                        style="@style/TextAppearance.AppCompat.Subhead"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_gravity="center"
-                        android:layout_marginStart="10dp"
-                        android:text="@string/summary_active_time_title" />
-
-                    <TextView
-                        android:id="@+id/total_active_time"
-                        style="@style/TextAppearance.AppCompat.Subhead"
+                        style="@style/TextAppearance.AppCompat.Headline"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:text="0" />
+                        android:layout_marginStart="5dp"
+                        android:text="@string/my_activities_summary_title" />
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:orientation="horizontal"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_activetime_gray" />
+
+                        <TextView
+                            style="@style/TextAppearance.AppCompat.Subhead"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_gravity="center"
+                            android:layout_marginStart="10dp"
+                            android:text="@string/summary_active_time_title" />
+
+                        <TextView
+                            android:id="@+id/total_active_time"
+                            style="@style/TextAppearance.AppCompat.Subhead"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="0" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:orientation="horizontal"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_steps_gray" />
+
+                        <TextView
+                            style="@style/TextAppearance.AppCompat.Subhead"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_gravity="center"
+                            android:layout_marginStart="10dp"
+                            android:text="@string/summary_steps_title" />
+
+                        <TextView
+                            android:id="@+id/total_steps"
+                            style="@style/TextAppearance.AppCompat.Subhead"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="0" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:orientation="horizontal"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_distance_gray" />
+
+                        <TextView
+                            style="@style/TextAppearance.AppCompat.Subhead"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_gravity="center"
+                            android:layout_marginStart="10dp"
+                            android:text="@string/summary_distance_title" />
+
+                        <TextView
+                            android:id="@+id/total_distance"
+                            style="@style/TextAppearance.AppCompat.Subhead"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="0" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:orientation="horizontal"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_calories_gray" />
+
+                        <TextView
+                            style="@style/TextAppearance.AppCompat.Subhead"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_gravity="center"
+                            android:layout_marginStart="10dp"
+                            android:text="@string/summary_calories_title" />
+
+                        <TextView
+                            android:id="@+id/total_calories"
+                            style="@style/TextAppearance.AppCompat.Subhead"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="0" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginEnd="20dp">
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="10dp">
 
                     <ImageView
-                        android:layout_width="20dp"
+                        android:layout_width="30dp"
                         android:layout_height="wrap_content"
                         android:src="@drawable/ic_steps_gray" />
 
                     <TextView
-                        style="@style/TextAppearance.AppCompat.Subhead"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_gravity="center"
-                        android:layout_marginStart="10dp"
-                        android:text="@string/summary_steps_title" />
-
-                    <TextView
-                        android:id="@+id/total_steps"
-                        style="@style/TextAppearance.AppCompat.Subhead"
+                        style="@style/TextAppearance.AppCompat.Headline"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:text="0" />
+                        android:layout_marginStart="5dp"
+                        android:text="@string/count_steps_chart_title" />
                 </LinearLayout>
+
+                <com.github.mikephil.charting.charts.BarChart
+                    android:id="@+id/steps_chart"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginEnd="20dp">
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="15dp">
 
                     <ImageView
-                        android:layout_width="20dp"
+                        android:layout_width="30dp"
                         android:layout_height="wrap_content"
                         android:src="@drawable/ic_distance_gray" />
 
                     <TextView
-                        style="@style/TextAppearance.AppCompat.Subhead"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_gravity="center"
-                        android:layout_marginStart="10dp"
-                        android:text="@string/summary_distance_title" />
-
-                    <TextView
-                        android:id="@+id/total_distance"
-                        style="@style/TextAppearance.AppCompat.Subhead"
+                        style="@style/TextAppearance.AppCompat.Headline"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:text="0" />
+                        android:layout_marginStart="5dp"
+                        android:text="@string/calculate_distances_chart_title" />
                 </LinearLayout>
+
+                <com.github.mikephil.charting.charts.BarChart
+                    android:id="@+id/distance_chart"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginEnd="20dp">
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="15dp">
 
                     <ImageView
-                        android:layout_width="20dp"
+                        android:layout_width="30dp"
                         android:layout_height="wrap_content"
                         android:src="@drawable/ic_calories_gray" />
 
                     <TextView
-                        style="@style/TextAppearance.AppCompat.Subhead"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_gravity="center"
-                        android:layout_marginStart="10dp"
-                        android:text="@string/summary_calories_title" />
-
-                    <TextView
-                        android:id="@+id/total_calories"
-                        style="@style/TextAppearance.AppCompat.Subhead"
+                        style="@style/TextAppearance.AppCompat.Headline"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:text="0" />
+                        android:layout_marginStart="5dp"
+                        android:text="@string/calculate_calories_chart_title" />
                 </LinearLayout>
 
+                <com.github.mikephil.charting.charts.BarChart
+                    android:id="@+id/calories_chart"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp" />
             </LinearLayout>
-
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginStart="5dp"
-                android:layout_marginTop="10dp">
-
-                <ImageView
-                    android:layout_width="30dp"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_steps_gray" />
-
-                <TextView
-                    style="@style/TextAppearance.AppCompat.Headline"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginStart="5dp"
-                    android:text="@string/count_steps_chart_title" />
-            </LinearLayout>
-
-            <com.github.mikephil.charting.charts.BarChart
-                android:id="@+id/steps_chart"
-                android:layout_width="match_parent"
-                android:layout_height="300dp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginStart="5dp"
-                android:layout_marginTop="15dp">
-
-                <ImageView
-                    android:layout_width="30dp"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_distance_gray" />
-
-                <TextView
-                    style="@style/TextAppearance.AppCompat.Headline"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginStart="5dp"
-                    android:text="@string/calculate_distances_chart_title" />
-            </LinearLayout>
-
-            <com.github.mikephil.charting.charts.BarChart
-                android:id="@+id/distance_chart"
-                android:layout_width="match_parent"
-                android:layout_height="300dp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginStart="5dp"
-                android:layout_marginTop="15dp">
-
-                <ImageView
-                    android:layout_width="30dp"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_calories_gray" />
-
-                <TextView
-                    style="@style/TextAppearance.AppCompat.Headline"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginStart="5dp"
-                    android:text="@string/calculate_calories_chart_title" />
-            </LinearLayout>
-
-            <com.github.mikephil.charting.charts.BarChart
-                android:id="@+id/calories_chart"
-                android:layout_width="match_parent"
-                android:layout_height="300dp" />
-        </LinearLayout>
-    </android.support.v4.widget.NestedScrollView>
+        </ScrollView>
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/bottom_sheet_fitness_date"

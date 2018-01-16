@@ -3,7 +3,6 @@ package it.unical.mat.lifetune.fragment
 import android.Manifest
 import android.content.IntentSender
 import android.content.pm.PackageManager
-import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.util.Log
 import com.crashlytics.android.Crashlytics
@@ -22,7 +21,7 @@ import org.greenrobot.eventbus.Subscribe
 /**
  * Created by beantoan on 1/12/18.
  */
-abstract class BaseLocationFragment : Fragment() {
+abstract class BaseLocationFragment : BaseFragment() {
 
     override fun onStart() {
         super.onStart()

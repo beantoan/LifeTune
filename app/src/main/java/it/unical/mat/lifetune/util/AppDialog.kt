@@ -2,13 +2,10 @@ package it.unical.mat.lifetune.util
 
 import android.app.Activity
 import android.app.DatePickerDialog
-import android.app.ProgressDialog
-import android.content.Context
 import android.content.DialogInterface
 import android.util.Log
 import android.widget.EditText
 import cn.pedant.SweetAlert.SweetAlertDialog
-import it.unical.mat.lifetune.R
 import java.text.DateFormat
 import java.util.*
 
@@ -20,8 +17,6 @@ object AppDialog {
     private val TAG = "AppDialog"
 
     private var alertDialog: SweetAlertDialog? = null
-    private var isShowingProgressDialog: Boolean = false
-    private var progressDialog: ProgressDialog? = null
 
     fun hideAlert(activity: Activity) {
         if (AppDialog.alertDialog != null) {
@@ -82,57 +77,6 @@ object AppDialog {
 
     fun success(titleId: Int, messageId: Int, activity: Activity) {
         success(titleId, messageId, activity, null)
-    }
-
-    private fun initProgressDialog(context: Context) {
-        if (AppDialog.progressDialog == null) {
-            AppDialog.progressDialog = ProgressDialog(context)
-            AppDialog.progressDialog!!.setCancelable(true)
-            AppDialog.progressDialog!!.setCanceledOnTouchOutside(true)
-            AppDialog.progressDialog!!.setMessage(context.getString(R.string.progress_dialog_waiting_message))
-        }
-    }
-
-    fun hideProgress(context: Context) {
-        if (!isShowingProgressDialog) {
-            return
-        }
-        
-        if (AppDialog.progressDialog != null) {
-            try {
-                AppDialog.progressDialog!!.dismiss()
-
-                isShowingProgressDialog = false
-
-            } catch (e: Exception) {
-                Log.e(TAG, "hideProgress", e)
-            }
-        }
-    }
-
-    fun showProgress(messageId: Int?, context: Context) {
-        if (isShowingProgressDialog) {
-            return
-        }
-        
-        AppDialog.initProgressDialog(context)
-
-        AppDialog.hideProgress(context)
-
-        if (AppDialog.progressDialog != null) {
-            if (messageId != null) {
-                AppDialog.progressDialog!!.setMessage(context.getString(messageId))
-            }
-
-            try {
-                AppDialog.progressDialog!!.show()
-
-                isShowingProgressDialog = true
-
-            } catch (e: Exception) {
-                Log.e(TAG, "showProgress", e)
-            }
-        }
     }
 
     fun showDatePickerDialog(activity: Activity, mDate: EditText,
