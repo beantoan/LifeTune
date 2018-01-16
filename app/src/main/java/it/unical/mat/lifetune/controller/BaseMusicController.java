@@ -16,6 +16,10 @@ public abstract class BaseMusicController<T> extends TypedEpoxyController<T> {
         void onSongClicked(Song song);
 
         void onPlaylistClicked(Playlist playlist);
+
+        void onLikePlaylistClicked(Playlist playlist);
+
+        void onUnlikePlaylistClicked(Playlist playlist);
     }
 
 

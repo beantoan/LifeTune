@@ -20,6 +20,7 @@ import com.google.android.exoplayer2.source.DynamicConcatenatingMediaSource
 import com.google.android.exoplayer2.source.ExtractorMediaSource
 import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
+import com.google.firebase.auth.FirebaseAuth
 import com.lapism.searchview.SearchView
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -31,11 +32,13 @@ import it.unical.mat.lifetune.adapter.PlayingTracksAdapter
 import it.unical.mat.lifetune.adapter.SearchSongResultsAdapter
 import it.unical.mat.lifetune.api.ApiServiceFactory
 import it.unical.mat.lifetune.decoration.RecyclerViewDividerItemDecoration
+import it.unical.mat.lifetune.entity.CommonApiResponse
 import it.unical.mat.lifetune.entity.Playlist
 import it.unical.mat.lifetune.entity.Song
 import it.unical.mat.lifetune.entity.Track
-import it.unical.mat.lifetune.view.CustomPlaybackControlView
+import it.unical.mat.lifetune.presenter.PlaylistPresenter
 import it.unical.mat.lifetune.view.CustomSearchView
+import it.unical.mat.lifetune.view.PlaybackControlView
 import kotlinx.android.synthetic.main.bottom_sheet_music_player.*
 import kotlinx.android.synthetic.main.bottom_sheet_search_song_results.*
 import kotlinx.android.synthetic.main.fragment_play_music.*
@@ -44,8 +47,7 @@ import kotlinx.android.synthetic.main.fragment_play_music.*
 /**
  * Created by beantoan on 12/12/17.
  */
-class PlayMusicFragment : Fragment(),
-        AppBarLayout.OnOffsetChangedListener {
+class PlayMusicFragment : Fragment(), AppBarLayout.OnOffsetChangedListener {
 
     private lateinit var mPlayMusicPagerAdapter: PlayMusicPagerAdapter
 
@@ -105,6 +107,8 @@ class PlayMusicFragment : Fragment(),
         setupRecyclerViewSearchSongResults()
 
         setupRecyclerViewPlayingTracks()
+
+        setupPlayingPlaylistActions()
     }
 
     private fun onDestroyTasks() {
@@ -133,7 +137,7 @@ class PlayMusicFragment : Fragment(),
         music_player.controllerAutoShow = true
         music_player.showController()
 
-        music_player.setOnCollapseExpandListener(object : CustomPlaybackControlView.CollapseExpandListener {
+        music_player.setOnCollapseExpandListener(object : PlaybackControlView.CollapseExpandListener {
             override fun onExpanded() {
                 displayTrackList(true)
                 displaySearchView(false)
@@ -149,83 +153,6 @@ class PlayMusicFragment : Fragment(),
             hideMusicPlayer()
         } else {
             showMusicPlayer()
-        }
-    }
-
-    private fun displayMusicPlayer(isShown: Boolean) {
-        Log.d(TAG, "displayMusicPlayer: isShown=$isShown")
-
-        val bottomSheetBehavior = BottomSheetBehavior.from(bottom_sheet_music_player)
-
-        val musicPlayerHeight = when {
-            isShown -> resources.getDimension(R.dimen.music_player_height).toInt()
-            else -> 0
-        }
-
-        bottomSheetBehavior.peekHeight = musicPlayerHeight
-        pager.setPadding(0, 0, 0, musicPlayerHeight)
-    }
-
-    fun showMusicPlayer() {
-        displayMusicPlayer(true)
-    }
-
-    fun hideMusicPlayer() {
-        displayMusicPlayer(false)
-    }
-
-    fun playSongs(playlist: Playlist?) {
-        Log.d(TAG, "playSongs")
-
-        music_player.player.stop()
-
-        val dynamicConcatenatingMediaSource = DynamicConcatenatingMediaSource()
-
-        if (playlist == null || playlist.tracks.isEmpty()) {
-            LifeTuneApplication.musicPlayer.playlist = null
-        } else {
-            LifeTuneApplication.musicPlayer.playlist = playlist
-
-            val mediaSources = ArrayList<MediaSource>()
-
-            playlist.tracks.forEach { mediaSources.add(buildMediaSource(Uri.parse(it.url))) }
-
-            dynamicConcatenatingMediaSource.addMediaSources(mediaSources)
-        }
-
-        music_player.player.prepare(dynamicConcatenatingMediaSource)
-        music_player.player.playWhenReady = true
-
-        showMusicPlayer()
-
-        updatePlayingTrackAdapter(playlist?.tracks)
-
-        updateLikeUnlikeButton(playlist)
-    }
-
-    private fun currentViewPagerItem(): Int = pager.currentItem
-
-    fun isCurrentRecommendationMusicFragment(): Boolean =
-            currentViewPagerItem() == PlayMusicPagerAdapter.RECOMMENDATION_MUSIC_FRAGMENT
-
-    fun isCurrentFavouriteMusicFragment():
-            Boolean = currentViewPagerItem() == PlayMusicPagerAdapter.FAVOURITE_MUSIC_FRAGMENT
-
-    private fun buildMediaSource(uri: Uri): ExtractorMediaSource {
-        return ExtractorMediaSource(uri, DefaultHttpDataSourceFactory("ua"),
-                DefaultExtractorsFactory(), null, null)
-    }
-
-    private fun displaySearchView(isShown: Boolean) {
-        when (isShown) {
-            false -> {
-                app_bar_layout.setExpanded(false, true)
-                search_view.visibility = View.GONE
-            }
-            true -> {
-                app_bar_layout.setExpanded(true, true)
-                search_view.visibility = View.VISIBLE
-            }
         }
     }
 
@@ -269,6 +196,135 @@ class PlayMusicFragment : Fragment(),
                 }
             }
         })
+    }
+
+    private fun setupRecyclerViewSearchSongResults() {
+        val dividerDrawable = ContextCompat.getDrawable(activity!!.applicationContext, R.drawable.song_divider)
+        val dividerItemDecoration = RecyclerViewDividerItemDecoration(activity!!.applicationContext, DividerItemDecoration.VERTICAL, dividerDrawable!!)
+
+        recycler_view_search_song_results.layoutManager = LinearLayoutManager(activity!!.applicationContext)
+        recycler_view_search_song_results.addItemDecoration(dividerItemDecoration)
+
+        recycler_view_search_song_results.adapter = searchSongResultsAdapter
+    }
+
+    private fun setupRecyclerViewPlayingTracks() {
+        val dividerDrawable = ContextCompat.getDrawable(activity!!.applicationContext, R.drawable.song_divider)
+        val dividerItemDecoration = RecyclerViewDividerItemDecoration(activity!!.applicationContext, DividerItemDecoration.VERTICAL, dividerDrawable!!)
+
+        recycler_view_playing_tracks.layoutManager = LinearLayoutManager(activity!!.applicationContext)
+        recycler_view_playing_tracks.addItemDecoration(dividerItemDecoration)
+
+        playingTrackAdapter = PlayingTracksAdapter(this@PlayMusicFragment, ArrayList())
+
+        recycler_view_playing_tracks.adapter = playingTrackAdapter
+    }
+
+    private fun setupPlayingPlaylistActions() {
+        like_playing_playlist.setOnClickListener {
+            likePlaylist(LifeTuneApplication.musicPlayer.playlist)
+        }
+
+        unlike_playing_playlist.setOnClickListener {
+            unlikePlaylist(LifeTuneApplication.musicPlayer.playlist)
+        }
+    }
+
+    private fun likePlaylist(playlist: Playlist?) {
+        if (playlist != null) {
+            val userId = FirebaseAuth.getInstance().currentUser!!.uid
+
+            PlaylistPresenter(ImplLikePlaylistCallbacks(this)).callLikePlaylistApi(playlist, userId)
+        }
+    }
+
+    private fun unlikePlaylist(playlist: Playlist?) {
+        if (playlist != null) {
+            val userId = FirebaseAuth.getInstance().currentUser!!.uid
+
+            PlaylistPresenter(ImplUnlikePlaylistCallbacks(this)).callUnlikePlaylistApi(playlist, userId)
+        }
+    }
+
+    private fun displayMusicPlayer(isShown: Boolean) {
+        Log.d(TAG, "displayMusicPlayer: isShown=$isShown")
+
+        val bottomSheetBehavior = BottomSheetBehavior.from(bottom_sheet_music_player)
+
+        val musicPlayerHeight = when {
+            isShown -> resources.getDimension(R.dimen.music_player_height).toInt()
+            else -> 0
+        }
+
+        bottomSheetBehavior.peekHeight = musicPlayerHeight
+        pager.setPadding(0, 0, 0, musicPlayerHeight)
+    }
+
+    fun showMusicPlayer() {
+        displayMusicPlayer(true)
+    }
+
+    fun hideMusicPlayer() {
+        displayMusicPlayer(false)
+    }
+
+    fun playSongs(playlist: Playlist?) {
+        Log.d(TAG, "playSongs")
+
+        music_player.player.stop()
+
+        val dynamicConcatenatingMediaSource = DynamicConcatenatingMediaSource()
+
+        if (playlist == null || playlist.tracks.isEmpty()) {
+            LifeTuneApplication.musicPlayer.playlist = null
+
+            LifeTuneApplication.musicPlayer.stop()
+
+            hideMusicPlayer()
+        } else {
+            LifeTuneApplication.musicPlayer.playlist = playlist
+
+            val mediaSources = ArrayList<MediaSource>()
+
+            playlist.tracks.forEach { mediaSources.add(buildMediaSource(Uri.parse(it.url))) }
+
+            dynamicConcatenatingMediaSource.addMediaSources(mediaSources)
+
+            showMusicPlayer()
+
+            music_player.player.prepare(dynamicConcatenatingMediaSource)
+            music_player.player.playWhenReady = true
+        }
+
+        updatePlayingTrackAdapter(playlist?.tracks)
+
+        updateLikeUnlikeButton(playlist)
+    }
+
+    private fun currentViewPagerItem(): Int = pager.currentItem
+
+    fun isCurrentRecommendationMusicFragment(): Boolean =
+            currentViewPagerItem() == PlayMusicPagerAdapter.RECOMMENDATION_MUSIC_FRAGMENT
+
+    fun isCurrentFavouriteMusicFragment():
+            Boolean = currentViewPagerItem() == PlayMusicPagerAdapter.FAVOURITE_MUSIC_FRAGMENT
+
+    private fun buildMediaSource(uri: Uri): ExtractorMediaSource {
+        return ExtractorMediaSource(uri, DefaultHttpDataSourceFactory("ua"),
+                DefaultExtractorsFactory(), null, null)
+    }
+
+    private fun displaySearchView(isShown: Boolean) {
+        when (isShown) {
+            false -> {
+                app_bar_layout.setExpanded(false, true)
+                search_view.visibility = View.GONE
+            }
+            true -> {
+                app_bar_layout.setExpanded(true, true)
+                search_view.visibility = View.VISIBLE
+            }
+        }
     }
 
     private fun setScrollFragsForAppBarLayout(isScroll: Boolean) {
@@ -358,30 +414,8 @@ class PlayMusicFragment : Fragment(),
         }
     }
 
-    private fun onSearchSongsError(error: Throwable?) {
+    private fun onSearchSongsError(error: Throwable) {
         Log.e(TAG, "onSearchSongsError", error)
-    }
-
-    private fun setupRecyclerViewSearchSongResults() {
-        val dividerDrawable = ContextCompat.getDrawable(activity!!.applicationContext, R.drawable.song_divider)
-        val dividerItemDecoration = RecyclerViewDividerItemDecoration(activity!!.applicationContext, DividerItemDecoration.VERTICAL, dividerDrawable!!)
-
-        recycler_view_search_song_results.layoutManager = LinearLayoutManager(activity!!.applicationContext)
-        recycler_view_search_song_results.addItemDecoration(dividerItemDecoration)
-
-        recycler_view_search_song_results.adapter = searchSongResultsAdapter
-    }
-
-    private fun setupRecyclerViewPlayingTracks() {
-        val dividerDrawable = ContextCompat.getDrawable(activity!!.applicationContext, R.drawable.song_divider)
-        val dividerItemDecoration = RecyclerViewDividerItemDecoration(activity!!.applicationContext, DividerItemDecoration.VERTICAL, dividerDrawable!!)
-
-        recycler_view_playing_tracks.layoutManager = LinearLayoutManager(activity!!.applicationContext)
-        recycler_view_playing_tracks.addItemDecoration(dividerItemDecoration)
-
-        playingTrackAdapter = PlayingTracksAdapter(this@PlayMusicFragment, ArrayList())
-
-        recycler_view_playing_tracks.adapter = playingTrackAdapter
     }
 
     private fun displaySearchSongResults(isShown: Boolean) {
@@ -423,21 +457,63 @@ class PlayMusicFragment : Fragment(),
     }
 
     private fun updateLikeUnlikeButton(playlist: Playlist?) {
+        Log.d(TAG, "updateLikeUnlikeButton: playlist.isLiked=${playlist?.isLiked}")
+        
         if (playlist == null) {
             playing_playlist_actions.visibility = View.GONE
         } else {
             playing_playlist_actions.visibility = View.VISIBLE
 
-            like_playling_playlist.visibility = if (playlist.isLiked) View.GONE else View.VISIBLE
-            unlike_playling_playlist.visibility = if (playlist.isLiked) View.VISIBLE else View.GONE
+            like_playing_playlist.visibility = if (playlist.isLiked) View.GONE else View.VISIBLE
+            unlike_playing_playlist.visibility = if (playlist.isLiked) View.VISIBLE else View.GONE
         }
+    }
+
+    fun playTrackAtPosition(position: Int) {
+        LifeTuneApplication.musicPlayer.seekTo(position, C.TIME_UNSET)
     }
 
     companion object {
         val TAG = PlayMusicFragment::class.java.simpleName
     }
 
-    fun playTrackAtPosition(position: Int) {
-        LifeTuneApplication.musicPlayer.seekTo(position, C.TIME_UNSET)
+    private class ImplLikePlaylistCallbacks(val playMusicFragment: PlayMusicFragment) : PlaylistPresenter.LikePlaylistCallbacks {
+        companion object {
+            val TAG = ImplLikePlaylistCallbacks::class.java.simpleName
+        }
+
+        override fun onLikePlaylistSuccess(commonApiResponse: CommonApiResponse, playlist: Playlist) {
+            Log.d(TAG, "onLikePlaylistSuccess: commonApiResponse=$commonApiResponse, playlist.id=${playlist.id}")
+
+            if (commonApiResponse.isOk()) {
+                playlist.isLiked = true
+
+                playMusicFragment.updateLikeUnlikeButton(playlist)
+            }
+        }
+
+        override fun onLikePlaylistError(error: Throwable) {
+
+        }
+    }
+
+    private class ImplUnlikePlaylistCallbacks(val playMusicFragment: PlayMusicFragment) : PlaylistPresenter.UnlikePlaylistCallbacks {
+        companion object {
+            val TAG = ImplUnlikePlaylistCallbacks::class.java.simpleName
+        }
+
+        override fun onUnlikePlaylistSuccess(commonApiResponse: CommonApiResponse, playlist: Playlist) {
+            Log.d(TAG, "onLikePlaylistSuccess: commonApiResponse=$commonApiResponse, playlist.id=${playlist.id}")
+
+            if (commonApiResponse.isOk()) {
+                playlist.isLiked = false
+
+                playMusicFragment.updateLikeUnlikeButton(playlist)
+            }
+        }
+
+        override fun onUnlikePlaylistError(error: Throwable) {
+
+        }
     }
 }

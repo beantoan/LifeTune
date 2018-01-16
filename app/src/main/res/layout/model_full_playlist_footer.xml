@@ -8,7 +8,11 @@
             type="it.unical.mat.lifetune.entity.Playlist" />
 
         <variable
-            name="clickListener"
+            name="clickLikeListener"
+            type="android.view.View.OnClickListener" />
+
+        <variable
+            name="clickUnlikeListener"
             type="android.view.View.OnClickListener" />
     </data>
 
@@ -21,17 +25,31 @@
         android:orientation="horizontal">
 
         <com.mikepenz.iconics.view.IconicsButton
-            android:text="{faw-heart} Unlike"
+            android:id="@+id/like_playlist"
+            android:text="{faw-heart} Like"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:gravity="center"
             android:layout_weight="1"
             android:clickable="true"
             android:focusable="true"
-
+            android:onClick="@{clickLikeListener}"
             android:foreground="?android:attr/selectableItemBackground" />
 
         <com.mikepenz.iconics.view.IconicsButton
+            android:id="@+id/unlike_playlist"
+            android:text="{faw-heart-o} Unlike"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
+            android:onClick="@{clickUnlikeListener}"
+            android:foreground="?android:attr/selectableItemBackground" />
+
+        <com.mikepenz.iconics.view.IconicsButton
+            android:id="@+id/share_playlist"
             android:text="{faw-share-alt} Share"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

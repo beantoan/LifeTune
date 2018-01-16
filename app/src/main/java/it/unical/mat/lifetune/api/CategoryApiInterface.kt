@@ -1,6 +1,6 @@
 package it.unical.mat.lifetune.api
 
-import io.reactivex.Flowable
+import io.reactivex.Single
 import it.unical.mat.lifetune.entity.Category
 import retrofit2.http.GET
 
@@ -9,8 +9,8 @@ import retrofit2.http.GET
  */
 interface CategoryApiInterface {
     @GET("categories.json")
-    fun index(): Flowable<List<Category>>
+    fun index(): Single<List<Category>>
 
     @GET("categories/recommendation.json")
-    fun recommendation(): Flowable<List<Category>>
+    fun recommendation(): Single<List<Category>>
 }

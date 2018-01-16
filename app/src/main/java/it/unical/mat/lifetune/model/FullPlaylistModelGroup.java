@@ -60,6 +60,14 @@ public class FullPlaylistModelGroup extends EpoxyModelGroup {
 
         FullPlaylistFooterModel_ fullPlaylistFooterModel = new FullPlaylistFooterModel_(_playlist);
         fullPlaylistFooterModel.id("footer-" + _playlist.getId());
+
+        fullPlaylistFooterModel.clickLikeListener((model, parentView, clickedView, position) -> {
+            callbacks.onLikePlaylistClicked(model.playlist);
+        });
+        fullPlaylistFooterModel.clickUnlikeListener((model, parentView, clickedView, position) -> {
+            callbacks.onUnlikePlaylistClicked(model.playlist);
+
+        });
         models.add(fullPlaylistFooterModel);
 
         return models;

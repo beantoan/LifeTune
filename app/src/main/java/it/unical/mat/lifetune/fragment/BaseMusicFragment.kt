@@ -4,20 +4,22 @@ import android.support.annotation.UiThread
 import android.support.v4.app.Fragment
 import android.util.Log
 import com.crashlytics.android.Crashlytics
-import io.reactivex.android.schedulers.AndroidSchedulers
+import com.google.firebase.auth.FirebaseAuth
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
 import it.unical.mat.lifetune.R
-import it.unical.mat.lifetune.api.ApiServiceFactory
 import it.unical.mat.lifetune.controller.BaseMusicController
 import it.unical.mat.lifetune.entity.*
+import it.unical.mat.lifetune.presenter.CategoryPresenter
+import it.unical.mat.lifetune.presenter.PlaylistPresenter
+import it.unical.mat.lifetune.presenter.SongPresenter
 import it.unical.mat.lifetune.util.AppDialog
 import it.unical.mat.lifetune.util.AppUtils
 
 /**
  * Created by beantoan on 12/14/17.
  */
-abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallbacks {
+abstract class BaseMusicFragment :
+        Fragment(), BaseMusicController.AdapterCallbacks {
 
     private var mCompositeDisposable: CompositeDisposable? = null
 
@@ -61,17 +63,46 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
 
     }
 
+    override fun onLikePlaylistClicked(playlist: Playlist) {
+        Log.d(TAG, "onLikePlaylistClicked#${playlist.id}-${playlist.title}")
+
+        callLikePlaylistApi(playlist)
+    }
+
+    override fun onUnlikePlaylistClicked(playlist: Playlist) {
+        Log.d(TAG, "onUnlikePlaylistClicked#${playlist.id}-${playlist.title}")
+
+        callUnlikePlaylistApi(playlist)
+    }
+
+    open protected fun onSongsApiSuccess(playlist: Playlist, trackList: TrackList) {
+        Log.d(TAG, "onSongsApiSuccess")
+
+        playlist.tracks = trackList.tracks
+
+        playSongs(playlist)
+    }
+
+    open protected fun onSongsApiError(error: Throwable) {
+        Crashlytics.log(Log.ERROR, TAG, "onSongsApiError:" + error)
+        Crashlytics.logException(error)
+
+        playSongs(null)
+
+        AppDialog.error(R.string.api_service_error_title, R.string.api_service_error_message, activity!!)
+    }
+
     open protected fun onRecommendationApiSuccess(categories: List<Category>) {
         Log.d(TAG, "onRecommendationApiSuccess: categories.size=" + categories.size)
 
         onCommonApiSuccess()
     }
 
-    open protected fun onRecommendationApiFailure(error: Throwable) {
-        Crashlytics.log(Log.ERROR, TAG, "onRecommendationApiFailure:" + error)
+    open protected fun onRecommendationApiError(error: Throwable) {
+        Crashlytics.log(Log.ERROR, TAG, "onRecommendationApiError:" + error)
         Crashlytics.logException(error)
 
-        onCommonApiFailure()
+        onCommonApiError()
     }
 
     open protected fun onFavouriteApiSuccess(playlists: List<Playlist>) {
@@ -80,11 +111,11 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
         onCommonApiSuccess()
     }
 
-    open protected fun onFavouriteApiFailure(error: Throwable) {
-        Crashlytics.log(Log.ERROR, TAG, "onFavouriteApiFailure:" + error)
+    open protected fun onFavouriteApiError(error: Throwable) {
+        Crashlytics.log(Log.ERROR, TAG, "onFavouriteApiError:" + error)
         Crashlytics.logException(error)
 
-        onCommonApiFailure()
+        onCommonApiError()
     }
 
     open protected fun beforeCallFavouriteApi() {
@@ -109,8 +140,8 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
         hideLoading()
     }
 
-    private fun onCommonApiFailure() {
-        Log.d(TAG, "onCommonApiFailure")
+    private fun onCommonApiError() {
+        Log.d(TAG, "onCommonApiError")
 
         hideLoading()
         AppDialog.error(R.string.api_service_error_title, R.string.api_service_error_message, activity!!)
@@ -163,15 +194,7 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
         if (AppUtils.isInternetConnected(context!!)) {
             beforeCallSongsApi()
 
-            getCompositeDisposable().add(
-                    ApiServiceFactory.createPlaylistXmlApi().songs(playlist.key)
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(
-                                    { playlistXml -> onSongsApiSuccess(playlist, playlistXml) },
-                                    { error -> onSongsApiFailure(error) }
-                            )
-            )
+            SongPresenter(ImplSongCallbacks(this)).callSongsApi(playlist)
         } else {
             AppDialog.error(R.string.no_internet_error_title, R.string.no_internet_error_message, activity!!)
         }
@@ -184,15 +207,7 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
 
             beforeCallRecommendationApi()
 
-            getCompositeDisposable().add(
-                    ApiServiceFactory.createCategoryApi().recommendation()
-                            .subscribeOn(Schedulers.io()) // "work" on io thread
-                            .observeOn(AndroidSchedulers.mainThread()) // "listen" on UIThread
-                            .subscribe(
-                                    { categories -> onRecommendationApiSuccess(categories) },
-                                    { error -> onRecommendationApiFailure(error) }
-                            )
-            )
+            CategoryPresenter(ImplRecommendationCallbacks(this)).callRecommendationApi()
         } else {
             AppDialog.error(R.string.no_internet_error_title, R.string.no_internet_error_message, activity!!)
         }
@@ -205,41 +220,92 @@ abstract class BaseMusicFragment : Fragment(), BaseMusicController.AdapterCallba
 
             beforeCallFavouriteApi()
 
-            getCompositeDisposable().add(
-                    ApiServiceFactory.createPlaylistApi().favourite()
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(
-                                    { playlists -> onFavouriteApiSuccess(playlists) },
-                                    { error -> onFavouriteApiFailure(error) }
-                            )
-            )
+            val userId = FirebaseAuth.getInstance().currentUser!!.uid
+
+            PlaylistPresenter(ImplFavouriteCallbacks(this)).callFavouriteApi(userId)
         } else {
             AppDialog.error(R.string.no_internet_error_title, R.string.no_internet_error_message, activity!!)
         }
     }
 
-    @UiThread
-    private fun onSongsApiSuccess(playlist: Playlist, trackList: TrackList) {
-        Log.d(TAG, "onSongsApiSuccess")
+    fun callLikePlaylistApi(playlist: Playlist) {
+        val userId = FirebaseAuth.getInstance().currentUser!!.uid
 
-        playlist.tracks = trackList.tracks
-
-        playSongs(playlist)
+        PlaylistPresenter(ImplLikePlaylistCallbacks(this)).callLikePlaylistApi(playlist, userId)
     }
 
-    @UiThread
-    private fun onSongsApiFailure(error: Throwable) {
-        Crashlytics.log(Log.ERROR, TAG, "onSongsApiFailure:" + error)
-        Crashlytics.logException(error)
-        
-        playSongs(null)
+    fun callUnlikePlaylistApi(playlist: Playlist) {
+        val userId = FirebaseAuth.getInstance().currentUser!!.uid
 
-        AppDialog.error(R.string.api_service_error_title, R.string.api_service_error_message, activity!!)
+        PlaylistPresenter(ImplUnlikePlaylistCallbacks(this)).callUnlikePlaylistApi(playlist, userId)
     }
-
 
     companion object {
         private val TAG = BaseMusicFragment::class.java.simpleName
+    }
+
+    private class ImplLikePlaylistCallbacks(val baseMusicFragment: BaseMusicFragment) : PlaylistPresenter.LikePlaylistCallbacks {
+        companion object {
+            val TAG = ImplLikePlaylistCallbacks::class.java.simpleName
+        }
+
+        override fun onLikePlaylistSuccess(commonApiResponse: CommonApiResponse, playlist: Playlist) {
+            Log.d(TAG, "onLikePlaylistSuccess: commonApiResponse=$commonApiResponse, playlist.id=${playlist.id}")
+
+        }
+
+        override fun onLikePlaylistError(error: Throwable) {
+
+        }
+    }
+
+    private class ImplUnlikePlaylistCallbacks(val baseMusicFragment: BaseMusicFragment) : PlaylistPresenter.UnlikePlaylistCallbacks {
+        companion object {
+            val TAG = ImplUnlikePlaylistCallbacks::class.java.simpleName
+        }
+
+        override fun onUnlikePlaylistSuccess(commonApiResponse: CommonApiResponse, playlist: Playlist) {
+            Log.d(TAG, "onUnlikePlaylistSuccess: commonApiResponse=$commonApiResponse, playlist.id=${playlist.id}")
+
+        }
+
+        override fun onUnlikePlaylistError(error: Throwable) {
+
+        }
+    }
+
+    private class ImplFavouriteCallbacks(val baseMusicFragment: BaseMusicFragment) : PlaylistPresenter.FavouriteCallbacks {
+        companion object {
+            val TAG = ImplFavouriteCallbacks::class.java.simpleName
+        }
+
+        override fun onFavouriteApiSuccess(playlists: List<Playlist>) {
+            baseMusicFragment.onFavouriteApiSuccess(playlists)
+        }
+
+        override fun onFavouriteApiError(error: Throwable) {
+            baseMusicFragment.onFavouriteApiError(error)
+        }
+    }
+
+    private class ImplRecommendationCallbacks(val baseMusicFragment: BaseMusicFragment) : CategoryPresenter.RecommendationCallbacks {
+        override fun onRecommendationApiSuccess(categories: List<Category>) {
+            baseMusicFragment.onRecommendationApiSuccess(categories)
+        }
+
+        override fun onRecommendationApiError(error: Throwable) {
+            baseMusicFragment.onRecommendationApiError(error)
+        }
+    }
+
+    private class ImplSongCallbacks(val baseMusicFragment: BaseMusicFragment) : SongPresenter.Callbacks {
+        override fun onSongsApiSuccess(playlist: Playlist, trackList: TrackList) {
+            baseMusicFragment.onSongsApiSuccess(playlist, trackList)
+        }
+
+        override fun onSongsApiError(error: Throwable) {
+            baseMusicFragment.onSongsApiError(error)
+        }
+
     }
 }

@@ -15,6 +15,7 @@
  */
 package it.unical.mat.lifetune.view;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.Resources;
@@ -24,7 +25,6 @@ import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -38,16 +38,16 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.exoplayer2.C;
-import com.google.android.exoplayer2.ExoPlaybackException;
-import com.google.android.exoplayer2.PlaybackParameters;
+import com.google.android.exoplayer2.ControlDispatcher;
+import com.google.android.exoplayer2.DefaultControlDispatcher;
 import com.google.android.exoplayer2.Player;
+import com.google.android.exoplayer2.Player.DiscontinuityReason;
 import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.metadata.Metadata;
 import com.google.android.exoplayer2.metadata.id3.ApicFrame;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.text.Cue;
-import com.google.android.exoplayer2.text.TextRenderer;
+import com.google.android.exoplayer2.text.TextOutput;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
@@ -69,140 +69,145 @@ import it.unical.mat.lifetune.util.CustomExoPlayer;
 
 /**
  * A high level view for {@link SimpleExoPlayer} media playbacks. It displays video, subtitles and
- * album art during playback, and displays playback controls using a {@link CustomPlaybackControlView}.
+ * album art during playback, and displays playback controls using a {@link PlaybackControlView}.
  * <p>
- * A SimpleExoPlayerView can be customized by setting attributes (or calling corresponding methods),
- * overriding the view's layout file or by specifying a custom view layout file, as outlined below.
+ * <p>A SimpleExoPlayerView can be customized by setting attributes (or calling corresponding
+ * methods), overriding the view's layout file or by specifying a custom view layout file, as
+ * outlined below.
  * <p>
  * <h3>Attributes</h3>
+ * <p>
  * The following attributes can be set on a SimpleExoPlayerView when used in a layout XML file:
+ * <p>
+ * <p>
  * <p>
  * <ul>
  * <li><b>{@code use_artwork}</b> - Whether artwork is used if available in audio streams.
  * <ul>
- * <li>Corresponding method: {@link #setUseArtwork(boolean)}</li>
- * <li>Default: {@code true}</li>
+ * <li>Corresponding method: {@link #setUseArtwork(boolean)}
+ * <li>Default: {@code true}
  * </ul>
- * </li>
  * <li><b>{@code default_artwork}</b> - Default artwork to use if no artwork available in audio
  * streams.
  * <ul>
- * <li>Corresponding method: {@link #setDefaultArtwork(Bitmap)}</li>
- * <li>Default: {@code null}</li>
+ * <li>Corresponding method: {@link #setDefaultArtwork(Bitmap)}
+ * <li>Default: {@code null}
  * </ul>
- * </li>
  * <li><b>{@code use_controller}</b> - Whether the playback controls can be shown.
  * <ul>
- * <li>Corresponding method: {@link #setUseController(boolean)}</li>
- * <li>Default: {@code true}</li>
+ * <li>Corresponding method: {@link #setUseController(boolean)}
+ * <li>Default: {@code true}
  * </ul>
- * </li>
  * <li><b>{@code hide_on_touch}</b> - Whether the playback controls are hidden by touch events.
  * <ul>
- * <li>Corresponding method: {@link #setControllerHideOnTouch(boolean)}</li>
- * <li>Default: {@code true}</li>
+ * <li>Corresponding method: {@link #setControllerHideOnTouch(boolean)}
+ * <li>Default: {@code true}
  * </ul>
- * </li>
  * <li><b>{@code auto_show}</b> - Whether the playback controls are automatically shown when
  * playback starts, pauses, ends, or fails. If set to false, the playback controls can be
  * manually operated with {@link #showController()} and {@link #hideController()}.
  * <ul>
- * <li>Corresponding method: {@link #setControllerAutoShow(boolean)}</li>
- * <li>Default: {@code true}</li>
+ * <li>Corresponding method: {@link #setControllerAutoShow(boolean)}
+ * <li>Default: {@code true}
  * </ul>
- * </li>
+ * <li><b>{@code hide_during_ads}</b> - Whether the playback controls are hidden during ads.
+ * Controls are always shown during ads if they are enabled and the player is paused.
+ * <ul>
+ * <li>Corresponding method: {@link #setControllerHideDuringAds(boolean)}
+ * <li>Default: {@code true}
+ * </ul>
  * <li><b>{@code resize_mode}</b> - Controls how video and album art is resized within the view.
  * Valid values are {@code fit}, {@code fixed_width}, {@code fixed_height} and {@code fill}.
  * <ul>
- * <li>Corresponding method: {@link #setResizeMode(int)}</li>
- * <li>Default: {@code fit}</li>
+ * <li>Corresponding method: {@link #setResizeMode(int)}
+ * <li>Default: {@code fit}
  * </ul>
- * </li>
  * <li><b>{@code surface_type}</b> - The type of surface view used for video playbacks. Valid
  * values are {@code surface_view}, {@code texture_view} and {@code none}. Using {@code none}
  * is recommended for audio only applications, since creating the surface can be expensive.
  * Using {@code surface_view} is recommended for video applications.
  * <ul>
- * <li>Corresponding method: None</li>
- * <li>Default: {@code surface_view}</li>
+ * <li>Corresponding method: None
+ * <li>Default: {@code surface_view}
  * </ul>
- * </li>
+ * <li><b>{@code shutter_background_color}</b> - The background color of the {@code exo_shutter}
+ * view.
+ * <ul>
+ * <li>Corresponding method: {@link #setShutterBackgroundColor(int)}
+ * <li>Default: {@code unset}
+ * </ul>
  * <li><b>{@code player_layout_id}</b> - Specifies the id of the layout to be inflated. See below
  * for more details.
  * <ul>
- * <li>Corresponding method: None</li>
- * <li>Default: {@code R.id.exo_simple_player_view}</li>
+ * <li>Corresponding method: None
+ * <li>Default: {@code R.id.exo_simple_player_view}
  * </ul>
  * <li><b>{@code controller_layout_id}</b> - Specifies the id of the layout resource to be
- * inflated by the child {@link CustomPlaybackControlView}. See below for more details.
+ * inflated by the child {@link PlaybackControlView}. See below for more details.
  * <ul>
- * <li>Corresponding method: None</li>
- * <li>Default: {@code R.id.exo_playback_control_view}</li>
+ * <li>Corresponding method: None
+ * <li>Default: {@code R.id.exo_playback_control_view}
  * </ul>
- * <li>All attributes that can be set on a {@link CustomPlaybackControlView} can also be set on a
- * SimpleExoPlayerView, and will be propagated to the inflated {@link CustomPlaybackControlView}
+ * <li>All attributes that can be set on a {@link PlaybackControlView} can also be set on a
+ * SimpleExoPlayerView, and will be propagated to the inflated {@link PlaybackControlView}
  * unless the layout is overridden to specify a custom {@code exo_controller} (see below).
- * </li>
  * </ul>
  * <p>
  * <h3>Overriding the layout file</h3>
+ * <p>
  * To customize the layout of SimpleExoPlayerView throughout your app, or just for certain
  * configurations, you can define {@code exo_simple_player_view.xml} layout files in your
  * application {@code res/layout*} directories. These layouts will override the one provided by the
  * ExoPlayer library, and will be inflated for use by SimpleExoPlayerView. The view identifies and
  * binds its children by looking for the following ids:
  * <p>
+ * <p>
+ * <p>
  * <ul>
  * <li><b>{@code exo_content_frame}</b> - A frame whose aspect ratio is resized based on the video
  * or album art of the media being played, and the configured {@code resize_mode}. The video
  * surface view is inflated into this frame as its first child.
  * <ul>
- * <li>Type: {@link AspectRatioFrameLayout}</li>
+ * <li>Type: {@link AspectRatioFrameLayout}
  * </ul>
- * </li>
  * <li><b>{@code exo_shutter}</b> - A view that's made visible when video should be hidden. This
  * view is typically an opaque view that covers the video surface view, thereby obscuring it
  * when visible.
  * <ul>
- * <li>Type: {@link View}</li>
+ * <li>Type: {@link View}
  * </ul>
- * </li>
  * <li><b>{@code exo_subtitles}</b> - Displays subtitles.
  * <ul>
- * <li>Type: {@link SubtitleView}</li>
+ * <li>Type: {@link SubtitleView}
  * </ul>
- * </li>
  * <li><b>{@code exo_artwork}</b> - Displays album art.
  * <ul>
- * <li>Type: {@link ImageView}</li>
+ * <li>Type: {@link ImageView}
  * </ul>
- * </li>
  * <li><b>{@code exo_controller_placeholder}</b> - A placeholder that's replaced with the inflated
- * {@link CustomPlaybackControlView}. Ignored if an {@code exo_controller} view exists.
+ * {@link PlaybackControlView}. Ignored if an {@code exo_controller} view exists.
  * <ul>
- * <li>Type: {@link View}</li>
+ * <li>Type: {@link View}
  * </ul>
- * </li>
- * <li><b>{@code exo_controller}</b> - An already inflated {@link CustomPlaybackControlView}. Allows use
- * of a custom extension of {@link CustomPlaybackControlView}. Note that attributes such as
- * {@code rewind_increment} will not be automatically propagated through to this instance. If
- * a view exists with this id, any {@code exo_controller_placeholder} view will be ignored.
+ * <li><b>{@code exo_controller}</b> - An already inflated {@link PlaybackControlView}. Allows use
+ * of a custom extension of {@link PlaybackControlView}. Note that attributes such as {@code
+ * rewind_increment} will not be automatically propagated through to this instance. If a view
+ * exists with this id, any {@code exo_controller_placeholder} view will be ignored.
  * <ul>
- * <li>Type: {@link CustomPlaybackControlView}</li>
+ * <li>Type: {@link PlaybackControlView}
  * </ul>
- * </li>
  * <li><b>{@code exo_overlay}</b> - A {@link FrameLayout} positioned on top of the player which
  * the app can access via {@link #getOverlayFrameLayout()}, provided for convenience.
  * <ul>
- * <li>Type: {@link FrameLayout}</li>
+ * <li>Type: {@link FrameLayout}
  * </ul>
- * </li>
  * </ul>
  * <p>
- * All child views are optional and so can be omitted if not required, however where defined they
+ * <p>All child views are optional and so can be omitted if not required, however where defined they
  * must be of the expected type.
  * <p>
  * <h3>Specifying a custom layout file</h3>
+ * <p>
  * Defining your own {@code exo_simple_player_view.xml} is useful to customize the layout of
  * SimpleExoPlayerView throughout your application. It's also possible to customize the layout for a
  * single instance in a layout file. This is achieved by setting the {@code player_layout_id}
@@ -210,9 +215,7 @@ import it.unical.mat.lifetune.util.CustomExoPlayer;
  * of {@code exo_simple_player_view.xml} for only the instance on which the attribute is set.
  */
 @TargetApi(16)
-public final class CustomExoPlayerView extends FrameLayout {
-
-    private static final String TAG = CustomExoPlayerView.class.getSimpleName();
+public final class SimpleExoPlayerView extends FrameLayout {
 
     private static final int SURFACE_TYPE_NONE = 0;
     private static final int SURFACE_TYPE_SURFACE_VIEW = 1;
@@ -223,7 +226,7 @@ public final class CustomExoPlayerView extends FrameLayout {
     private final View surfaceView;
     private final ImageView artworkView;
     private final SubtitleView subtitleView;
-    private final CustomPlaybackControlView controller;
+    private final PlaybackControlView controller;
     private final ComponentListener componentListener;
     private final FrameLayout overlayFrameLayout;
 
@@ -233,17 +236,18 @@ public final class CustomExoPlayerView extends FrameLayout {
     private Bitmap defaultArtwork;
     private int controllerShowTimeoutMs;
     private boolean controllerAutoShow;
+    private boolean controllerHideDuringAds;
     private boolean controllerHideOnTouch;
 
-    public CustomExoPlayerView(Context context) {
+    public SimpleExoPlayerView(Context context) {
         this(context, null);
     }
 
-    public CustomExoPlayerView(Context context, AttributeSet attrs) {
+    public SimpleExoPlayerView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public CustomExoPlayerView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public SimpleExoPlayerView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
 
         if (isInEditMode()) {
@@ -265,19 +269,25 @@ public final class CustomExoPlayerView extends FrameLayout {
             return;
         }
 
+        boolean shutterColorSet = false;
+        int shutterColor = 0;
         int playerLayoutId = com.google.android.exoplayer2.ui.R.layout.exo_simple_player_view;
         boolean useArtwork = true;
         int defaultArtworkId = 0;
         boolean useController = true;
         int surfaceType = SURFACE_TYPE_SURFACE_VIEW;
         int resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT;
-        int controllerShowTimeoutMs = CustomPlaybackControlView.DEFAULT_SHOW_TIMEOUT_MS;
+        int controllerShowTimeoutMs = PlaybackControlView.DEFAULT_SHOW_TIMEOUT_MS;
         boolean controllerHideOnTouch = true;
         boolean controllerAutoShow = true;
+        boolean controllerHideDuringAds = true;
         if (attrs != null) {
             TypedArray a = context.getTheme().obtainStyledAttributes(attrs,
                     com.google.android.exoplayer2.ui.R.styleable.SimpleExoPlayerView, 0, 0);
             try {
+                shutterColorSet = a.hasValue(com.google.android.exoplayer2.ui.R.styleable.SimpleExoPlayerView_shutter_background_color);
+                shutterColor = a.getColor(com.google.android.exoplayer2.ui.R.styleable.SimpleExoPlayerView_shutter_background_color,
+                        shutterColor);
                 playerLayoutId = a.getResourceId(com.google.android.exoplayer2.ui.R.styleable.SimpleExoPlayerView_player_layout_id,
                         playerLayoutId);
                 useArtwork = a.getBoolean(com.google.android.exoplayer2.ui.R.styleable.SimpleExoPlayerView_use_artwork, useArtwork);
@@ -292,6 +302,8 @@ public final class CustomExoPlayerView extends FrameLayout {
                         controllerHideOnTouch);
                 controllerAutoShow = a.getBoolean(com.google.android.exoplayer2.ui.R.styleable.SimpleExoPlayerView_auto_show,
                         controllerAutoShow);
+                controllerHideDuringAds =
+                        a.getBoolean(com.google.android.exoplayer2.ui.R.styleable.SimpleExoPlayerView_hide_during_ads, controllerHideDuringAds);
             } finally {
                 a.recycle();
             }
@@ -302,13 +314,16 @@ public final class CustomExoPlayerView extends FrameLayout {
         setDescendantFocusability(FOCUS_AFTER_DESCENDANTS);
 
         // Content frame.
-        contentFrame = (AspectRatioFrameLayout) findViewById(com.google.android.exoplayer2.ui.R.id.exo_content_frame);
+        contentFrame = findViewById(com.google.android.exoplayer2.ui.R.id.exo_content_frame);
         if (contentFrame != null) {
             setResizeModeRaw(contentFrame, resizeMode);
         }
 
         // Shutter view.
         shutterView = findViewById(com.google.android.exoplayer2.ui.R.id.exo_shutter);
+        if (shutterView != null && shutterColorSet) {
+            shutterView.setBackgroundColor(shutterColor);
+        }
 
         // Create a surface view and insert it into the content frame, if there is one.
         if (contentFrame != null && surfaceType != SURFACE_TYPE_NONE) {
@@ -323,31 +338,31 @@ public final class CustomExoPlayerView extends FrameLayout {
         }
 
         // Overlay frame layout.
-        overlayFrameLayout = (FrameLayout) findViewById(com.google.android.exoplayer2.ui.R.id.exo_overlay);
+        overlayFrameLayout = findViewById(com.google.android.exoplayer2.ui.R.id.exo_overlay);
 
         // Artwork view.
-        artworkView = (ImageView) findViewById(com.google.android.exoplayer2.ui.R.id.exo_artwork);
+        artworkView = findViewById(com.google.android.exoplayer2.ui.R.id.exo_artwork);
         this.useArtwork = useArtwork && artworkView != null;
         if (defaultArtworkId != 0) {
             defaultArtwork = BitmapFactory.decodeResource(context.getResources(), defaultArtworkId);
         }
 
         // Subtitle view.
-        subtitleView = (SubtitleView) findViewById(com.google.android.exoplayer2.ui.R.id.exo_subtitles);
+        subtitleView = findViewById(com.google.android.exoplayer2.ui.R.id.exo_subtitles);
         if (subtitleView != null) {
             subtitleView.setUserDefaultStyle();
             subtitleView.setUserDefaultTextSize();
         }
 
         // Playback control view.
-        CustomPlaybackControlView customController = (CustomPlaybackControlView) findViewById(com.google.android.exoplayer2.ui.R.id.exo_controller);
+        PlaybackControlView customController = findViewById(com.google.android.exoplayer2.ui.R.id.exo_controller);
         View controllerPlaceholder = findViewById(com.google.android.exoplayer2.ui.R.id.exo_controller_placeholder);
         if (customController != null) {
             this.controller = customController;
         } else if (controllerPlaceholder != null) {
             // Propagate attrs as playbackAttrs so that PlaybackControlView's custom attributes are
             // transferred, but standard FrameLayout attributes (e.g. background) are not.
-            this.controller = new CustomPlaybackControlView(context, null, 0, attrs);
+            this.controller = new PlaybackControlView(context, null, 0, attrs);
             controller.setLayoutParams(controllerPlaceholder.getLayoutParams());
             ViewGroup parent = ((ViewGroup) controllerPlaceholder.getParent());
             int controllerIndex = parent.indexOfChild(controllerPlaceholder);
@@ -359,6 +374,7 @@ public final class CustomExoPlayerView extends FrameLayout {
         this.controllerShowTimeoutMs = controller != null ? controllerShowTimeoutMs : 0;
         this.controllerHideOnTouch = controllerHideOnTouch;
         this.controllerAutoShow = controllerAutoShow;
+        this.controllerHideDuringAds = controllerHideDuringAds;
         this.useController = useController && controller != null;
         hideController();
 
@@ -373,7 +389,7 @@ public final class CustomExoPlayerView extends FrameLayout {
      * @param newPlayerView The new view to attach to the player.
      */
     public static void switchTargetView(@NonNull CustomExoPlayer player,
-                                        @Nullable CustomExoPlayerView oldPlayerView, @Nullable CustomExoPlayerView newPlayerView) {
+                                        @Nullable SimpleExoPlayerView oldPlayerView, @Nullable SimpleExoPlayerView newPlayerView) {
         if (oldPlayerView == newPlayerView) {
             return;
         }
@@ -400,7 +416,7 @@ public final class CustomExoPlayerView extends FrameLayout {
      * Set the {@link CustomExoPlayer} to use.
      * <p>
      * To transition a {@link CustomExoPlayer} from targeting one view to another, it's recommended to
-     * use {@link #switchTargetView(CustomExoPlayer, CustomExoPlayerView, CustomExoPlayerView)} rather
+     * use {@link #switchTargetView(CustomExoPlayer, SimpleExoPlayerView, SimpleExoPlayerView)} rather
      * than this method. If you do wish to use this method directly, be sure to attach the player to
      * the new view <em>before</em> calling {@code setPlayer(null)} to detach it from the old one.
      * This ordering is significantly more efficient and may allow for more seamless transitions.
@@ -428,6 +444,9 @@ public final class CustomExoPlayerView extends FrameLayout {
         if (shutterView != null) {
             shutterView.setVisibility(VISIBLE);
         }
+        if (subtitleView != null) {
+            subtitleView.setCues(null);
+        }
         if (player != null) {
             if (surfaceView instanceof TextureView) {
                 player.setVideoTextureView((TextureView) surfaceView);
@@ -449,18 +468,11 @@ public final class CustomExoPlayerView extends FrameLayout {
     public void setVisibility(int visibility) {
         super.setVisibility(visibility);
         if (surfaceView instanceof SurfaceView) {
-            // Work around https://github.com/google/ExoPlayer/issues/3160
+            // Work around https://github.com/google/ExoPlayer/issues/3160.
             surfaceView.setVisibility(visibility);
         }
     }
 
-    public void setOnCollapseExpandListener(CustomPlaybackControlView.CollapseExpandListener collapseExpandListener) {
-
-        if (this.controller != null) {
-            this.controller.setOnCollapseExpandListener(collapseExpandListener);
-        }
-    }
-    
     /**
      * Sets the resize mode.
      *
@@ -538,6 +550,17 @@ public final class CustomExoPlayerView extends FrameLayout {
         }
     }
 
+    /**
+     * Sets the background color of the {@code exo_shutter} view.
+     *
+     * @param color The background color.
+     */
+    public void setShutterBackgroundColor(int color) {
+        if (shutterView != null) {
+            shutterView.setBackgroundColor(color);
+        }
+    }
+
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         if (player != null && player.isPlayingAd()) {
@@ -547,8 +570,10 @@ public final class CustomExoPlayerView extends FrameLayout {
             overlayFrameLayout.requestFocus();
             return super.dispatchKeyEvent(event);
         }
+        boolean isDpadWhenControlHidden = isDpadKey(event.getKeyCode()) && useController
+                && !controller.isVisible();
         maybeShowController(true);
-        return dispatchMediaKeyEvent(event) || super.dispatchKeyEvent(event);
+        return isDpadWhenControlHidden || dispatchMediaKeyEvent(event) || super.dispatchKeyEvent(event);
     }
 
     /**
@@ -644,22 +669,32 @@ public final class CustomExoPlayerView extends FrameLayout {
     }
 
     /**
-     * Set the {@link CustomPlaybackControlView.VisibilityListener}.
+     * Sets whether the playback controls are hidden when ads are playing. Controls are always shown
+     * during ads if they are enabled and the player is paused.
+     *
+     * @param controllerHideDuringAds Whether the playback controls are hidden when ads are playing.
+     */
+    public void setControllerHideDuringAds(boolean controllerHideDuringAds) {
+        this.controllerHideDuringAds = controllerHideDuringAds;
+    }
+
+    /**
+     * Set the {@link PlaybackControlView.VisibilityListener}.
      *
      * @param listener The listener to be notified about visibility changes.
      */
-    public void setControllerVisibilityListener(CustomPlaybackControlView.VisibilityListener listener) {
+    public void setControllerVisibilityListener(PlaybackControlView.VisibilityListener listener) {
         Assertions.checkState(controller != null);
         controller.setVisibilityListener(listener);
     }
 
     /**
-     * Sets the {@link CustomPlaybackControlView.ControlDispatcher}.
+     * Sets the {@link ControlDispatcher}.
      *
-     * @param controlDispatcher The {@link CustomPlaybackControlView}, or null to use
-     *                          {@link CustomPlaybackControlView#DEFAULT_CONTROL_DISPATCHER}.
+     * @param controlDispatcher The {@link ControlDispatcher}, or null to use
+     *                          {@link DefaultControlDispatcher}.
      */
-    public void setControlDispatcher(CustomPlaybackControlView.ControlDispatcher controlDispatcher) {
+    public void setControlDispatcher(@Nullable ControlDispatcher controlDispatcher) {
         Assertions.checkState(controller != null);
         controller.setControlDispatcher(controlDispatcher);
     }
@@ -694,6 +729,16 @@ public final class CustomExoPlayerView extends FrameLayout {
     public void setRepeatToggleModes(@RepeatModeUtil.RepeatToggleModes int repeatToggleModes) {
         Assertions.checkState(controller != null);
         controller.setRepeatToggleModes(repeatToggleModes);
+    }
+
+    /**
+     * Sets whether the shuffle button is shown.
+     *
+     * @param showShuffleButton Whether the shuffle button is shown.
+     */
+    public void setShowShuffleButton(boolean showShuffleButton) {
+        Assertions.checkState(controller != null);
+        controller.setShowShuffleButton(showShuffleButton);
     }
 
     /**
@@ -768,6 +813,9 @@ public final class CustomExoPlayerView extends FrameLayout {
      * Shows the playback controls, but only if forced or shown indefinitely.
      */
     private void maybeShowController(boolean isForced) {
+        if (isPlayingAd() && controllerHideDuringAds) {
+            return;
+        }
         if (useController) {
             boolean wasShowingIndefinitely = controller.isVisible() && controller.getShowTimeoutMs() <= 0;
             boolean shouldShowIndefinitely = shouldShowControllerIndefinitely();
@@ -792,6 +840,10 @@ public final class CustomExoPlayerView extends FrameLayout {
         }
         controller.setShowTimeoutMs(showIndefinitely ? 0 : controllerShowTimeoutMs);
         controller.show();
+    }
+
+    private boolean isPlayingAd() {
+        return player != null && player.isPlayingAd() && player.getPlayWhenReady();
     }
 
     private void updateForCurrentTrackSelections() {
@@ -830,58 +882,7 @@ public final class CustomExoPlayerView extends FrameLayout {
         }
         // Artwork disabled or unavailable.
         hideArtwork();
-
         showTrackInfo();
-    }
-
-    private void updateOnPlayerStateChanged(int playbackState) {
-        switch (playbackState) {
-            case Player.STATE_READY:
-            case Player.STATE_BUFFERING:
-                showTrackInfo();
-                break;
-            case Player.STATE_IDLE:
-            case Player.STATE_ENDED:
-                setTitle(R.string.no_song_play);
-                setAvatar(null);
-                break;
-        }
-    }
-
-    /**
-     * Customize to update title and avatar
-     */
-    public void showTrackInfo() {
-        Log.d(TAG, "showTrackInfo");
-
-        if (this.player == null) {
-            return;
-        }
-
-        List<Track> tracks = this.player.getPlaylist() == null ?
-                new ArrayList() : this.player.getPlaylist().getTracks();
-
-        if (tracks.isEmpty() || this.player.getCurrentWindowIndex() > tracks.size() - 1) {
-            setTitle(null);
-            setAvatar(null);
-        } else {
-            Track currentTrack = tracks.get(this.player.getCurrentWindowIndex());
-            String title = currentTrack.getCombinedTitle() + " >> " + currentTrack.getTitle();
-            String avatarUrl = currentTrack.getPlayerAvatar();
-
-            setCurrentPlayingTrack(tracks, currentTrack);
-
-            setTitle(title);
-            setAvatar(avatarUrl);
-        }
-    }
-
-    private void setCurrentPlayingTrack(List<Track> tracks, Track playingTrack) {
-        for (Track track : tracks) {
-            track.setPlaying(false);
-        }
-
-        playingTrack.setPlaying(true);
     }
 
     private boolean setArtworkFromMetadata(Metadata metadata) {
@@ -931,16 +932,24 @@ public final class CustomExoPlayerView extends FrameLayout {
         logo.setBackgroundColor(resources.getColor(com.google.android.exoplayer2.ui.R.color.exo_edit_mode_background_color));
     }
 
-
     @SuppressWarnings("ResourceType")
     private static void setResizeModeRaw(AspectRatioFrameLayout aspectRatioFrame, int resizeMode) {
         aspectRatioFrame.setResizeMode(resizeMode);
     }
 
-    private final class ComponentListener implements SimpleExoPlayer.VideoListener,
-            TextRenderer.Output, Player.EventListener {
+    @SuppressLint("InlinedApi")
+    private boolean isDpadKey(int keyCode) {
+        return keyCode == KeyEvent.KEYCODE_DPAD_UP || keyCode == KeyEvent.KEYCODE_DPAD_UP_RIGHT
+                || keyCode == KeyEvent.KEYCODE_DPAD_RIGHT || keyCode == KeyEvent.KEYCODE_DPAD_DOWN_RIGHT
+                || keyCode == KeyEvent.KEYCODE_DPAD_DOWN || keyCode == KeyEvent.KEYCODE_DPAD_DOWN_LEFT
+                || keyCode == KeyEvent.KEYCODE_DPAD_LEFT || keyCode == KeyEvent.KEYCODE_DPAD_UP_LEFT
+                || keyCode == KeyEvent.KEYCODE_DPAD_CENTER;
+    }
 
-        // TextRenderer.Output implementation
+    private final class ComponentListener extends Player.DefaultEventListener implements TextOutput,
+            SimpleExoPlayer.VideoListener {
+
+        // TextOutput implementation
 
         @Override
         public void onCues(List<Cue> cues) {
@@ -949,7 +958,7 @@ public final class CustomExoPlayerView extends FrameLayout {
             }
         }
 
-        // SimpleExoPlayer.VideoListener implementation
+        // SimpleExoPlayer.VideoInfoListener implementation
 
         @Override
         public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees,
@@ -975,42 +984,49 @@ public final class CustomExoPlayerView extends FrameLayout {
         // Player.EventListener implementation
 
         @Override
-        public void onLoadingChanged(boolean isLoading) {
-            // Do nothing.
-        }
-
-        @Override
         public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-            maybeShowController(false);
+            if (isPlayingAd() && controllerHideDuringAds) {
+                hideController();
+            } else {
+                maybeShowController(false);
+            }
 
             updateOnPlayerStateChanged(playbackState);
         }
 
         @Override
-        public void onRepeatModeChanged(int repeatMode) {
-            // Do nothing.
+        public void onPositionDiscontinuity(@DiscontinuityReason int reason) {
+            if (isPlayingAd() && controllerHideDuringAds) {
+                hideController();
+            }
         }
 
-        @Override
-        public void onPlayerError(ExoPlaybackException e) {
-            // Do nothing.
+    }
+
+    /**
+     * Customize
+     */
+    public void showTrackInfo() {
+        if (this.player == null) {
+            return;
         }
 
-        @Override
-        public void onPositionDiscontinuity() {
-            // Do nothing.
-        }
+        List<Track> tracks = this.player.getPlaylist() == null ?
+                new ArrayList() : this.player.getPlaylist().getTracks();
 
-        @Override
-        public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
-            // Do nothing.
-        }
+        if (tracks.isEmpty() || this.player.getCurrentWindowIndex() > tracks.size() - 1) {
+            setTitle(null);
+            setAvatar(null);
+        } else {
+            Track currentTrack = tracks.get(this.player.getCurrentWindowIndex());
+            String title = currentTrack.getCombinedTitle() + " >> " + currentTrack.getTitle();
+            String avatarUrl = currentTrack.getPlayerAvatar();
 
-        @Override
-        public void onTimelineChanged(Timeline timeline, Object manifest) {
-            // Do nothing.
-        }
+            setCurrentPlayingTrack(tracks, currentTrack);
 
+            setTitle(title);
+            setAvatar(avatarUrl);
+        }
     }
 
     private void setTitle(int resId) {
@@ -1049,5 +1065,34 @@ public final class CustomExoPlayerView extends FrameLayout {
                 .resize(imageSize, imageSize)
                 .centerCrop()
                 .into(mAvatar);
+    }
+
+    private void setCurrentPlayingTrack(List<Track> tracks, Track playingTrack) {
+        for (Track track : tracks) {
+            track.setPlaying(false);
+        }
+
+        playingTrack.setPlaying(true);
+    }
+
+    private void updateOnPlayerStateChanged(int playbackState) {
+        switch (playbackState) {
+            case Player.STATE_READY:
+            case Player.STATE_BUFFERING:
+                showTrackInfo();
+                break;
+            case Player.STATE_IDLE:
+            case Player.STATE_ENDED:
+                setTitle(R.string.no_song_play);
+                setAvatar(null);
+                break;
+        }
+    }
+
+    public void setOnCollapseExpandListener(PlaybackControlView.CollapseExpandListener collapseExpandListener) {
+
+        if (this.controller != null) {
+            this.controller.setOnCollapseExpandListener(collapseExpandListener);
+        }
     }
 }

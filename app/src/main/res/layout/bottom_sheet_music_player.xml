@@ -17,7 +17,7 @@
         android:background="@color/quantum_greywhite1000"
         app:layout_behavior="it.unical.mat.lifetune.behavior.NoDraggableBottomSheetBehavior">
 
-        <it.unical.mat.lifetune.view.CustomExoPlayerView
+        <it.unical.mat.lifetune.view.SimpleExoPlayerView
             android:id="@+id/music_player"
             android:layout_width="match_parent"
             android:layout_height="@dimen/music_player_height"
@@ -51,7 +51,7 @@
             android:orientation="horizontal">
 
             <com.mikepenz.iconics.view.IconicsButton
-                android:id="@+id/like_playling_playlist"
+                android:id="@+id/like_playing_playlist"
                 android:text="{faw-heart} Like"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -63,7 +63,7 @@
                 android:foreground="?android:attr/selectableItemBackground" />
 
             <com.mikepenz.iconics.view.IconicsButton
-                android:id="@+id/unlike_playling_playlist"
+                android:id="@+id/unlike_playing_playlist"
                 android:text="{faw-heart-o} Unlike"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -75,6 +75,7 @@
                 android:foreground="?android:attr/selectableItemBackground" />
 
             <com.mikepenz.iconics.view.IconicsButton
+                android:id="@+id/share_playing_playlist"
                 android:text="{faw-share-alt} Share"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

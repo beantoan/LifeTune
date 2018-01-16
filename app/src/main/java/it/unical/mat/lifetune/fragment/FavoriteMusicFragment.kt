@@ -54,8 +54,8 @@ class FavoriteMusicFragment : BaseMusicFragment() {
         updateControllerData(playlists)
     }
 
-    override fun onFavouriteApiFailure(error: Throwable) {
-        super.onFavouriteApiFailure(error)
+    override fun onFavouriteApiError(error: Throwable) {
+        super.onFavouriteApiError(error)
 
         updateControllerData(ArrayList())
     }

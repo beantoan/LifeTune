@@ -1,6 +1,6 @@
 package it.unical.mat.lifetune.api
 
-import io.reactivex.Flowable
+import io.reactivex.Single
 import it.unical.mat.lifetune.entity.Song
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -10,5 +10,5 @@ import retrofit2.http.Query
  */
 interface SongApiInterface {
     @GET("/songs/search.json")
-    fun search(@Query("q") term: String): Flowable<List<Song>>
+    fun search(@Query("q") term: String): Single<List<Song>>
 }

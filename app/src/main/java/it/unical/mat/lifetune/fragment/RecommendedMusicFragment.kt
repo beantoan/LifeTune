@@ -69,8 +69,8 @@ class RecommendedMusicFragment : BaseMusicFragment() {
         updateControllerData(categories)
     }
 
-    override fun onRecommendationApiFailure(error: Throwable) {
-        super.onRecommendationApiFailure(error)
+    override fun onRecommendationApiError(error: Throwable) {
+        super.onRecommendationApiError(error)
 
         updateControllerData(ArrayList())
     }
