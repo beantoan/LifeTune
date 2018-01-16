@@ -15,8 +15,8 @@ class CategoryPresenter {
         recommendationCallbacks = callbacks
     }
 
-    fun callRecommendationApi() {
-        ApiServiceFactory.createCategoryApi().recommendation()
+    fun callRecommendationApi(userId: String) {
+        ApiServiceFactory.createCategoryApi().recommendation(userId)
                 .subscribeOn(Schedulers.io()) // "work" on io thread
                 .observeOn(AndroidSchedulers.mainThread()) // "listen" on UIThread
                 .subscribe(
