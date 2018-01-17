@@ -28,14 +28,28 @@ abstract class BaseMusicFragment :
 
     protected val recommendationParameter: RecommendationParameter = RecommendationParameter()
 
-    abstract protected fun startLoadingData()
+    abstract fun startLoadingData()
 
     abstract protected fun clearControllerData()
+
+    override fun onStart() {
+        super.onStart()
+
+        Log.d(TAG, "onStart")
+    }
 
     override fun onResume() {
         super.onResume()
 
+        Log.d(TAG, "onResume")
+
         startLoadingData()
+    }
+
+    override fun onPause() {
+        Log.d(TAG, "onPause")
+
+        super.onPause()
     }
 
     override fun onDestroy() {
@@ -120,13 +134,13 @@ abstract class BaseMusicFragment :
     }
 
     open protected fun beforeCallFavouriteApi() {
-        if (playMusicFragment!!.isCurrentFavouriteMusicFragment()) {
+        if (playMusicFragment!!.isFavouriteMusicFragmentActive()) {
             showLoading()
         }
     }
 
     open protected fun beforeCallRecommendationApi() {
-        if (playMusicFragment!!.isCurrentRecommendationMusicFragment()) {
+        if (playMusicFragment!!.isRecommendationMusicFragmentActive()) {
             showLoading()
         }
     }

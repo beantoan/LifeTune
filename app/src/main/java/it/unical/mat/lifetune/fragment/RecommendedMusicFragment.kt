@@ -76,6 +76,8 @@ class RecommendedMusicFragment : BaseMusicFragment() {
 //    }
 
     override fun startLoadingData() {
+        Log.d(TAG, "startLoadingData")
+
         checkLocationSetting()
     }
 
@@ -105,8 +107,6 @@ class RecommendedMusicFragment : BaseMusicFragment() {
         setupRecyclerViewCategories()
 
         setupMusicController()
-
-        checkLocationSetting()
     }
 
     private fun onStopTasks() {

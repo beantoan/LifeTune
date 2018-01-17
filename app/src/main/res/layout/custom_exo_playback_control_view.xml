@@ -20,26 +20,6 @@
     android:background="@color/colorPrimary"
     android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/exo_title"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/exo_title_height"
-        android:layout_gravity="center"
-        android:textColor="@color/quantum_grey100"
-        android:singleLine="true"
-        android:ellipsize="marquee"
-        android:marqueeRepeatLimit="-1"
-        android:textSize="14sp"
-        android:textStyle="bold"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp"
-        android:includeFontPadding="false"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:scrollHorizontally="true" />
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -56,9 +36,29 @@
             android:layout_weight="1"
             android:orientation="vertical">
 
+            <TextView
+                android:id="@+id/exo_title"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/exo_title_height"
+                android:layout_gravity="center"
+                android:textColor="@color/quantum_grey100"
+                android:singleLine="true"
+                android:ellipsize="marquee"
+                android:marqueeRepeatLimit="-1"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:includeFontPadding="false"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:scrollHorizontally="true" />
+
             <LinearLayout
-                android:layout_width="250dp"
-                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_gravity="center">
 

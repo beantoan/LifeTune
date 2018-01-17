@@ -14,6 +14,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
+import com.facebook.share.model.ShareLinkContent
+import com.facebook.share.widget.ShareDialog
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource
 import com.google.android.exoplayer2.source.ExtractorMediaSource
@@ -212,7 +214,8 @@ class PlayMusicFragment : BaseFragment(), AppBarLayout.OnOffsetChangedListener {
         Log.d(TAG, "setupRecyclerViewSearchSongResults")
 
         val dividerDrawable = ContextCompat.getDrawable(activity!!.applicationContext, R.drawable.song_divider)
-        val dividerItemDecoration = RecyclerViewDividerItemDecoration(activity!!.applicationContext, DividerItemDecoration.VERTICAL, dividerDrawable!!)
+        val dividerItemDecoration = RecyclerViewDividerItemDecoration(activity!!.applicationContext,
+                DividerItemDecoration.VERTICAL, dividerDrawable!!)
 
         recycler_view_search_song_results.layoutManager = LinearLayoutManager(activity!!.applicationContext)
         recycler_view_search_song_results.addItemDecoration(dividerItemDecoration)
@@ -224,7 +227,8 @@ class PlayMusicFragment : BaseFragment(), AppBarLayout.OnOffsetChangedListener {
         Log.d(TAG, "setupRecyclerViewPlayingTracks")
 
         val dividerDrawable = ContextCompat.getDrawable(activity!!.applicationContext, R.drawable.song_divider)
-        val dividerItemDecoration = RecyclerViewDividerItemDecoration(activity!!.applicationContext, DividerItemDecoration.VERTICAL, dividerDrawable!!)
+        val dividerItemDecoration = RecyclerViewDividerItemDecoration(activity!!.applicationContext,
+                DividerItemDecoration.VERTICAL, dividerDrawable!!)
 
         recycler_view_playing_tracks.layoutManager = LinearLayoutManager(activity!!.applicationContext)
         recycler_view_playing_tracks.addItemDecoration(dividerItemDecoration)
@@ -243,6 +247,10 @@ class PlayMusicFragment : BaseFragment(), AppBarLayout.OnOffsetChangedListener {
 
         unlike_playing_playlist.setOnClickListener {
             unlikePlaylist(LifeTuneApplication.musicPlayer.playlist)
+        }
+
+        share_playing_playlist.setOnClickListener {
+            sharePlaylist(LifeTuneApplication.musicPlayer.playlist)
         }
     }
 
@@ -263,6 +271,20 @@ class PlayMusicFragment : BaseFragment(), AppBarLayout.OnOffsetChangedListener {
             val userId = FirebaseAuth.getInstance().currentUser!!.uid
 
             PlaylistPresenter(ImplUnlikePlaylistCallbacks(this)).callUnlikePlaylistApi(playlist, userId)
+        }
+    }
+
+    private fun sharePlaylist(playlist: Playlist?) {
+        Log.d(TAG, "sharePlaylist: ${playlist?.shortLog()}")
+
+        if (playlist != null) {
+            val content = ShareLinkContent.Builder()
+                    .setContentUrl(Uri.parse(playlist.url))
+                    .build()
+
+            val shareDialog = ShareDialog(this)
+            shareDialog.show(content, ShareDialog.Mode.AUTOMATIC)
+
         }
     }
 
@@ -327,13 +349,13 @@ class PlayMusicFragment : BaseFragment(), AppBarLayout.OnOffsetChangedListener {
         playlist_playlist_title.marqueeRepeatLimit = Animation.INFINITE
     }
 
-    private fun currentViewPagerItem(): Int = pager.currentItem
+    private fun activeViewPagerItem(): Int = pager.currentItem
 
-    fun isCurrentRecommendationMusicFragment(): Boolean =
-            currentViewPagerItem() == PlayMusicPagerAdapter.RECOMMENDATION_MUSIC_FRAGMENT
+    fun isRecommendationMusicFragmentActive(): Boolean =
+            activeViewPagerItem() == PlayMusicPagerAdapter.RECOMMENDATION_MUSIC_FRAGMENT
 
-    fun isCurrentFavouriteMusicFragment():
-            Boolean = currentViewPagerItem() == PlayMusicPagerAdapter.FAVOURITE_MUSIC_FRAGMENT
+    fun isFavouriteMusicFragmentActive():
+            Boolean = activeViewPagerItem() == PlayMusicPagerAdapter.FAVOURITE_MUSIC_FRAGMENT
 
     private fun buildMediaSource(uri: Uri): ExtractorMediaSource {
         val dataSourceFactory = DefaultDataSourceFactory(context,

@@ -18,6 +18,7 @@ package com.beantoan.smsbackup.util
 
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
+import android.util.Log
 
 
 /**
@@ -78,6 +79,8 @@ object ActivityUtils {
     }
 
     fun addOrAttachFragment(fragmentManager: FragmentManager, fragment: Fragment, frameId: Int, tag: String) {
+        Log.d(TAG, "addOrAttachFragment: tag=$tag")
+
         detachFragments(fragmentManager)
 
         val existedFragment = fragmentManager.findFragmentByTag(tag)
@@ -85,12 +88,18 @@ object ActivityUtils {
         val transaction = fragmentManager.beginTransaction()
 
         if (existedFragment == null) {
+            Log.d(TAG, "add to placeholder")
+
             transaction.add(frameId, fragment, tag)
         } else {
+            Log.d(TAG, "attach to placeholder")
+
             transaction.attach(existedFragment)
         }
 
         transaction.commit()
     }
+
+    val TAG = ActivityUtils::class.java.simpleName
 
 }

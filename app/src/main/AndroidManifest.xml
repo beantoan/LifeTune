@@ -31,6 +31,15 @@
             android:value="@integer/google_play_services_version" />
 
         <meta-data
+            tools:replace="android:value"
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="159706501302929" />
+
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationName"
+            android:value="LifeTune" />
+
+        <meta-data
             android:name="com.google.android.awareness.API_KEY"
             android:value="AIzaSyBtTO8FbhHgTU3Fh3yn4gg7oPwCcOwE9HU" />
 
@@ -54,10 +63,10 @@
             android:label="@string/app_name">
         </activity>
 
-        <service
-            android:name=".service.RecordStepsService"
-            android:enabled="true"
-            android:exported="false" />
+        <provider
+            android:authorities="com.facebook.app.FacebookContentProvider159706501302929"
+            android:name="com.facebook.FacebookContentProvider"
+            android:exported="true" />
     </application>
 
 </manifest>

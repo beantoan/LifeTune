@@ -61,6 +61,8 @@ class FavoriteMusicFragment : BaseMusicFragment() {
 //    }
 
     override fun startLoadingData() {
+        Log.d(TAG, "startLoadingData")
+
         callFavouriteApi()
     }
 
