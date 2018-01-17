@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.Activity
 import android.content.DialogInterface
 import android.content.IntentSender
-import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
@@ -32,6 +31,7 @@ import it.unical.mat.lifetune.util.AppUtils
 import kotlinx.android.synthetic.main.fragment_recommended_music.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
+import pub.devrel.easypermissions.EasyPermissions
 
 
 /**
@@ -118,8 +118,7 @@ class RecommendedMusicFragment : BaseMusicFragment() {
     private fun checkLocationSetting() {
         Log.d(TAG, "checkLocationSetting")
 
-        if (ContextCompat.checkSelfPermission(activity!!, Manifest.permission.ACCESS_FINE_LOCATION) ==
-                PackageManager.PERMISSION_GRANTED) {
+        if (EasyPermissions.hasPermissions(context, Manifest.permission.ACCESS_FINE_LOCATION)) {
             val mLocationRequest = LocationRequest()
             mLocationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
 
@@ -176,8 +175,7 @@ class RecommendedMusicFragment : BaseMusicFragment() {
     private fun callSnapshotLocationApi() {
         Log.d(TAG, "callSnapshotLocationApi")
 
-        if (ContextCompat.checkSelfPermission(activity!!, Manifest.permission.ACCESS_FINE_LOCATION) ==
-                PackageManager.PERMISSION_GRANTED) {
+        if (EasyPermissions.hasPermissions(context, Manifest.permission.ACCESS_FINE_LOCATION)) {
 
             if (AppUtils.isInternetConnected(context!!)) {
                 Awareness.getSnapshotClient(activity).location
@@ -245,8 +243,7 @@ class RecommendedMusicFragment : BaseMusicFragment() {
     }
 
     private fun callSnapshotWeather() {
-        if (ContextCompat.checkSelfPermission(activity!!, Manifest.permission.ACCESS_FINE_LOCATION) ==
-                PackageManager.PERMISSION_GRANTED) {
+        if (EasyPermissions.hasPermissions(context, Manifest.permission.ACCESS_FINE_LOCATION)) {
 
             if (AppUtils.isInternetConnected(context!!)) {
                 Awareness.getSnapshotClient(activity).weather

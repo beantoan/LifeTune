@@ -28,7 +28,6 @@ import it.unical.mat.lifetune.entity.ActivityResultEvent
 import it.unical.mat.lifetune.fragment.MyActivitiesFragment
 import it.unical.mat.lifetune.fragment.NearbyPlacesFragment
 import it.unical.mat.lifetune.fragment.PlayMusicFragment
-import it.unical.mat.lifetune.fragment.SchedulesFragment
 import it.unical.mat.lifetune.util.AppDialog
 import it.unical.mat.lifetune.util.AppUtils
 import kotlinx.android.synthetic.main.activity_main.*
@@ -46,8 +45,6 @@ class MainActivity :
     private var playMusicFragment: PlayMusicFragment? = null
 
     private var myActivitiesFragment: MyActivitiesFragment? = null
-
-    private var schedulesFragment: SchedulesFragment? = null
 
     private var nearbyPlacesFragment: NearbyPlacesFragment? = null
 
@@ -122,7 +119,7 @@ class MainActivity :
 
     @AfterPermissionGranted(ACCESS_FINE_LOCATION_REQUEST_CODE)
     private fun checkFineLocationPermission() {
-        Log.d(TAG, "onPermissionsGranted")
+        Log.d(TAG, "checkFineLocationPermission")
 
         if (!EasyPermissions.hasPermissions(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
             EasyPermissions.requestPermissions(this, getString(R.string.request_access_fine_location),
@@ -206,18 +203,6 @@ class MainActivity :
 
     }
 
-    private fun showSchedulesFragment() {
-        Log.d(TAG, "showSchedulesFragment")
-
-        if (schedulesFragment == null) {
-            schedulesFragment = SchedulesFragment()
-        }
-
-        ActivityUtils.addOrAttachFragment(supportFragmentManager,
-                schedulesFragment!!, R.id.content_main_placeholder, SchedulesFragment.TAG)
-
-    }
-
     private fun checkFitnessPermissions() {
         Log.d(TAG, "checkFitnessPermissions")
 
@@ -254,7 +239,7 @@ class MainActivity :
                 .subscribe(DataType.TYPE_STEP_COUNT_CUMULATIVE)
                 .addOnCompleteListener(this@MainActivity, { task ->
                     if (task.isSuccessful) {
-                        Log.d(TAG, "Fitness.getRecordingClient#addOnCompleteListener: Successfully subscribed!")
+                        Log.d(TAG, "Fitness.getRecordingClient#addOnCompleteListener: Successfully subscribed DataType.TYPE_STEP_COUNT_CUMULATIVE!")
                     } else {
                         Crashlytics.log(Log.ERROR, TAG, "Fitness.getRecordingClient#addOnCompleteListener:" + task.exception!!)
                         Crashlytics.logException(task.exception)
@@ -265,29 +250,32 @@ class MainActivity :
                 .subscribe(DataType.TYPE_STEP_COUNT_DELTA)
                 .addOnCompleteListener(this@MainActivity, { task ->
                     if (task.isSuccessful) {
-                        Log.d(TAG, "Fitness.getRecordingClient#addOnCompleteListener: Successfully subscribed!")
+                        Log.d(TAG, "Fitness.getRecordingClient#addOnCompleteListener: Successfully subscribed DataType.TYPE_STEP_COUNT_DELTA!")
                     } else {
                         Crashlytics.log(Log.ERROR, TAG, "Fitness.getRecordingClient#addOnCompleteListener:" + task.exception!!)
                         Crashlytics.logException(task.exception)
                     }
                 })
 
-        Fitness.getRecordingClient(this, account)
-                .subscribe(DataType.TYPE_DISTANCE_DELTA)
-                .addOnCompleteListener(this@MainActivity, { task ->
-                    if (task.isSuccessful) {
-                        Log.d(TAG, "Fitness.getRecordingClient#addOnCompleteListener: Successfully subscribed!")
-                    } else {
-                        Crashlytics.log(Log.ERROR, TAG, "Fitness.getRecordingClient#addOnCompleteListener:" + task.exception!!)
-                        Crashlytics.logException(task.exception)
-                    }
-                })
+
+        if (EasyPermissions.hasPermissions(this@MainActivity, Manifest.permission.ACCESS_FINE_LOCATION)) {
+            Fitness.getRecordingClient(this, account)
+                    .subscribe(DataType.TYPE_DISTANCE_DELTA)
+                    .addOnCompleteListener(this@MainActivity, { task ->
+                        if (task.isSuccessful) {
+                            Log.d(TAG, "Fitness.getRecordingClient#addOnCompleteListener: Successfully subscribed DataType.TYPE_DISTANCE_DELTA!")
+                        } else {
+                            Crashlytics.log(Log.ERROR, TAG, "Fitness.getRecordingClient#addOnCompleteListener:" + task.exception!!)
+                            Crashlytics.logException(task.exception)
+                        }
+                    })
+        }
 
         Fitness.getRecordingClient(this, account)
                 .subscribe(DataType.TYPE_CALORIES_EXPENDED)
                 .addOnCompleteListener(this@MainActivity, { task ->
                     if (task.isSuccessful) {
-                        Log.d(TAG, "Fitness.getRecordingClient#addOnCompleteListener: Successfully subscribed!")
+                        Log.d(TAG, "Fitness.getRecordingClient#addOnCompleteListener: Successfully subscribed DataType.TYPE_CALORIES_EXPENDED!")
                     } else {
                         Crashlytics.log(Log.ERROR, TAG, "Fitness.getRecordingClient#addOnCompleteListener:" + task.exception!!)
                         Crashlytics.logException(task.exception)

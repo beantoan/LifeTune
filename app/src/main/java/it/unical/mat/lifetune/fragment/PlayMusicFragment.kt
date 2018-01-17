@@ -277,7 +277,7 @@ class PlayMusicFragment : BaseFragment(), AppBarLayout.OnOffsetChangedListener {
         }
     }
 
-    private fun sharePlaylist(playlist: Playlist?) {
+    fun sharePlaylist(playlist: Playlist?) {
         Log.d(TAG, "sharePlaylist: ${playlist?.shortLog()}")
 
         if (playlist != null) {
@@ -285,9 +285,9 @@ class PlayMusicFragment : BaseFragment(), AppBarLayout.OnOffsetChangedListener {
                     .setContentUrl(Uri.parse(playlist.url))
                     .build()
 
-            val shareDialog = ShareDialog(this)
-            shareDialog.show(content, ShareDialog.Mode.AUTOMATIC)
+            val shareDialog = ShareDialog(this@PlayMusicFragment)
 
+            shareDialog.show(content, ShareDialog.Mode.AUTOMATIC)
         }
     }
 
@@ -332,8 +332,6 @@ class PlayMusicFragment : BaseFragment(), AppBarLayout.OnOffsetChangedListener {
             var needToPlayTrackPosition = -1
 
             playlist.tracks.forEachIndexed { index, track ->
-
-                Log.d(TAG, "track=${track.shortLog()}")
                 mediaSources.add(buildMediaSource(Uri.parse(track.url)))
 
                 if (needToPlaySong != null && needToPlayTrackPosition == -1
@@ -604,7 +602,7 @@ class PlayMusicFragment : BaseFragment(), AppBarLayout.OnOffsetChangedListener {
 
         needToPlaySong = song
 
-        val musicFragment = mPlayMusicPagerAdapter.getMusicFragment(PlayMusicPagerAdapter.RECOMMENDATION_MUSIC_FRAGMENT)
+        val musicFragment = mPlayMusicPagerAdapter.getMusicFragment(activeViewPagerItem())
 
         musicFragment.callSongsApi(playlist)
     }

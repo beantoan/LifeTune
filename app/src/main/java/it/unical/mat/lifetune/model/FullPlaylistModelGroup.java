@@ -68,6 +68,10 @@ public class FullPlaylistModelGroup extends EpoxyModelGroup {
             callbacks.onUnlikePlaylistClicked(model.playlist);
 
         });
+        fullPlaylistFooterModel.clickShareListener((model, parentView, clickedView, position) -> {
+            callbacks.onSharePlaylistClicked(model.playlist);
+
+        });
         models.add(fullPlaylistFooterModel);
 
         return models;

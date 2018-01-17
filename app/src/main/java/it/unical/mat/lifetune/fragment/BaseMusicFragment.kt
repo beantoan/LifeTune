@@ -90,6 +90,12 @@ abstract class BaseMusicFragment :
         callUnlikePlaylistApi(playlist)
     }
 
+    override fun onSharePlaylistClicked(playlist: Playlist) {
+        Log.d(TAG, "onSharePlaylistClicked: ${playlist.shortLog()}")
+
+        playMusicFragment!!.sharePlaylist(playlist)
+    }
+
     open protected fun onSongsApiSuccess(playlist: Playlist, trackList: TrackList) {
         Log.d(TAG, "onSongsApiSuccess: ${playlist.shortLog()}")
 

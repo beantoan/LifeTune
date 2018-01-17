@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
 
@@ -40,17 +41,17 @@
                     android:text='@{place.name}'
                     android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
 
-                <ImageView
+                <com.mikepenz.iconics.view.IconicsImageView
                     android:id="@+id/get_direction"
-                    android:src="@drawable/ic_directions_black_24dp"
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:scaleType="fitXY"
-                    android:adjustViewBounds="true"
-                    android:layout_gravity="top"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:clickable="true"
                     android:focusable="true"
-                    android:foreground="?android:attr/selectableItemBackground" />
+                    android:foreground="?android:attr/selectableItemBackground"
+                    app:iiv_size="18dp"
+                    app:iiv_icon="faw-location-arrow" />
+
             </LinearLayout>
 
             <TextView

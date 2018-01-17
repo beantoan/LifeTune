@@ -2,8 +2,6 @@ package it.unical.mat.lifetune.fragment
 
 import android.Manifest
 import android.content.IntentSender
-import android.content.pm.PackageManager
-import android.support.v4.content.ContextCompat
 import android.util.Log
 import com.crashlytics.android.Crashlytics
 import com.google.android.gms.common.api.ApiException
@@ -17,6 +15,7 @@ import it.unical.mat.lifetune.entity.ActivityResultEvent
 import it.unical.mat.lifetune.util.AppDialog
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
+import pub.devrel.easypermissions.EasyPermissions
 
 /**
  * Created by beantoan on 1/12/18.
@@ -58,8 +57,8 @@ abstract class BaseLocationFragment : BaseFragment() {
     private fun checkLocationSetting() {
         Log.d(TAG, "checkLocationSetting")
 
-        if (ContextCompat.checkSelfPermission(activity!!, Manifest.permission.ACCESS_FINE_LOCATION) ==
-                PackageManager.PERMISSION_GRANTED) {
+        if (EasyPermissions.hasPermissions(context, Manifest.permission.ACCESS_FINE_LOCATION)) {
+
             val mLocationRequest = LocationRequest()
             mLocationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
 

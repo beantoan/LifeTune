@@ -33,7 +33,7 @@
         <meta-data
             tools:replace="android:value"
             android:name="com.facebook.sdk.ApplicationId"
-            android:value="159706501302929" />
+            android:value="@string/facebook_app_id" />
 
         <meta-data
             android:name="com.facebook.sdk.ApplicationName"

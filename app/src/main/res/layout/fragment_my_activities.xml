@@ -213,11 +213,24 @@
 
                     <TextView
                         style="@style/TextAppearance.AppCompat.Headline"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_weight="1"
                         android:layout_gravity="center"
                         android:layout_marginStart="5dp"
                         android:text="@string/count_steps_chart_title" />
+
+                    <com.mikepenz.iconics.view.IconicsImageView
+                        android:id="@+id/share_steps"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_gravity="center"
+                        android:layout_marginEnd="5dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?android:attr/selectableItemBackground"
+                        app:iiv_size="18dp"
+                        app:iiv_icon="faw-share-alt" />
                 </LinearLayout>
 
                 <com.github.mikephil.charting.charts.BarChart
@@ -239,11 +252,24 @@
 
                     <TextView
                         style="@style/TextAppearance.AppCompat.Headline"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_weight="1"
                         android:layout_gravity="center"
                         android:layout_marginStart="5dp"
                         android:text="@string/calculate_distances_chart_title" />
+
+                    <com.mikepenz.iconics.view.IconicsImageView
+                        android:id="@+id/share_distance"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_gravity="center"
+                        android:layout_marginEnd="5dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?android:attr/selectableItemBackground"
+                        app:iiv_size="18dp"
+                        app:iiv_icon="faw-share-alt" />
                 </LinearLayout>
 
                 <com.github.mikephil.charting.charts.BarChart
@@ -265,11 +291,24 @@
 
                     <TextView
                         style="@style/TextAppearance.AppCompat.Headline"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_weight="1"
                         android:layout_gravity="center"
                         android:layout_marginStart="5dp"
                         android:text="@string/calculate_calories_chart_title" />
+
+                    <com.mikepenz.iconics.view.IconicsImageView
+                        android:id="@+id/share_calories"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_gravity="center"
+                        android:layout_marginEnd="5dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?android:attr/selectableItemBackground"
+                        app:iiv_size="18dp"
+                        app:iiv_icon="faw-share-alt" />
                 </LinearLayout>
 
                 <com.github.mikephil.charting.charts.BarChart

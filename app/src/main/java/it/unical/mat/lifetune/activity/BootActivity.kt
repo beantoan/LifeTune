@@ -13,6 +13,8 @@ import com.firebase.ui.auth.ErrorCodes
 import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
 import it.unical.mat.lifetune.R
+import it.unical.mat.lifetune.util.AppDialog
+import it.unical.mat.lifetune.util.AppUtils
 import java.util.*
 
 class BootActivity : AppCompatActivity() {
@@ -47,6 +49,7 @@ class BootActivity : AppCompatActivity() {
         Log.d(TAG, "onActivityResult")
 
         super.onActivityResult(requestCode, resultCode, data)
+
         if (requestCode == RC_SIGN_IN) {
             handleSignInResponse(resultCode, data)
             return
@@ -58,12 +61,16 @@ class BootActivity : AppCompatActivity() {
     private fun boot() {
         Log.d(TAG, "boot")
 
-        val auth = FirebaseAuth.getInstance()
+        if (AppUtils.isInternetConnected(applicationContext)) {
+            val auth = FirebaseAuth.getInstance()
 
-        if (auth.currentUser != null) {
-            showMainActivity(null)
+            if (auth.currentUser != null) {
+                showMainActivity(null)
+            } else {
+                showFireBaseAuthUI()
+            }
         } else {
-            showFireBaseAuthUI()
+            AppDialog.error(R.string.no_internet_error_title, R.string.no_internet_error_message, this@BootActivity)
         }
     }
 

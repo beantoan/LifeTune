@@ -8,6 +8,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.facebook.share.model.ShareMediaContent
+import com.facebook.share.model.SharePhoto
+import com.facebook.share.widget.ShareDialog
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
@@ -86,6 +89,8 @@ class MyActivitiesFragment : BaseFragment() {
         mainActivity!!.setupToggleDrawer(toolbar)
 
         setupFitnessDateInput()
+
+        setupShareFitnessChartEvents()
     }
 
     private fun onResumeTasks() {
@@ -347,7 +352,8 @@ class MyActivitiesFragment : BaseFragment() {
 
         val timeHoursStr = if (timeHours > 0) "${timeHours}h" else ""
         val timeMinutesStr = if (timeMinutes > 0) "${timeMinutes}m" else ""
-        val timeSpace = if (timeHoursStr == "" || timeMinutesStr == "") "" else " "
+        val timeSpace = if (timeHoursStr == "" && timeMinutesStr == "") "0" else
+            if (timeHoursStr == "" || timeMinutesStr == "") "" else " "
 
         return "$timeHoursStr$timeSpace$timeMinutesStr"
     }
@@ -358,7 +364,8 @@ class MyActivitiesFragment : BaseFragment() {
 
         val distanceKmStr = if (distanceKm > 0) "${distanceKm}km" else ""
         val distanceMStr = if (distanceM > 0) "${distanceM}m" else ""
-        val distanceSpace = if (distanceKmStr == "" || distanceMStr == "") "" else " "
+        val distanceSpace = if (distanceKmStr == "" && distanceMStr == "") "0" else
+            if (distanceKmStr == "" || distanceMStr == "") "" else " "
 
         return "$distanceKmStr$distanceSpace$distanceMStr"
     }
@@ -510,6 +517,28 @@ class MyActivitiesFragment : BaseFragment() {
         chart.notifyDataSetChanged()
 
         chart.invalidate()
+    }
+
+    private fun shareFitnessChart(chart: BarChart) {
+        val sharePhoto = SharePhoto.Builder()
+                .setBitmap(chart.chartBitmap)
+                .build()
+
+        val shareContent = ShareMediaContent.Builder()
+                .addMedium(sharePhoto)
+                .build()
+
+
+        val shareDialog = ShareDialog(this@MyActivitiesFragment)
+        shareDialog.show(shareContent, ShareDialog.Mode.AUTOMATIC)
+    }
+
+    private fun setupShareFitnessChartEvents() {
+        share_calories.setOnClickListener { shareFitnessChart(calories_chart) }
+
+        share_distance.setOnClickListener { shareFitnessChart(distance_chart) }
+
+        share_steps.setOnClickListener { shareFitnessChart(steps_chart) }
     }
 
     companion object {

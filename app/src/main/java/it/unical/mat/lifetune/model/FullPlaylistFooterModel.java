@@ -20,6 +20,9 @@ abstract class FullPlaylistFooterModel extends DataBindingEpoxyModel {
     View.OnClickListener clickUnlikeListener;
 
     @EpoxyAttribute(DoNotHash)
+    View.OnClickListener clickShareListener;
+
+    @EpoxyAttribute(DoNotHash)
     Playlist playlist;
 
     FullPlaylistFooterModel(Playlist _playlist) {

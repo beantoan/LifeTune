@@ -33,7 +33,7 @@
     <string name="error_turn_on_location_title">Cannot turn on location</string>
     <string name="error_turn_on_location_message">Please turn on location to receive the best recommendation</string>
     <string name="count_steps_chart_title">Count Steps</string>
-    <string name="calculate_distances_chart_title">Calculate Distances</string>
+    <string name="calculate_distances_chart_title">Calculate Distance</string>
     <string name="calculate_calories_chart_title">Calculate Calories</string>
     <string name="my_activities_summary_title">Summary</string>
     <string name="fitness_read_history_error_title">Sorry! I\'m Wrong</string>
@@ -62,4 +62,5 @@
     <string name="unliked_playlist_successfully_message">Unliked the playlist %1$s successfully</string>
     <string name="unliked_playlist_unsuccessfully_message">Error when unliked the playlist %1$s. Please try again.</string>
 
+    <string name="facebook_app_id">159706501302929</string>
 </resources>

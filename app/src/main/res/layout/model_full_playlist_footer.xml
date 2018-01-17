@@ -16,6 +16,10 @@
         <variable
             name="clickUnlikeListener"
             type="android.view.View.OnClickListener" />
+
+        <variable
+            name="clickShareListener"
+            type="android.view.View.OnClickListener" />
     </data>
 
     <LinearLayout
@@ -61,6 +65,7 @@
             android:layout_weight="1"
             android:clickable="true"
             android:focusable="true"
+            android:onClick="@{clickShareListener}"
             android:foreground="?android:attr/selectableItemBackground" />
     </LinearLayout>
 </layout>

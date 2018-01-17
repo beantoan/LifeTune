@@ -1,8 +1,8 @@
 package it.unical.mat.lifetune.fragment
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.location.Address
 import android.location.Geocoder
@@ -32,13 +32,13 @@ import it.unical.mat.lifetune.BuildConfig
 import it.unical.mat.lifetune.R
 import it.unical.mat.lifetune.activity.MainActivity
 import it.unical.mat.lifetune.adapter.NearbyPlacesAdapter
-import it.unical.mat.lifetune.controller.NearbyPlacesController
 import it.unical.mat.lifetune.decoration.RecyclerViewDividerItemDecoration
 import it.unical.mat.lifetune.entity.ActivityResultEvent
 import it.unical.mat.lifetune.entity.Place
 import it.unical.mat.lifetune.util.AppDialog
 import it.unical.mat.lifetune.util.AppUtils
 import kotlinx.android.synthetic.main.fragment_nearby_places.*
+import pub.devrel.easypermissions.EasyPermissions
 import java.io.File
 import java.io.FileOutputStream
 import java.util.*
@@ -52,12 +52,11 @@ import kotlin.collections.ArrayList
 /**
  * A dummy fragment representing a section of the app, but that simply displays dummy text.
  */
-class NearbyPlacesFragment : BaseLocationFragment(),
-        NearbyPlacesController.AdapterCallbacks {
+class NearbyPlacesFragment : BaseLocationFragment() {
 
     private var mainActivity: MainActivity? = null
 
-    private var adapter = NearbyPlacesAdapter(ArrayList())
+    private var adapter: NearbyPlacesAdapter? = null
 
     private var isLoadingPlaces = false
 
@@ -101,13 +100,7 @@ class NearbyPlacesFragment : BaseLocationFragment(),
         Log.d(TAG, "onLocationPermissionDenied")
     }
 
-    override fun onPlaceClicked(place: Place?) {
-        Log.d(TAG, "onPlaceClicked: ${place?.name}")
-
-        navigationToPlaceByGoogleMap(place!!)
-    }
-
-    private fun navigationToPlaceByGoogleMap(place: Place) {
+    fun navigationToPlaceByGoogleMap(place: Place) {
         val gmmIntentUri = Uri.parse("google.navigation:q=${place.latLng.latitude},${place.latLng.longitude}")
 
         val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
@@ -139,6 +132,8 @@ class NearbyPlacesFragment : BaseLocationFragment(),
         recycler_view_nearby_places.layoutManager = LinearLayoutManager(activity!!.applicationContext)
         recycler_view_nearby_places.addItemDecoration(dividerItemDecoration)
 
+        adapter = NearbyPlacesAdapter(this, ArrayList())
+
         recycler_view_nearby_places.adapter = adapter
     }
 
@@ -156,11 +151,11 @@ class NearbyPlacesFragment : BaseLocationFragment(),
         }
     }
 
+    @SuppressLint("MissingPermission")
     private fun callSnapshotLocationApi() {
         Log.d(TAG, "callSnapshotLocationApi")
 
-        if (ContextCompat.checkSelfPermission(activity!!, Manifest.permission.ACCESS_FINE_LOCATION) ==
-                PackageManager.PERMISSION_GRANTED) {
+        if (EasyPermissions.hasPermissions(context, Manifest.permission.ACCESS_FINE_LOCATION)) {
 
             if (AppUtils.isInternetConnected(context!!)) {
                 Awareness.getSnapshotClient(activity).location
@@ -199,6 +194,7 @@ class NearbyPlacesFragment : BaseLocationFragment(),
         }
     }
 
+    @SuppressLint("MissingPermission")
     private fun initializeGoogleMap() {
         Log.d(TAG, "initializeGoogleMap")
 
@@ -208,8 +204,7 @@ class NearbyPlacesFragment : BaseLocationFragment(),
             map.getMapAsync { _googleMap ->
                 googleMap = _googleMap
 
-                if (ContextCompat.checkSelfPermission(activity!!, Manifest.permission.ACCESS_FINE_LOCATION) ==
-                        PackageManager.PERMISSION_GRANTED) {
+                if (EasyPermissions.hasPermissions(context, Manifest.permission.ACCESS_FINE_LOCATION)) {
                     googleMap?.isMyLocationEnabled = true
                 }
 
@@ -227,6 +222,7 @@ class NearbyPlacesFragment : BaseLocationFragment(),
         }
     }
 
+    @SuppressLint("MissingPermission")
     private fun callSnapshotPlacesApi() {
         Log.d(TAG, "callSnapshotPlacesApi")
 
@@ -236,8 +232,7 @@ class NearbyPlacesFragment : BaseLocationFragment(),
 
         isLoadingPlaces = true
 
-        if (ContextCompat.checkSelfPermission(activity!!, Manifest.permission.ACCESS_FINE_LOCATION) ==
-                PackageManager.PERMISSION_GRANTED) {
+        if (EasyPermissions.hasPermissions(context, Manifest.permission.ACCESS_FINE_LOCATION)) {
 
             if (AppUtils.isInternetConnected(context!!)) {
 
@@ -295,7 +290,7 @@ class NearbyPlacesFragment : BaseLocationFragment(),
     private fun updateAdapterData(places: List<Place>) {
         Log.d(TAG, "updateAdapterData: places.size=${places.size}")
 
-        adapter.addAll(places)
+        adapter!!.addAll(places)
     }
 
     private fun addNearbyPlacesToMap(places: List<Place>) {
