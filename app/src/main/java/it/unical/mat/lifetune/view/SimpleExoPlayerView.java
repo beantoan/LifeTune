@@ -1029,7 +1029,7 @@ public final class SimpleExoPlayerView extends FrameLayout {
             setCurrentPlayingTrack(tracks, null);
         } else {
             Track currentTrack = tracks.get(this.player.getCurrentWindowIndex());
-            String title = currentTrack.getCombinedTitle();
+            String title = currentTrack.getTitle();
             String avatarUrl = currentTrack.getPlayerAvatar();
 
             setCurrentPlayingTrack(tracks, currentTrack);

@@ -42,12 +42,15 @@ public class Track extends BaseObservable {
     @Element(name = "avatar", data = true, required = false)
     String avatar;
 
+    @Element(name = "key", required = false)
+    String songKey;
+
     private Boolean isPlaying = false;
 
     public Track() {
     }
 
-    public Track(String title, String singers, String url, String image, String bgimage, String thumb, String avatar) {
+    public Track(String title, String singers, String url, String image, String bgimage, String thumb, String avatar, String songKey, Boolean isPlaying) {
         this.title = title;
         this.singers = singers;
         this.url = url;
@@ -55,6 +58,16 @@ public class Track extends BaseObservable {
         this.bgimage = bgimage;
         this.thumb = thumb;
         this.avatar = avatar;
+        this.songKey = songKey;
+        this.isPlaying = isPlaying;
+    }
+
+    public String getSongKey() {
+        return StringUtils.strip(songKey);
+    }
+
+    public void setSongKey(String songKey) {
+        this.songKey = songKey;
     }
 
     public String getTitle() {
@@ -163,6 +176,11 @@ public class Track extends BaseObservable {
                 ", bgimage='" + bgimage + '\'' +
                 ", thumb='" + thumb + '\'' +
                 ", avatar='" + avatar + '\'' +
+                ", songKey='" + songKey + '\'' +
                 '}';
+    }
+
+    public String shortLog() {
+        return "Track(songKey=" + getSongKey() + ", title=" + getTitle() + ")";
     }
 }

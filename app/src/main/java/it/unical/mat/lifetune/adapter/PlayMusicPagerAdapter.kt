@@ -29,7 +29,7 @@ class PlayMusicPagerAdapter(playMusicFragment: PlayMusicFragment, fragmentManage
         else -> "Favourite"
     }
 
-    fun currentMusicFragment(position: Int): BaseMusicFragment {
+    fun getMusicFragment(position: Int): BaseMusicFragment {
         return getItem(position) as BaseMusicFragment
     }
 

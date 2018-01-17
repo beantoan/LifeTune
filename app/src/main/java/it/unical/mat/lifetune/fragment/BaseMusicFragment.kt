@@ -206,7 +206,7 @@ abstract class BaseMusicFragment :
         if (AppUtils.isInternetConnected(context!!)) {
             beforeCallSongsApi()
 
-            SongPresenter(ImplSongsCallback(this)).callSongsApi(playlist)
+            SongPresenter(ImplSongsCallbacks(this)).callSongsApi(playlist)
         } else {
             AppDialog.error(R.string.no_internet_error_title, R.string.no_internet_error_message, activity!!)
         }
@@ -353,7 +353,7 @@ abstract class BaseMusicFragment :
         }
     }
 
-    private class ImplSongsCallback(val baseMusicFragment: BaseMusicFragment) : SongPresenter.SongsCallback {
+    private class ImplSongsCallbacks(val baseMusicFragment: BaseMusicFragment) : SongPresenter.SongsCallbacks {
         override fun onSongsApiSuccess(playlist: Playlist, trackList: TrackList) {
             baseMusicFragment.onSongsApiSuccess(playlist, trackList)
         }

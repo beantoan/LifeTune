@@ -53,9 +53,11 @@ class PlayMusicFragment : BaseFragment(), AppBarLayout.OnOffsetChangedListener {
 
     private lateinit var mPlayMusicPagerAdapter: PlayMusicPagerAdapter
 
-    private val searchSongResultsAdapter = SearchSongResultsAdapter(ArrayList())
+    private var searchSongResultsAdapter: SearchSongResultsAdapter? = null
 
     private var playingTrackAdapter: PlayingTracksAdapter? = null
+
+    private var needToPlaySong: Song? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         Log.d(TAG, "onCreateView")
@@ -220,6 +222,7 @@ class PlayMusicFragment : BaseFragment(), AppBarLayout.OnOffsetChangedListener {
         recycler_view_search_song_results.layoutManager = LinearLayoutManager(activity!!.applicationContext)
         recycler_view_search_song_results.addItemDecoration(dividerItemDecoration)
 
+        searchSongResultsAdapter = SearchSongResultsAdapter(this@PlayMusicFragment, ArrayList())
         recycler_view_search_song_results.adapter = searchSongResultsAdapter
     }
 
@@ -311,7 +314,7 @@ class PlayMusicFragment : BaseFragment(), AppBarLayout.OnOffsetChangedListener {
     }
 
     fun playSongs(playlist: Playlist?) {
-        Log.d(TAG, "playSongs: ${playlist?.shortLog()}")
+        Log.d(TAG, "playSongs: ${playlist?.shortLog()}, needToPlaySong=${needToPlaySong?.shortLog()}")
 
         music_player.player.stop()
 
@@ -326,7 +329,18 @@ class PlayMusicFragment : BaseFragment(), AppBarLayout.OnOffsetChangedListener {
 
             val mediaSources = ArrayList<MediaSource>()
 
-            playlist.tracks.forEach { mediaSources.add(buildMediaSource(Uri.parse(it.url))) }
+            var needToPlayTrackPosition = -1
+
+            playlist.tracks.forEachIndexed { index, track ->
+
+                Log.d(TAG, "track=${track.shortLog()}")
+                mediaSources.add(buildMediaSource(Uri.parse(track.url)))
+
+                if (needToPlaySong != null && needToPlayTrackPosition == -1
+                        && track.songKey == needToPlaySong?.code) {
+                    needToPlayTrackPosition = index
+                }
+            }
 
             val concatenatingMediaSource = ConcatenatingMediaSource(*mediaSources.toTypedArray())
 
@@ -334,7 +348,13 @@ class PlayMusicFragment : BaseFragment(), AppBarLayout.OnOffsetChangedListener {
 
             music_player.player.prepare(concatenatingMediaSource)
             music_player.player.playWhenReady = true
+
+            if (needToPlayTrackPosition > -1) {
+                playTrackAtPosition(needToPlayTrackPosition)
+            }
         }
+
+        needToPlaySong = null
 
         updateMediaPlayControl()
     }
@@ -483,7 +503,7 @@ class PlayMusicFragment : BaseFragment(), AppBarLayout.OnOffsetChangedListener {
     private fun updateSearchSongResultAdapter(songs: List<Song>) {
         Log.d(TAG, "updateSearchSongResultAdapter: songs.size=${songs.size}")
 
-        searchSongResultsAdapter.addAll(songs)
+        searchSongResultsAdapter?.addAll(songs)
     }
 
     private fun updatePlayingTrackAdapter(tracks: List<Track>?) {
@@ -570,6 +590,29 @@ class PlayMusicFragment : BaseFragment(), AppBarLayout.OnOffsetChangedListener {
         LifeTuneApplication.musicPlayer.seekTo(position, C.TIME_UNSET)
     }
 
+    fun playFoundSong(song: Song?) {
+        search_view.close(true)
+
+        displaySearchSongResults(false)
+
+        val userId = FirebaseAuth.getInstance().currentUser!!.uid
+        SongPresenter(ImplPlaylistCallbacks(this)).callPlaylistApi(song!!, userId)
+    }
+
+    private fun onPlaylistSuccess(song: Song, playlist: Playlist) {
+        Log.d(TAG, "onPlaylistSuccess: ${song.shortLog()}, ${playlist.shortLog()}")
+
+        needToPlaySong = song
+
+        val musicFragment = mPlayMusicPagerAdapter.getMusicFragment(PlayMusicPagerAdapter.RECOMMENDATION_MUSIC_FRAGMENT)
+
+        musicFragment.callSongsApi(playlist)
+    }
+
+    private fun onPlaylistError(song: Song) {
+
+    }
+
     companion object {
         val TAG = PlayMusicFragment::class.java.simpleName
     }
@@ -610,7 +653,7 @@ class PlayMusicFragment : BaseFragment(), AppBarLayout.OnOffsetChangedListener {
         }
     }
 
-    private class ImplSearchCallbacks(val playMusicFragment: PlayMusicFragment) : SongPresenter.SearchCallback {
+    private class ImplSearchCallbacks(val playMusicFragment: PlayMusicFragment) : SongPresenter.SearchCallbacks {
         override fun onSearchSuccess(songs: List<Song>) {
             playMusicFragment.onSearchSongsSuccess(songs)
         }
@@ -618,5 +661,16 @@ class PlayMusicFragment : BaseFragment(), AppBarLayout.OnOffsetChangedListener {
         override fun onSearchError(error: Throwable) {
             playMusicFragment.onSearchSongsError(error)
         }
+    }
+
+    private class ImplPlaylistCallbacks(val playMusicFragment: PlayMusicFragment) : SongPresenter.PlaylistCallbacks {
+        override fun onPlaylistSuccess(song: Song, playlist: Playlist) {
+            playMusicFragment.onPlaylistSuccess(song, playlist)
+        }
+
+        override fun onPlaylistError(error: Throwable, song: Song) {
+            playMusicFragment.onPlaylistError(song)
+        }
+
     }
 }

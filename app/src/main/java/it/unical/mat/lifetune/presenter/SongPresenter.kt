@@ -13,15 +13,20 @@ import it.unical.mat.lifetune.entity.TrackList
  */
 class SongPresenter {
 
-    var songsCallback: SongsCallback? = null
-    var searchCallback: SearchCallback? = null
+    var songsCallbacks: SongsCallbacks? = null
+    var searchCallbacks: SearchCallbacks? = null
+    var playlistCallbacks: PlaylistCallbacks? = null
 
-    constructor(callbacks: SongsCallback) {
-        songsCallback = callbacks
+    constructor(callbacks: SongsCallbacks) {
+        songsCallbacks = callbacks
     }
 
-    constructor(callbacks: SearchCallback) {
-        searchCallback = callbacks
+    constructor(callbacks: SearchCallbacks) {
+        searchCallbacks = callbacks
+    }
+
+    constructor(callbacks: PlaylistCallbacks) {
+        playlistCallbacks = callbacks
     }
 
     companion object {
@@ -35,8 +40,8 @@ class SongPresenter {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        { trackList -> songsCallback?.onSongsApiSuccess(playlist, trackList) },
-                        { error -> songsCallback?.onSongsApiError(error) }
+                        { trackList -> songsCallbacks?.onSongsApiSuccess(playlist, trackList) },
+                        { error -> songsCallbacks?.onSongsApiError(error) }
                 )
     }
 
@@ -47,18 +52,35 @@ class SongPresenter {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        { songs -> searchCallback?.onSearchSuccess(songs) },
-                        { error -> searchCallback?.onSearchError(error) }
+                        { songs -> searchCallbacks?.onSearchSuccess(songs) },
+                        { error -> searchCallbacks?.onSearchError(error) }
                 )
     }
 
-    interface SongsCallback {
+    fun callPlaylistApi(song: Song, userId: String) {
+        Log.d(TAG, "callPlaylistApi: ${song.shortLog()}")
+
+        ApiServiceFactory.createSongApi().playlist(song.id, userId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        { playlist -> playlistCallbacks?.onPlaylistSuccess(song, playlist) },
+                        { error -> playlistCallbacks?.onPlaylistError(error, song) }
+                )
+    }
+
+    interface SongsCallbacks {
         fun onSongsApiSuccess(playlist: Playlist, trackList: TrackList)
         fun onSongsApiError(error: Throwable)
     }
 
-    interface SearchCallback {
+    interface SearchCallbacks {
         fun onSearchSuccess(songs: List<Song>)
         fun onSearchError(error: Throwable)
+    }
+
+    interface PlaylistCallbacks {
+        fun onPlaylistSuccess(song: Song, playlist: Playlist)
+        fun onPlaylistError(error: Throwable, song: Song)
     }
 }
