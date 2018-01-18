@@ -90,21 +90,22 @@ class BootActivity : AppCompatActivity() {
 
             if (response == null) {
                 // User pressed back button
-                showSnackbar(R.string.sign_in_cancelled)
+                AppDialog.error(R.string.sign_in_cancelled, R.string.no_internet_error_message, this@BootActivity)
+
                 return
             }
 
             if (response.errorCode == ErrorCodes.NO_NETWORK) {
-                showSnackbar(R.string.no_internet_connection)
+                AppDialog.error(R.string.no_internet_error_title, R.string.no_internet_error_message, this@BootActivity)
                 return
             }
 
             if (response.errorCode == ErrorCodes.UNKNOWN_ERROR) {
-                showSnackbar(R.string.unknown_error)
+                AppDialog.error(R.string.unknown_error, R.string.no_internet_error_message, this@BootActivity)
                 return
             }
 
-            showSnackbar(R.string.unknown_sign_in_response)
+            AppDialog.error(R.string.unknown_sign_in_response, R.string.no_internet_error_message, this@BootActivity)
         }
     }
 
@@ -116,7 +117,7 @@ class BootActivity : AppCompatActivity() {
 
         startActivityForResult(
                 AuthUI.getInstance().createSignInIntentBuilder()
-                        .setLogo(R.drawable.logo)
+                        .setLogo(R.drawable.ic_launcher)
                         .setAvailableProviders(selectedProviders)
                         .setTosUrl(GOOGLE_TOS_URL)
                         .setPrivacyPolicyUrl(GOOGLE_PRIVACY_POLICY_URL)

@@ -14,7 +14,7 @@ android {
     defaultConfig {
         applicationId "it.unical.mat.lifetune"
         minSdkVersion 17
-        targetSdkVersion 17
+        targetSdkVersion 27
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -109,7 +109,10 @@ dependencies {
     implementation 'com.squareup.retrofit2:retrofit:2.3.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
     implementation 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
-    implementation 'com.squareup.retrofit2:converter-simplexml:2.3.0'
+    implementation ('com.squareup.retrofit2:converter-simplexml:2.3.0') {
+        exclude module: 'stax'
+        exclude module: 'stax-api'
+    }
     implementation 'com.squareup.okhttp3:logging-interceptor:3.9.1'
     implementation 'org.apache.commons:commons-lang3:3.7'
     implementation 'cn.pedant.sweetalert:library:1.3'

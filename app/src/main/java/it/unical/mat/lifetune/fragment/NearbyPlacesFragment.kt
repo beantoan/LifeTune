@@ -18,9 +18,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.crashlytics.android.Crashlytics
 import com.google.android.gms.awareness.Awareness
-import com.google.android.gms.location.places.GeoDataClient
 import com.google.android.gms.location.places.PlaceLikelihood
-import com.google.android.gms.location.places.Places
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
@@ -302,70 +300,6 @@ class NearbyPlacesFragment : BaseLocationFragment() {
 
                 googleMap?.addMarker(markerOptions)
             }
-        }
-    }
-
-    private fun getPhotosOfNearbyPlaces(places: List<Place>) {
-        Log.d(TAG, "getPhotosOfNearbyPlaces")
-
-        if (places.isNotEmpty()) {
-            val photosDirPath = AppUtils.getPhotosDir()
-
-            AppUtils.clearPhotosDir(photosDirPath)
-
-            AppUtils.createPhotosDir(photosDirPath)
-
-            val geoDataClient = Places.getGeoDataClient(context!!, null)
-
-            getPhotosForPlace(geoDataClient, photosDirPath, places)
-        }
-    }
-
-    private fun getPhotosForPlace(geoDataClient: GeoDataClient, photosDirPath: String, places: List<Place>) {
-        places.forEach { place ->
-
-            geoDataClient.getPlacePhotos(place.id)
-                    .addOnCompleteListener(activity!!, { placePhotoMetadataResponse ->
-                        Log.d(TAG, "geoDataClient.getPlacePhotos#addOnCompleteListener")
-
-                        if (placePhotoMetadataResponse.isSuccessful) {
-                            placePhotoMetadataResponse.result.photoMetadata.take(1).forEach { placePhotoMetadata ->
-
-                                geoDataClient.getScaledPhoto(placePhotoMetadata, 500, 500)
-                                        .addOnSuccessListener(activity!!, {
-                                            Log.d(TAG, "geoDataClient.getScaledPhoto#addOnSuccessListener")
-                                        })
-                                        .addOnCompleteListener(activity!!, { placePhotoResponse ->
-                                            Log.d(TAG, "geoDataClient.getScaledPhoto#addOnCompleteListener")
-
-                                            if (placePhotoResponse.isSuccessful) {
-                                                val imgFile = AppUtils.savePlacePhoto(photosDirPath, placePhotoResponse.result.bitmap)
-
-                                                if (imgFile != null) {
-                                                    Log.d(TAG, imgFile.absolutePath)
-
-                                                    place.addPhoto(imgFile.absolutePath)
-                                                    place.notifyChange()
-                                                } else {
-                                                    Log.w(TAG, "geoDataClient.getScaledPhoto#addOnCompleteListener: scaled photos not found")
-                                                }
-                                            }
-                                        })
-                                        .addOnFailureListener(activity!!, {
-                                            Log.d(TAG, "geoDataClient.getScaledPhoto#addOnFailureListener")
-                                        })
-                            }
-                        } else {
-                            Log.w(TAG, "geoDataClient.getPlacePhotos#addOnCompleteListener: place photos not found")
-                        }
-                    })
-                    .addOnSuccessListener(activity!!, {
-                        Log.d(TAG, "geoDataClient.getPlacePhotos#addOnSuccessListener")
-
-                    })
-                    .addOnFailureListener(activity!!, {
-                        Log.d(TAG, "geoDataClient.getPlacePhotos#addOnFailureListener")
-                    })
         }
     }
 
