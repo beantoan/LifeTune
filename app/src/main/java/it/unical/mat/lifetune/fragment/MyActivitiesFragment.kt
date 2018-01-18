@@ -1,20 +1,16 @@
 package it.unical.mat.lifetune.fragment
 
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.Paint
 import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.text.InputType
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.facebook.FacebookSdk
-import com.facebook.LoggingBehavior
-import com.facebook.share.model.ShareMediaContent
-import com.facebook.share.model.SharePhoto
-import com.facebook.share.model.SharePhotoContent
-import com.facebook.share.widget.ShareDialog
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
@@ -29,15 +25,12 @@ import com.google.android.gms.fitness.data.DataSource
 import com.google.android.gms.fitness.data.DataType
 import com.google.android.gms.fitness.data.Field
 import com.google.android.gms.fitness.request.DataReadRequest
-import it.unical.mat.lifetune.BuildConfig
 import it.unical.mat.lifetune.R
 import it.unical.mat.lifetune.activity.MainActivity
 import it.unical.mat.lifetune.entity.FitnessActivity
 import it.unical.mat.lifetune.entity.FitnessChartEntry
 import it.unical.mat.lifetune.util.AppDialog
-import it.unical.mat.lifetune.util.AppUtils
 import kotlinx.android.synthetic.main.fragment_my_activities.*
-import java.io.File
 import java.text.DateFormat
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
@@ -526,60 +519,49 @@ class MyActivitiesFragment : BaseFragment() {
         chart.invalidate()
     }
 
-    private fun shareFitnessChart(chart: BarChart) {
+    private fun shareFitnessChart(chart: BarChart, fitnessType: Int) {
         Log.d(TAG, "shareFitnessChart")
-
-        FacebookSdk.setIsDebugEnabled(true)
-
-        FacebookSdk.addLoggingBehavior(LoggingBehavior.APP_EVENTS)
-        FacebookSdk.addLoggingBehavior(LoggingBehavior.REQUESTS)
-        FacebookSdk.addLoggingBehavior(LoggingBehavior.GRAPH_API_DEBUG_INFO)
-        FacebookSdk.addLoggingBehavior(LoggingBehavior.GRAPH_API_DEBUG_WARNING)
-
-        val photosDir = AppUtils.getPhotosDir()
-
-        AppUtils.createPhotosDir(photosDir)
 
         val fileName = fitnessCalendar.timeInMillis.toString()
 
-        val file = File(photosDir, fileName + ".png")
+        val dateFormat = DateFormat.getDateInstance(DateFormat.LONG)
+        val dateTitle = dateFormat.format(fitnessCalendar.timeInMillis)
 
-        chart.saveToPath(fileName, "/" + BuildConfig.APPLICATION_ID)
+        val bitmapPath = MediaStore.Images.Media.insertImage(activity!!.contentResolver, chart.chartBitmap, fileName, null)
+        val bitmapUri = Uri.parse(bitmapPath)
 
-        Log.d(TAG, file.absolutePath)
+        val caption = when (fitnessType) {
+            FitnessChartEntry.TYPE_CALORIES -> {
+                "I burned ${totalCalories.toInt()} calories on $dateTitle"
+            }
+            FitnessChartEntry.TYPE_DISTANCE -> {
+                val distance = convertDistanceToHuman(totalDistance)
 
-        val sharePhoto = SharePhoto.Builder()
-                .setCaption("My fitness chart")
-                .setImageUrl(Uri.parse(file.absolutePath))
-                .build()
+                "I walked $distance on $dateTitle"
+            }
+            FitnessChartEntry.TYPE_STEPS -> {
+                "I stepped ${totalSteps.toInt()} on $dateTitle"
+            }
+            else -> "My activities on $dateTitle"
+        }
 
-        val shareContent = ShareMediaContent.Builder()
-                .addMedium(sharePhoto)
-                .build()
-
-        val content = SharePhotoContent.Builder().setPhotos(arrayOf(sharePhoto).toList()).build()
-        
-
-        val shareDialog = ShareDialog(this@MyActivitiesFragment)
-        shareDialog.show(content, ShareDialog.Mode.AUTOMATIC)
-
-//        val content = ShareLinkContent.Builder()
-//                .setContentUrl(Uri.parse("https://lianjim.wordpress.com/2011/12/04/android-convert-file-to-bitmap"))
-//                .build()
-//
-//        val shareDialog = ShareDialog(this@MyActivitiesFragment)
-//
-//        shareDialog.show(content, ShareDialog.Mode.AUTOMATIC)
+        val sendIntent = Intent()
+        sendIntent.action = Intent.ACTION_SEND
+        sendIntent.putExtra(Intent.EXTRA_TEXT, caption)
+        sendIntent.type = "text/plain"
+        sendIntent.putExtra(Intent.EXTRA_STREAM, bitmapUri)
+        sendIntent.type = "image/jpeg"
+        startActivity(Intent.createChooser(sendIntent, resources.getText(R.string.share_playlist_dialog_title)))
     }
 
     private fun setupShareFitnessChartEvents() {
         Log.d(TAG, "setupShareFitnessChartEvents")
 
-        share_calories.setOnClickListener { shareFitnessChart(calories_chart) }
+        share_calories.setOnClickListener { shareFitnessChart(calories_chart, FitnessChartEntry.TYPE_CALORIES) }
 
-        share_distance.setOnClickListener { shareFitnessChart(distance_chart) }
+        share_distance.setOnClickListener { shareFitnessChart(distance_chart, FitnessChartEntry.TYPE_DISTANCE) }
 
-        share_steps.setOnClickListener { shareFitnessChart(steps_chart) }
+        share_steps.setOnClickListener { shareFitnessChart(steps_chart, FitnessChartEntry.TYPE_STEPS) }
     }
 
     companion object {

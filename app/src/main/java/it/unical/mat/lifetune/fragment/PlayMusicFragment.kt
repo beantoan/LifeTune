@@ -265,10 +265,6 @@ class PlayMusicFragment : BaseFragment(), AppBarLayout.OnOffsetChangedListener {
             override fun onOptionItemClicked(option: Int) {
                 onShareOptionItemClicked(option, playlist)
             }
-
-            override fun onNegativeButtonClicked() {
-
-            }
         }
 
         dialog.show(fragmentManager, ShareDialogFragment.TAG)
@@ -322,7 +318,7 @@ class PlayMusicFragment : BaseFragment(), AppBarLayout.OnOffsetChangedListener {
         sendIntent.action = Intent.ACTION_SEND
         sendIntent.putExtra(Intent.EXTRA_TEXT, playlist?.title + "\n" + playlist?.url)
         sendIntent.type = "text/plain"
-        startActivity(Intent.createChooser(sendIntent, resources.getText(R.string.share_playlist_dialog_title)));
+        startActivity(Intent.createChooser(sendIntent, resources.getText(R.string.share_playlist_dialog_title)))
     }
 
     private fun displayMusicPlayer(isShown: Boolean) {

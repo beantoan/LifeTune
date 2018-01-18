@@ -50,6 +50,5 @@ class ShareDialogFragment : DialogFragment() {
 
     interface ShareDialogCallbacks {
         fun onOptionItemClicked(option: Int)
-        fun onNegativeButtonClicked()
     }
 }
