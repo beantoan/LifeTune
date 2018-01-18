@@ -34,6 +34,7 @@ abstract class FullPlaylistHeaderModel extends DataBindingEpoxyModel {
 
         Picasso.with(view.getContext())
                 .load(playlist.getImg())
+                .fit()
                 .placeholder(R.drawable.no_image)
                 .error(R.drawable.no_image)
                 .into(image);

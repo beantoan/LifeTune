@@ -63,4 +63,7 @@
     <string name="unliked_playlist_unsuccessfully_message">Error when unliked the playlist %1$s. Please try again.</string>
 
     <string name="facebook_app_id">159706501302929</string>
+    <string name="alert_dialog_cancel">Cancel</string>
+    <string name="share_playlist_dialog_title">Share playlist</string>
+    <string name="share_dialog_cancel_button_title">Cancel</string>
 </resources>

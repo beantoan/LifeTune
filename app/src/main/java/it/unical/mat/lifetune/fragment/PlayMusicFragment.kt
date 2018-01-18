@@ -1,5 +1,6 @@
 package it.unical.mat.lifetune.fragment
 
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.AppBarLayout
@@ -253,7 +254,30 @@ class PlayMusicFragment : BaseFragment(), AppBarLayout.OnOffsetChangedListener {
         }
 
         share_playing_playlist.setOnClickListener {
-            sharePlaylist(LifeTuneApplication.musicPlayer.playlist)
+            onShareButtonClicked(LifeTuneApplication.musicPlayer.playlist)
+        }
+    }
+
+    fun onShareButtonClicked(playlist: Playlist?) {
+        val dialog = ShareDialogFragment.newInstance(R.string.share_playlist_dialog_title)
+
+        dialog.shareDialogCallbacks = object : ShareDialogFragment.ShareDialogCallbacks {
+            override fun onOptionItemClicked(option: Int) {
+                onShareOptionItemClicked(option, playlist)
+            }
+
+            override fun onNegativeButtonClicked() {
+
+            }
+        }
+
+        dialog.show(fragmentManager, ShareDialogFragment.TAG)
+    }
+
+    fun onShareOptionItemClicked(option: Int, playlist: Playlist?) {
+        when (option) {
+            ShareDialogFragment.FACEBOOK_OPTION -> sharePlaylistToFacebook(playlist)
+            ShareDialogFragment.OTHERS_OPTION -> sharePlaylistToOthers(playlist)
         }
     }
 
@@ -277,8 +301,8 @@ class PlayMusicFragment : BaseFragment(), AppBarLayout.OnOffsetChangedListener {
         }
     }
 
-    fun sharePlaylist(playlist: Playlist?) {
-        Log.d(TAG, "sharePlaylist: ${playlist?.shortLog()}")
+    fun sharePlaylistToFacebook(playlist: Playlist?) {
+        Log.d(TAG, "sharePlaylistToFacebook: ${playlist?.shortLog()}")
 
         if (playlist != null) {
             val content = ShareLinkContent.Builder()
@@ -289,6 +313,16 @@ class PlayMusicFragment : BaseFragment(), AppBarLayout.OnOffsetChangedListener {
 
             shareDialog.show(content, ShareDialog.Mode.AUTOMATIC)
         }
+    }
+
+    fun sharePlaylistToOthers(playlist: Playlist?) {
+        Log.d(TAG, "sharePlaylistToOthers: ${playlist?.shortLog()}")
+
+        val sendIntent = Intent()
+        sendIntent.action = Intent.ACTION_SEND
+        sendIntent.putExtra(Intent.EXTRA_TEXT, playlist?.title + "\n" + playlist?.url)
+        sendIntent.type = "text/plain"
+        startActivity(Intent.createChooser(sendIntent, resources.getText(R.string.share_playlist_dialog_title)));
     }
 
     private fun displayMusicPlayer(isShown: Boolean) {

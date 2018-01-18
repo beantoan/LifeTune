@@ -3,13 +3,19 @@ package it.unical.mat.lifetune.util
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
 import android.provider.Settings
 import android.util.Log
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import it.unical.mat.lifetune.BuildConfig
+import java.io.File
+import java.io.FileOutputStream
+import java.util.*
 
 /**
  * Created by beantoan on 1/27/16.
@@ -89,5 +95,41 @@ object AppUtils {
             Log.e(TAG, "openAppSettings", e)
         }
 
+    }
+
+    fun getPhotosDir(): String = Environment.getExternalStorageDirectory().absolutePath + "/${BuildConfig.APPLICATION_ID}"
+
+    fun createPhotosDir(photosDirPath: String) {
+        if (!File(photosDirPath).mkdirs()) {
+            Log.e(TAG, "Directory not created")
+        }
+    }
+
+    fun clearPhotosDir(photosDirPath: String) {
+        val dir = File(photosDirPath)
+
+        if (dir.exists()) {
+            dir.delete()
+        }
+    }
+
+    fun savePlacePhoto(photosDirPath: String, bitmap: Bitmap): File? {
+
+        val random = Random()
+        val filename = random.nextInt(999999).toString() + ".png"
+        val imgFile = File(photosDirPath, filename)
+
+        try {
+            val out = FileOutputStream(imgFile)
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+            out.flush()
+            out.close()
+
+            return imgFile
+        } catch (e: Exception) {
+
+        }
+
+        return null
     }
 }

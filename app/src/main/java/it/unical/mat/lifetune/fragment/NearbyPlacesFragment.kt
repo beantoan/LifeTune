@@ -3,13 +3,11 @@ package it.unical.mat.lifetune.fragment
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.graphics.Bitmap
 import android.location.Address
 import android.location.Geocoder
 import android.location.Location
 import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
 import android.support.design.widget.BottomSheetBehavior
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.DividerItemDecoration
@@ -28,7 +26,6 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import it.unical.mat.lifetune.BuildConfig
 import it.unical.mat.lifetune.R
 import it.unical.mat.lifetune.activity.MainActivity
 import it.unical.mat.lifetune.adapter.NearbyPlacesAdapter
@@ -39,10 +36,6 @@ import it.unical.mat.lifetune.util.AppDialog
 import it.unical.mat.lifetune.util.AppUtils
 import kotlinx.android.synthetic.main.fragment_nearby_places.*
 import pub.devrel.easypermissions.EasyPermissions
-import java.io.File
-import java.io.FileOutputStream
-import java.util.*
-import kotlin.collections.ArrayList
 
 
 /**
@@ -312,51 +305,15 @@ class NearbyPlacesFragment : BaseLocationFragment() {
         }
     }
 
-    private fun getPhotosDir(): String = Environment.getExternalStorageDirectory().absolutePath + "/${BuildConfig.APPLICATION_ID}"
-
-    private fun createPhotosDir(photosDirPath: String) {
-        if (!File(photosDirPath)?.mkdirs()) {
-            Log.e(TAG, "Directory not created")
-        }
-    }
-
-    private fun clearPhotosDir(photosDirPath: String) {
-        val dir = File(photosDirPath)
-
-        if (dir.exists()) {
-            dir.delete()
-        }
-    }
-
-    private fun savePlacePhoto(photosDirPath: String, bitmap: Bitmap): File? {
-
-        val random = Random()
-        val filename = random.nextInt(999999).toString() + ".png"
-        val imgFile = File(photosDirPath, filename)
-
-        try {
-            val out = FileOutputStream(imgFile)
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
-            out.flush()
-            out.close()
-
-            return imgFile
-        } catch (e: Exception) {
-
-        }
-
-        return null
-    }
-
     private fun getPhotosOfNearbyPlaces(places: List<Place>) {
         Log.d(TAG, "getPhotosOfNearbyPlaces")
 
         if (places.isNotEmpty()) {
-            val photosDirPath = getPhotosDir()
+            val photosDirPath = AppUtils.getPhotosDir()
 
-            clearPhotosDir(photosDirPath)
+            AppUtils.clearPhotosDir(photosDirPath)
 
-            createPhotosDir(photosDirPath)
+            AppUtils.createPhotosDir(photosDirPath)
 
             val geoDataClient = Places.getGeoDataClient(context!!, null)
 
@@ -382,7 +339,7 @@ class NearbyPlacesFragment : BaseLocationFragment() {
                                             Log.d(TAG, "geoDataClient.getScaledPhoto#addOnCompleteListener")
 
                                             if (placePhotoResponse.isSuccessful) {
-                                                val imgFile = savePlacePhoto(photosDirPath, placePhotoResponse.result.bitmap)
+                                                val imgFile = AppUtils.savePlacePhoto(photosDirPath, placePhotoResponse.result.bitmap)
 
                                                 if (imgFile != null) {
                                                     Log.d(TAG, imgFile.absolutePath)
