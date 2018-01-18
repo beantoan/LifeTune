@@ -12,6 +12,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.github.mikephil.charting.charts.BarChart
+import com.github.mikephil.charting.components.Description
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
@@ -527,9 +528,6 @@ class MyActivitiesFragment : BaseFragment() {
         val dateFormat = DateFormat.getDateInstance(DateFormat.LONG)
         val dateTitle = dateFormat.format(fitnessCalendar.timeInMillis)
 
-        val bitmapPath = MediaStore.Images.Media.insertImage(activity!!.contentResolver, chart.chartBitmap, fileName, null)
-        val bitmapUri = Uri.parse(bitmapPath)
-
         val caption = when (fitnessType) {
             FitnessChartEntry.TYPE_CALORIES -> {
                 "I burned ${totalCalories.toInt()} calories on $dateTitle"
@@ -544,6 +542,14 @@ class MyActivitiesFragment : BaseFragment() {
             }
             else -> "My activities on $dateTitle"
         }
+
+        val desc = Description()
+        desc.text = caption
+        chart.description = desc
+
+        val bitmapPath = MediaStore.Images.Media.insertImage(activity!!.contentResolver, chart.chartBitmap, fileName, null)
+        val bitmapUri = Uri.parse(bitmapPath)
+
 
         val sendIntent = Intent()
         sendIntent.action = Intent.ACTION_SEND
