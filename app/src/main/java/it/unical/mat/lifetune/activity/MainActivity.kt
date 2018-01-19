@@ -122,9 +122,12 @@ class MainActivity :
     private fun checkFineLocationPermission() {
         Log.d(TAG, "checkFineLocationPermission")
 
-        if (!EasyPermissions.hasPermissions(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+        val perms = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BODY_SENSORS,
+                Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+
+        if (!EasyPermissions.hasPermissions(this, *perms)) {
             EasyPermissions.requestPermissions(this, getString(R.string.request_access_fine_location),
-                    ACCESS_FINE_LOCATION_REQUEST_CODE, Manifest.permission.ACCESS_FINE_LOCATION)
+                    ACCESS_FINE_LOCATION_REQUEST_CODE, *perms)
         }
     }
 
