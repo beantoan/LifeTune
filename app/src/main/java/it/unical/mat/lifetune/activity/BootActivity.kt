@@ -1,6 +1,7 @@
 package it.unical.mat.lifetune.activity
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.support.annotation.MainThread
 import android.support.annotation.StringRes
@@ -147,5 +148,12 @@ class BootActivity : AppCompatActivity() {
         private val GOOGLE_PRIVACY_POLICY_URL = "https://www.google.com/policies/privacy/"
 
         private val RC_SIGN_IN = 100
+
+        fun createIntent(context: Context): Intent {
+
+            val startIntent = Intent()
+
+            return startIntent.setClass(context, BootActivity::class.java)
+        }
     }
 }

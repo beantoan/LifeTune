@@ -21,7 +21,7 @@
     <item android:title="@string/nav_settings_title">
         <menu>
             <item
-                android:id="@+id/nav_send"
+                android:id="@+id/nav_logout"
                 android:title="@string/nav_logout_title" />
         </menu>
     </item>

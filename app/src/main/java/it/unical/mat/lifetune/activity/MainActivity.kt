@@ -63,6 +63,7 @@ class MainActivity :
             R.id.nav_play_music -> showPlayMusicFragment()
             R.id.nav_my_activities -> showMyActivitiesFragment()
             R.id.nav_nearby_places -> showNearbyPlacesFragment()
+            R.id.nav_logout -> logout()
         }
 
         drawer_layout.closeDrawer(GravityCompat.START)
@@ -299,6 +300,12 @@ class MainActivity :
 
             mDrawerToggle.syncState()
         }
+    }
+
+    private fun logout() {
+        FirebaseAuth.getInstance().signOut()
+
+        startActivity(BootActivity.createIntent(this))
     }
 
     companion object {
