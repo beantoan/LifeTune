@@ -6,5 +6,6 @@ package it.unical.mat.lifetune.entity
 data class RecommendationParameter(
         var countryCode: String? = null,
         var temp: Float? = null,
+        var weatherConditions: Int? = null,
         var activityType: Int? = null
 )

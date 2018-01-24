@@ -1,18 +1,1 @@
-[
-  {
-    "outputType": {
-      "type": "APK"
-    },
-    "apkInfo": {
-      "type": "MAIN",
-      "splits": [],
-      "versionCode": 1
-    },
-    "path": "app-develop-release.apk",
-    "properties": {
-      "packageId": "it.unical.mat.lifetune.dev",
-      "split": "",
-      "minSdkVersion": "17"
-    }
-  }
-]
+[{"outputType":{"type":"APK"},"apkInfo":{"type":"MAIN","splits":[],"versionCode":1},"path":"app-develop-release.apk","properties":{"packageId":"it.unical.mat.lifetune.dev","split":"","minSdkVersion":"17"}}]

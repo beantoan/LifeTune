@@ -4,6 +4,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import it.unical.mat.lifetune.api.ApiServiceFactory
 import it.unical.mat.lifetune.entity.Category
+import it.unical.mat.lifetune.entity.RecommendationParameter
 
 /**
  * Created by beantoan on 1/16/18.
@@ -15,8 +16,9 @@ class CategoryPresenter {
         recommendationCallbacks = callbacks
     }
 
-    fun callRecommendationApi(userId: String) {
-        ApiServiceFactory.createCategoryApi().recommendation(userId)
+    fun callRecommendationApi(userId: String, parameter: RecommendationParameter) {
+        ApiServiceFactory.createCategoryApi().recommendation(userId,
+                parameter.countryCode, parameter.temp, parameter.weatherConditions, parameter.activityType)
                 .subscribeOn(Schedulers.io()) // "work" on io thread
                 .observeOn(AndroidSchedulers.mainThread()) // "listen" on UIThread
                 .subscribe(

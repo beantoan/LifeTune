@@ -13,5 +13,9 @@ interface CategoryApiInterface {
     fun index(): Single<List<Category>>
 
     @GET("categories/recommendation.json")
-    fun recommendation(@Query("user_id") user_id: String): Single<List<Category>>
+    fun recommendation(@Query("user_id") user_id: String,
+                       @Query("country_code") countryCode: String?,
+                       @Query("temp") temp: Float?,
+                       @Query("weather_conditions") weatherConditions: Int?,
+                       @Query("activity_type") activityType: Int?): Single<List<Category>>
 }

@@ -251,10 +251,12 @@ class RecommendedMusicFragment : BaseMusicFragment() {
                             Log.d(TAG, "Awareness.getSnapshotClient#weather#addOnSuccessListener")
 
                             val temp = weatherResponse.weather.getFeelsLikeTemperature(2)
+                            val conditions = weatherResponse.weather.conditions.joinToString(",")
 
-                            Log.d(TAG, "temp = $temp")
+                            Log.d(TAG, "temp = $temp, conditions = $conditions")
 
                             recommendationParameter.temp = temp
+                            recommendationParameter.weatherConditions = weatherResponse.weather.conditions.first()
 
                             callRecommendationApi()
                         })

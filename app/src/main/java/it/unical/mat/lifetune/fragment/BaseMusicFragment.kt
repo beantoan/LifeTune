@@ -227,7 +227,7 @@ abstract class BaseMusicFragment :
 
             val userId = FirebaseAuth.getInstance().currentUser!!.uid
 
-            CategoryPresenter(ImplRecommendationCallbacks(this)).callRecommendationApi(userId)
+            CategoryPresenter(ImplRecommendationCallbacks(this)).callRecommendationApi(userId, recommendationParameter)
         } else {
             AppDialog.error(R.string.no_internet_error_title, R.string.no_internet_error_message, activity!!)
         }
